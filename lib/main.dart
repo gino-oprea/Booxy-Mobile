@@ -12,11 +12,19 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
       value: CompaniesProvider([]),
-      child: MaterialApp(
-        title: 'Booxy',
-        theme: ThemeData(
-            primarySwatch: Colors.green, accentColor: Colors.deepOrange),
-        home: CompanySearchScreen(),
+      child: GestureDetector(
+        onTap: () {
+          FocusScopeNode currentFocus = FocusScope.of(context);
+          if (!currentFocus.hasPrimaryFocus) {
+            currentFocus.unfocus();
+          }
+        },
+        child: MaterialApp(
+          title: 'Booxy',
+          theme: ThemeData(
+              primarySwatch: Colors.green, accentColor: Colors.deepOrange),
+          home: CompanySearchScreen(),
+        ),
       ),
     );
   }

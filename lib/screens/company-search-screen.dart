@@ -25,12 +25,7 @@ class _CompanySearchScreenState extends State<CompanySearchScreen> {
   Widget build(BuildContext context) {
     final companiesProvider = Provider.of<CompaniesProvider>(context);
 
-    return GestureDetector(
-      onTap: () {
-        FocusScope.of(context)
-            .unfocus(); //pentru problema cu textfieldul de sus care nu pierde focusul
-      },
-      child: Scaffold(
+    return Scaffold(
         appBar: AppBar(
           title: Container(
             height: 40,
@@ -72,8 +67,7 @@ class _CompanySearchScreenState extends State<CompanySearchScreen> {
               itemBuilder: (ctx, i) {
                 return Text(companiesProvider.companies[i].name);
               }),
-        ),
-      ),
+        ),      
     );
   }
 }
