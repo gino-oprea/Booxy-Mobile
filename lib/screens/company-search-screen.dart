@@ -27,8 +27,8 @@ class _CompanySearchScreenState extends State<CompanySearchScreen> {
 
     return GestureDetector(
       onTap: () {
-        FocusScope.of(context).requestFocus(
-            new FocusNode()); //pentru problema cu textfieldul de sus care nu pierde focusul
+        FocusScope.of(context)
+            .unfocus(); //pentru problema cu textfieldul de sus care nu pierde focusul
       },
       child: Scaffold(
         appBar: AppBar(
