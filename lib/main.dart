@@ -1,4 +1,7 @@
-import 'package:booxy/screens/company-details-screen.dart';
+import './screens/company-details-screen.dart';
+import './screens/my-account-screen.dart';
+import './screens/my-bookings-screen.dart';
+import './screens/my-companies-screen.dart';
 import 'package:provider/provider.dart';
 
 import './screens/company-search-screen.dart';
@@ -25,7 +28,13 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
               primarySwatch: Colors.green, accentColor: Colors.deepOrange),
           home: CompanySearchScreen(),
-          routes: {CompanyDetailsScreen.routeName: (ctx) => CompanyDetailsScreen()},
+          routes: {
+            CompanySearchScreen.routeName: (ctx) => CompanySearchScreen(),
+            CompanyDetailsScreen.routeName: (ctx) => CompanyDetailsScreen(),
+            MyAccountScreen.routeName: (ctx) => MyAccountScreen(),
+            MyBookingsScreen.routeName: (ctx) => MyBookingsScreen(),
+            MyCompaniesScreen.routeName: (ctx) => MyCompaniesScreen(),
+          },
         ),
       ),
     );

@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class CompanySearchScreen extends StatefulWidget {
+static const routeName = '/company-search';
+
   @override
   _CompanySearchScreenState createState() => _CompanySearchScreenState();
 }

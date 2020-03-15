@@ -1,3 +1,7 @@
+import 'package:booxy/screens/company-search-screen.dart';
+import 'package:booxy/screens/my-account-screen.dart';
+import 'package:booxy/screens/my-bookings-screen.dart';
+import 'package:booxy/screens/my-companies-screen.dart';
 import 'package:flutter/material.dart';
 
 class AppDrawer extends StatelessWidget {
@@ -11,16 +15,33 @@ class AppDrawer extends StatelessWidget {
             automaticallyImplyLeading: false,
           ),
           ListTile(
+            onTap: () {
+              Navigator.of(context).pushNamed(MyAccountScreen.routeName);
+            },
             leading: Icon(Icons.account_circle),
             title: Text('Contul meu'),
           ),
           Divider(),
           ListTile(
+            onTap: () {
+              Navigator.of(context).pushReplacementNamed('/');
+            },
+            leading: Icon(Icons.search),
+            title: Text('Cauta companii'),
+          ),
+          Divider(),
+          ListTile(
+            onTap: () {
+              Navigator.of(context).pushNamed(MyBookingsScreen.routeName);
+            },
             leading: Icon(Icons.access_time),
             title: Text('Programari'),
           ),
           Divider(),
           ListTile(
+            onTap: () {
+              Navigator.of(context).pushNamed(MyCompaniesScreen.routeName);
+            },
             leading: Icon(Icons.business),
             title: Text('Companiile mele'),
           ),
