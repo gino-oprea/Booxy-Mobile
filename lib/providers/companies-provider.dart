@@ -26,17 +26,18 @@ class CompaniesProvider with ChangeNotifier {
       return;
     }
 
-    final objList = extractedData["objList"];
-    objList.forEach((value) {
+    final List<dynamic> objList = extractedData["objList"];
+
+    for (int i = 0; i < objList.length; i++) {
+      var value = objList[i];
       var comp = new Company().fromJson(value);
 
-      getCompanyImages(comp).then((_) {
-        loadedCompanies.add(comp);
+      await getCompanyImages(comp);
+      loadedCompanies.add(comp);
+    }
 
-        _companies = loadedCompanies;
-        notifyListeners();
-      });
-    });
+    _companies = loadedCompanies;
+    notifyListeners();    
   }
 
   Future<void> getCompanyImages(Company comp) async {

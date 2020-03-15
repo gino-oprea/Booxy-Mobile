@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:booxy/widgets/company-list-item.dart';
+
 import '../providers/companies-provider.dart';
 import 'package:booxy/widgets/app-drawer.dart';
 import 'package:flutter/material.dart';
@@ -67,24 +69,7 @@ class _CompanySearchScreenState extends State<CompanySearchScreen> {
         child: ListView.builder(
             itemCount: companiesProvider.companies.length,
             itemBuilder: (ctx, i) {
-              return Card(
-                child: ListTile(
-                  leading: CircleAvatar(
-                    radius: 30.0,
-                    backgroundImage: companiesProvider
-                                .companies[i].image.length >
-                            0
-                        ? MemoryImage(base64Decode(
-                            companiesProvider.companies[i].image[0].img))
-                        : NetworkImage(
-                            'https://i.ya-webdesign.com/images/vector-buildings-logo-1.png'),
-                    backgroundColor: Colors.transparent,
-                  ),
-                  title: Text(companiesProvider.companies[i].name),
-                  subtitle: Text(companiesProvider.companies[i].address),
-                  isThreeLine: true,
-                ),
-              );
+              return CompanyListItem(companiesProvider.companies[i]);
             }),
       ),
     );
