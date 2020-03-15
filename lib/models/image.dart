@@ -1,8 +1,17 @@
-class Image {
-  final int id;
-  final int idParent;
-  final String img;
-  final bool isDefaultImage;
+class BooxyImage {
+  int id;
+  int idParent;
+  String img;
+  bool isDefaultImage;
 
-  Image({this.id, this.idParent, this.img, this.isDefaultImage});
+  BooxyImage({this.id, this.idParent, this.img, this.isDefaultImage});
+
+  BooxyImage fromJson(Map json) {
+    this.id = json['id'];
+    this.idParent = json['idParent'];
+    this.img = json['img'];
+    this.isDefaultImage = json['isDefaultImage'];
+
+    return this;
+  }
 }

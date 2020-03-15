@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import '../providers/companies-provider.dart';
 import 'package:booxy/widgets/app-drawer.dart';
 import 'package:flutter/material.dart';
@@ -26,48 +28,65 @@ class _CompanySearchScreenState extends State<CompanySearchScreen> {
     final companiesProvider = Provider.of<CompaniesProvider>(context);
 
     return Scaffold(
-        appBar: AppBar(
-          title: Container(
-            height: 40,
-            margin: EdgeInsets.symmetric(vertical: 5),
-            child: TextField(
-              maxLines: 1,
-              decoration: InputDecoration(
-                border: new OutlineInputBorder(
-                  borderRadius: const BorderRadius.all(
-                    const Radius.circular(10.0),
-                  ),
-                  borderSide: BorderSide(
-                    width: 0,
-                    style: BorderStyle.none,
-                  ),
+      appBar: AppBar(
+        title: Container(
+          height: 40,
+          margin: EdgeInsets.symmetric(vertical: 5),
+          child: TextField(
+            maxLines: 1,
+            decoration: InputDecoration(
+              border: new OutlineInputBorder(
+                borderRadius: const BorderRadius.all(
+                  const Radius.circular(10.0),
                 ),
-                prefixIcon: Icon(Icons.search),
-                hintText: 'Cauta companie',
-                fillColor: Colors.white,
-                filled: true,
-                contentPadding: EdgeInsets.symmetric(vertical: 1),
+                borderSide: BorderSide(
+                  width: 0,
+                  style: BorderStyle.none,
+                ),
               ),
+              prefixIcon: Icon(Icons.search),
+              hintText: 'Cauta companie',
+              fillColor: Colors.white,
+              filled: true,
+              contentPadding: EdgeInsets.symmetric(vertical: 1),
             ),
           ),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(
-                Icons.filter_list,
-                color: Colors.white,
-              ),
-              onPressed: null,
-            )
-          ],
         ),
-        drawer: AppDrawer(),
-        body: Container(
-          child: ListView.builder(
-              itemCount: companiesProvider.companies.length,
-              itemBuilder: (ctx, i) {
-                return Text(companiesProvider.companies[i].name);
-              }),
-        ),      
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(
+              Icons.filter_list,
+              color: Colors.white,
+            ),
+            onPressed: null,
+          )
+        ],
+      ),
+      drawer: AppDrawer(),
+      body: Container(
+        child: ListView.builder(
+            itemCount: companiesProvider.companies.length,
+            itemBuilder: (ctx, i) {
+              return Card(
+                child: ListTile(
+                  leading: CircleAvatar(
+                    radius: 30.0,
+                    backgroundImage: companiesProvider
+                                .companies[i].image.length >
+                            0
+                        ? MemoryImage(base64Decode(
+                            companiesProvider.companies[i].image[0].img))
+                        : NetworkImage(
+                            'https://i.ya-webdesign.com/images/vector-buildings-logo-1.png'),
+                    backgroundColor: Colors.transparent,
+                  ),
+                  title: Text(companiesProvider.companies[i].name),
+                  subtitle: Text(companiesProvider.companies[i].address),
+                  isThreeLine: true,
+                ),
+              );
+            }),
+      ),
     );
   }
 }
