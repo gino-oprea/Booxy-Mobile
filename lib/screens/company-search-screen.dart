@@ -1,14 +1,16 @@
-import 'dart:convert';
+import '../models/company-filter.dart';
 
-import 'package:booxy/widgets/company-list-item.dart';
+import './company-filters-screen.dart';
+
+import '../widgets/company-list-item.dart';
 
 import '../providers/companies-provider.dart';
-import 'package:booxy/widgets/app-drawer.dart';
+import '../widgets/app-drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class CompanySearchScreen extends StatefulWidget {
-static const routeName = '/company-search';
+  static const routeName = '/company-search';
 
   @override
   _CompanySearchScreenState createState() => _CompanySearchScreenState();
@@ -16,15 +18,44 @@ static const routeName = '/company-search';
 
 class _CompanySearchScreenState extends State<CompanySearchScreen> {
   var _isInit = true;
+  var _isLoading = false;
+
+  final _companyNameController = TextEditingController();
 
   @override
   void didChangeDependencies() {
     if (_isInit) {
-      Provider.of<CompaniesProvider>(context).getCompanies();
+      setState(() {
+        _isLoading = true;
+      });
+      Provider.of<CompaniesProvider>(context).getCompanies().then((_) {
+        setState(() {
+          _isLoading = false;
+        });
+      });
     }
     _isInit = false;
 
     super.didChangeDependencies();
+  }
+
+  void _onSearchCompany(String companyName) {
+    Provider.of<CompaniesProvider>(context)
+        .getCompanies(_companyNameController.text);
+  }
+
+  Future<void> _onRefresh(BuildContext ctx) async {
+    await Provider.of<CompaniesProvider>(ctx)
+        .getCompanies(_companyNameController.text);
+  }
+
+  void _setAdvancedFilters(CompanyFilter filter) {
+    Provider.of<CompaniesProvider>(context).getCompanies(
+        _companyNameController.text,
+        filter.idCategory,
+        filter.idSubCategory,
+        filter.idCounty,
+        filter.idCity);
   }
 
   @override
@@ -37,6 +68,9 @@ class _CompanySearchScreenState extends State<CompanySearchScreen> {
           height: 40,
           margin: EdgeInsets.symmetric(vertical: 5),
           child: TextField(
+            textInputAction: TextInputAction.search,
+            controller: _companyNameController,
+            onSubmitted: _onSearchCompany,
             maxLines: 1,
             decoration: InputDecoration(
               border: new OutlineInputBorder(
@@ -62,18 +96,31 @@ class _CompanySearchScreenState extends State<CompanySearchScreen> {
               Icons.filter_list,
               color: Colors.white,
             ),
-            onPressed: null,
+            onPressed: () {
+              Navigator.of(context)
+                  .pushNamed(CompanyFiltersScreen.routeName)
+                  .then((flt) {
+                _setAdvancedFilters(flt);
+              });
+            },
           )
         ],
       ),
       drawer: AppDrawer(),
-      body: Container(
-        child: ListView.builder(
-            itemCount: companiesProvider.companies.length,
-            itemBuilder: (ctx, i) {
-              return CompanyListItem(companiesProvider.companies[i]);
-            }),
-      ),
+      body: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : RefreshIndicator(
+              onRefresh: () => _onRefresh(context),
+              child: Container(
+                child: ListView.builder(
+                    itemCount: companiesProvider.companies.length,
+                    itemBuilder: (ctx, i) {
+                      return CompanyListItem(companiesProvider.companies[i]);
+                    }),
+              ),
+            ),
     );
   }
 }

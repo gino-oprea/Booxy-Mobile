@@ -1,3 +1,5 @@
+import 'package:booxy/screens/company-filters-screen.dart';
+
 import './screens/company-details-screen.dart';
 import './screens/my-account-screen.dart';
 import './screens/my-bookings-screen.dart';
@@ -34,6 +36,7 @@ class MyApp extends StatelessWidget {
             MyAccountScreen.routeName: (ctx) => MyAccountScreen(),
             MyBookingsScreen.routeName: (ctx) => MyBookingsScreen(),
             MyCompaniesScreen.routeName: (ctx) => MyCompaniesScreen(),
+            CompanyFiltersScreen.routeName: (ctx) => CompanyFiltersScreen(),
           },
         ),
       ),

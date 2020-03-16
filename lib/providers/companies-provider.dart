@@ -15,9 +15,14 @@ class CompaniesProvider with ChangeNotifier {
     return _companies;
   }
 
-  Future<void> getCompanies() async {
+  Future<void> getCompanies(
+      [String companyName = '',
+      int idCategory,
+      int idSubcategory,
+      int idCounty,
+      int idCity]) async {
     final url = BooxyConfig.api_endpoint +
-        'CompanyFront?id=null&name=&idCategory=null&idSubcategory=null&idCountry=null&idCounty=null&idCity=null';
+        'CompanyFront?id=null&name=$companyName&idCategory=$idCategory&idSubcategory=$idSubcategory&idCountry=null&idCounty=$idCounty&idCity=$idCity';
     final response = await http.get(url);
     final List<Company> loadedCompanies = [];
     final extractedData = json.decode(response.body) as Map<String, dynamic>;
@@ -35,9 +40,9 @@ class CompaniesProvider with ChangeNotifier {
       await getCompanyImages(comp);
       loadedCompanies.add(comp);
     }
-
+    
     _companies = loadedCompanies;
-    notifyListeners();    
+    notifyListeners();
   }
 
   Future<void> getCompanyImages(Company comp) async {
