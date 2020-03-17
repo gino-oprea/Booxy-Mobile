@@ -1,5 +1,7 @@
+import '../providers/categories-provider.dart';
+import 'package:provider/provider.dart';
+import '../providers/company-location-provider.dart';
 import '../models/company-filter.dart';
-
 import '../models/city.dart';
 import '../models/generic-dictionary-item.dart';
 import '../models/county.dart';
@@ -13,36 +15,59 @@ class CompanyFiltersScreen extends StatefulWidget {
 }
 
 class _CompanyFiltersScreenState extends State<CompanyFiltersScreen> {
+  bool _isInit = true;
+
   County _selectedCounty;
   City _selectedCity;
   GenericDictionaryItem _selectedCategory;
   GenericDictionaryItem _selectedSubCategory;
 
-  List<County> _counties = [
-    County(id: 1, code: 'B', idCountry: 1, name: 'Bucuresti'),
-    County(id: 2, code: 'AG', idCountry: 1, name: 'Arges'),
-    County(id: 3, code: 'BR', idCountry: 1, name: 'Brasov'),
-    County(id: 4, code: 'CT', idCountry: 1, name: 'Constanta'),
-  ];
+  bool _useRouteArgs = true;
 
-  List<City> _cities = [
-    City(id: 1, name: 'Bucuresti'),
-    City(id: 2, name: 'Pitesti'),
-    City(id: 3, name: 'Arad'),
-    City(id: 4, name: 'Giurgiu'),
-  ];
+  @override
+  void initState() {
+    super.initState();
+  }
 
-  List<GenericDictionaryItem> _categories = [
-    GenericDictionaryItem(id: 1, value_RO: 'Altele'),
-    GenericDictionaryItem(id: 2, value_RO: 'Frumusete'),
-    GenericDictionaryItem(id: 3, value_RO: 'Sanatate'),
-  ];
+  @override
+  void didChangeDependencies() {
+    if (_isInit) {
+      Provider.of<CompanyLocationProvider>(context).getCounties().then((_) {
+        Provider.of<CategoriesProvider>(context).getCategories().then((_) {
+          _getFilterFromArgs(context);
+        });
+      });
+    }
+    _isInit = false;
 
-  List<GenericDictionaryItem> _subCategories = [
-    GenericDictionaryItem(id: 1, value_RO: 'Altele'),
-    GenericDictionaryItem(id: 2, value_RO: 'Cosmetica'),
-    GenericDictionaryItem(id: 3, value_RO: 'HairStyle'),
-  ];
+    super.didChangeDependencies();
+  }
+
+  // List<County> _counties = [
+  //   County(id: 1, code: 'B', idCountry: 1, name: 'Bucuresti'),
+  //   County(id: 2, code: 'AG', idCountry: 1, name: 'Arges'),
+  //   County(id: 3, code: 'BR', idCountry: 1, name: 'Brasov'),
+  //   County(id: 4, code: 'CT', idCountry: 1, name: 'Constanta'),
+  // ];
+
+  // List<City> _cities = [
+  //   City(id: 1, name: 'Bucuresti'),
+  //   City(id: 2, name: 'Pitesti'),
+  //   City(id: 3, name: 'Arad'),
+  //   City(id: 4, name: 'Giurgiu'),
+  // ];
+
+  // List<GenericDictionaryItem> _categories = [
+  //   GenericDictionaryItem(id: 1, value_RO: 'Altele'),
+  //   GenericDictionaryItem(id: 2, value_RO: 'Frumusete'),
+  //   GenericDictionaryItem(id: 3, value_RO: 'Sanatate'),
+  // ];
+
+  // List<GenericDictionaryItem> _subCategories = [
+  //   GenericDictionaryItem(id: 1, value_RO: 'Altele'),
+  //   GenericDictionaryItem(id: 2, value_RO: 'Cosmetica'),
+  //   GenericDictionaryItem(id: 3, value_RO: 'HairStyle'),
+  // ];
 
   CompanyFilter _getFilter() {
     return CompanyFilter(
@@ -52,6 +77,26 @@ class _CompanyFiltersScreenState extends State<CompanyFiltersScreen> {
         idCategory: _selectedCategory != null ? _selectedCategory.id : null,
         idSubCategory:
             _selectedSubCategory != null ? _selectedSubCategory.id : null);
+  }
+
+  void _getFilterFromArgs(BuildContext context) {
+    var routeArgs = ModalRoute.of(context).settings.arguments as CompanyFilter;
+
+    if (routeArgs != null) {
+      _selectedCounty = Provider.of<CompanyLocationProvider>(context)
+          .counties
+          .firstWhere((c) => c.id == routeArgs.idCounty, orElse: () => null);
+      _selectedCity = Provider.of<CompanyLocationProvider>(context)
+          .cities
+          .firstWhere((c) => c.id == routeArgs.idCity, orElse: () => null);
+      _selectedCategory = Provider.of<CategoriesProvider>(context)
+          .categories
+          .firstWhere((c) => c.id == routeArgs.idCategory, orElse: () => null);
+      _selectedSubCategory = Provider.of<CategoriesProvider>(context)
+          .subCategories
+          .firstWhere((c) => c.id == routeArgs.idSubCategory,
+              orElse: () => null);
+    }
   }
 
   bool _filterExists() {
@@ -65,16 +110,19 @@ class _CompanyFiltersScreenState extends State<CompanyFiltersScreen> {
   }
 
   void _clearFilters() {
-    setState(() {
-      _selectedCounty = null;
-      _selectedCity = null;
-      _selectedCategory = null;
-      _selectedSubCategory = null;
-    });
+    _selectedCounty = null;
+    _selectedCity = null;
+    _selectedCategory = null;
+    _selectedSubCategory = null;
   }
 
   @override
   Widget build(BuildContext context) {
+    final companyLocationProvider =
+        Provider.of<CompanyLocationProvider>(context);
+
+    final categoriesProvider = Provider.of<CategoriesProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Filtre companie'),
@@ -97,7 +145,7 @@ class _CompanyFiltersScreenState extends State<CompanyFiltersScreen> {
                       ),
                       hint: Text('Judet'),
                       value: _selectedCounty,
-                      items: _counties.map((county) {
+                      items: companyLocationProvider.counties.map((county) {
                         return new DropdownMenuItem<County>(
                           value: county,
                           child: new Text(county.name),
@@ -106,6 +154,7 @@ class _CompanyFiltersScreenState extends State<CompanyFiltersScreen> {
                       onChanged: (County newValue) {
                         setState(() {
                           _selectedCounty = newValue;
+                          companyLocationProvider.getCities(_selectedCounty.id);
                         });
                       },
                     ),
@@ -121,7 +170,7 @@ class _CompanyFiltersScreenState extends State<CompanyFiltersScreen> {
                       ),
                       hint: Text('Localitate'),
                       value: _selectedCity,
-                      items: _cities.map((city) {
+                      items: companyLocationProvider.cities.map((city) {
                         return new DropdownMenuItem<City>(
                           value: city,
                           child: new Text(city.name),
@@ -145,7 +194,7 @@ class _CompanyFiltersScreenState extends State<CompanyFiltersScreen> {
                       ),
                       hint: Text('Categorie'),
                       value: _selectedCategory,
-                      items: _categories.map((category) {
+                      items: categoriesProvider.categories.map((category) {
                         return new DropdownMenuItem<GenericDictionaryItem>(
                           value: category,
                           child: new Text(category.value_RO),
@@ -154,6 +203,8 @@ class _CompanyFiltersScreenState extends State<CompanyFiltersScreen> {
                       onChanged: (GenericDictionaryItem newValue) {
                         setState(() {
                           _selectedCategory = newValue;
+                          categoriesProvider
+                              .getSubcategories(_selectedCategory.id);
                         });
                       },
                     ),
@@ -169,7 +220,8 @@ class _CompanyFiltersScreenState extends State<CompanyFiltersScreen> {
                       ),
                       hint: Text('Subcategorie'),
                       value: _selectedSubCategory,
-                      items: _subCategories.map((subcategory) {
+                      items:
+                          categoriesProvider.subCategories.map((subcategory) {
                         return new DropdownMenuItem<GenericDictionaryItem>(
                           value: subcategory,
                           child: new Text(subcategory.value_RO),
@@ -205,17 +257,19 @@ class _CompanyFiltersScreenState extends State<CompanyFiltersScreen> {
                   color: Theme.of(context).accentColor,
                   textColor: Colors.white,
                 ),
-                if(_filterExists()) RaisedButton.icon(
-                  onPressed: () {
-                    _clearFilters();
-                  },
-                  icon: Icon(Icons.refresh),
-                  label: Text('Sterge filtre'),
-                  elevation: 1,
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  color: Theme.of(context).accentColor,
-                  textColor: Colors.white,
-                ),
+                if (_filterExists())
+                  RaisedButton.icon(
+                    onPressed: () {
+                      _clearFilters();
+                      Navigator.of(context).pop<CompanyFilter>(_getFilter());
+                    },
+                    icon: Icon(Icons.refresh),
+                    label: Text('Sterge filtre'),
+                    elevation: 1,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    color: Theme.of(context).accentColor,
+                    textColor: Colors.white,
+                  ),
               ],
             ),
           ),

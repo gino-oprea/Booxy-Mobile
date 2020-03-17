@@ -1,11 +1,12 @@
-import 'package:booxy/screens/company-filters-screen.dart';
+import './providers/categories-provider.dart';
 
+import './providers/company-location-provider.dart';
+import './screens/company-filters-screen.dart';
 import './screens/company-details-screen.dart';
 import './screens/my-account-screen.dart';
 import './screens/my-bookings-screen.dart';
 import './screens/my-companies-screen.dart';
 import 'package:provider/provider.dart';
-
 import './screens/company-search-screen.dart';
 import 'package:flutter/material.dart';
 import './providers/companies-provider.dart';
@@ -17,7 +18,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [ChangeNotifierProvider.value(value: CompaniesProvider([]))],
+      providers: [
+        ChangeNotifierProvider.value(value: CompaniesProvider([])),
+        ChangeNotifierProvider.value(value: CompanyLocationProvider([],[])),
+        ChangeNotifierProvider.value(value: CategoriesProvider([],[])),
+        ],
       child: GestureDetector(
         onTap: () {
           FocusScopeNode currentFocus = FocusScope.of(context);

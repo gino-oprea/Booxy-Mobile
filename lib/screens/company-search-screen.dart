@@ -19,6 +19,7 @@ class CompanySearchScreen extends StatefulWidget {
 class _CompanySearchScreenState extends State<CompanySearchScreen> {
   var _isInit = true;
   var _isLoading = false;
+  CompanyFilter _advancedFilter = null;
 
   final _companyNameController = TextEditingController();
 
@@ -50,6 +51,18 @@ class _CompanySearchScreenState extends State<CompanySearchScreen> {
   }
 
   void _setAdvancedFilters(CompanyFilter filter) {
+    if (filter.idCounty == null &&
+        filter.idCity == null &&
+        filter.idCategory == null &&
+        filter.idSubCategory == null)
+      this._advancedFilter = null;
+    else
+      this._advancedFilter = CompanyFilter(
+          idCounty: filter.idCounty,
+          idCity: filter.idCity,
+          idCategory: filter.idCategory,
+          idSubCategory: filter.idSubCategory);
+
     Provider.of<CompaniesProvider>(context).getCompanies(
         _companyNameController.text,
         filter.idCategory,
@@ -98,7 +111,8 @@ class _CompanySearchScreenState extends State<CompanySearchScreen> {
             ),
             onPressed: () {
               Navigator.of(context)
-                  .pushNamed(CompanyFiltersScreen.routeName)
+                  .pushNamed(CompanyFiltersScreen.routeName,
+                      arguments: _advancedFilter)
                   .then((flt) {
                 _setAdvancedFilters(flt);
               });

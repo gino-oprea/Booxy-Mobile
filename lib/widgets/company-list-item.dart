@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:booxy/models/company.dart';
-import 'package:booxy/screens/company-details-screen.dart';
+import '../models/company.dart';
+import '../screens/company-details-screen.dart';
 import 'package:flutter/material.dart';
 
 class CompanyListItem extends StatelessWidget {
