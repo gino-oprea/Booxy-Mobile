@@ -41,13 +41,29 @@ class _CompanySearchScreenState extends State<CompanySearchScreen> {
   }
 
   void _onSearchCompany(String companyName) {
-    Provider.of<CompaniesProvider>(context)
-        .getCompanies(_companyNameController.text);
+    if (_advancedFilter == null)
+      Provider.of<CompaniesProvider>(context)
+          .getCompanies(_companyNameController.text);
+    else
+      Provider.of<CompaniesProvider>(context).getCompanies(
+          _companyNameController.text,
+          _advancedFilter.idCategory,
+          _advancedFilter.idSubCategory,
+          _advancedFilter.idCounty,
+          _advancedFilter.idCity);
   }
 
   Future<void> _onRefresh(BuildContext ctx) async {
-    await Provider.of<CompaniesProvider>(ctx)
-        .getCompanies(_companyNameController.text);
+    if (_advancedFilter == null)
+      await Provider.of<CompaniesProvider>(ctx)
+          .getCompanies(_companyNameController.text);
+    else
+      Provider.of<CompaniesProvider>(context).getCompanies(
+          _companyNameController.text,
+          _advancedFilter.idCategory,
+          _advancedFilter.idSubCategory,
+          _advancedFilter.idCounty,
+          _advancedFilter.idCity);
   }
 
   void _setAdvancedFilters(CompanyFilter filter) {

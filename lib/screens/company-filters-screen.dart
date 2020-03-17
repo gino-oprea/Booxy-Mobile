@@ -32,8 +32,12 @@ class _CompanyFiltersScreenState extends State<CompanyFiltersScreen> {
   @override
   void didChangeDependencies() {
     if (_isInit) {
-      Provider.of<CompanyLocationProvider>(context).getCounties().then((_) {
-        Provider.of<CategoriesProvider>(context).getCategories().then((_) {
+      Provider.of<CompanyLocationProvider>(context, listen: false)
+          .getCounties()
+          .then((_) {
+        Provider.of<CategoriesProvider>(context, listen: false)
+            .getCategories()
+            .then((_) {
           _getFilterFromArgs(context);
         });
       });
@@ -42,32 +46,6 @@ class _CompanyFiltersScreenState extends State<CompanyFiltersScreen> {
 
     super.didChangeDependencies();
   }
-
-  // List<County> _counties = [
-  //   County(id: 1, code: 'B', idCountry: 1, name: 'Bucuresti'),
-  //   County(id: 2, code: 'AG', idCountry: 1, name: 'Arges'),
-  //   County(id: 3, code: 'BR', idCountry: 1, name: 'Brasov'),
-  //   County(id: 4, code: 'CT', idCountry: 1, name: 'Constanta'),
-  // ];
-
-  // List<City> _cities = [
-  //   City(id: 1, name: 'Bucuresti'),
-  //   City(id: 2, name: 'Pitesti'),
-  //   City(id: 3, name: 'Arad'),
-  //   City(id: 4, name: 'Giurgiu'),
-  // ];
-
-  // List<GenericDictionaryItem> _categories = [
-  //   GenericDictionaryItem(id: 1, value_RO: 'Altele'),
-  //   GenericDictionaryItem(id: 2, value_RO: 'Frumusete'),
-  //   GenericDictionaryItem(id: 3, value_RO: 'Sanatate'),
-  // ];
-
-  // List<GenericDictionaryItem> _subCategories = [
-  //   GenericDictionaryItem(id: 1, value_RO: 'Altele'),
-  //   GenericDictionaryItem(id: 2, value_RO: 'Cosmetica'),
-  //   GenericDictionaryItem(id: 3, value_RO: 'HairStyle'),
-  // ];
 
   CompanyFilter _getFilter() {
     return CompanyFilter(
