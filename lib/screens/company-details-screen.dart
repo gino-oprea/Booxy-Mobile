@@ -1,6 +1,6 @@
 import 'dart:convert';
+import './company-booking-screen.dart';
 import '../providers/working-hours-provider.dart';
-
 import '../models/working-hours.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../models/company.dart';
@@ -244,7 +244,9 @@ class CompanyDetailsScreen extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.of(context).pushNamed(CompanyBookingScreen.routeName);
+        },
         label: Text('Programeaza acum'),
         icon: Icon(Icons.thumb_up),
       ),

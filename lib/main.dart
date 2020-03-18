@@ -1,5 +1,5 @@
+import './screens/company-booking-screen.dart';
 import './providers/categories-provider.dart';
-
 import './providers/company-location-provider.dart';
 import './screens/company-filters-screen.dart';
 import './screens/company-details-screen.dart';
@@ -42,6 +42,7 @@ class MyApp extends StatelessWidget {
             MyBookingsScreen.routeName: (ctx) => MyBookingsScreen(),
             MyCompaniesScreen.routeName: (ctx) => MyCompaniesScreen(),
             CompanyFiltersScreen.routeName: (ctx) => CompanyFiltersScreen(),
+            CompanyBookingScreen.routeName: (ctx) => CompanyBookingScreen(),
           },
         ),
       ),
