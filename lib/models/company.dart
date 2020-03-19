@@ -1,4 +1,4 @@
-import './image.dart';
+import './booxy-image.dart';
 
 class Company {
   int id;

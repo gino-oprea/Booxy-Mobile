@@ -1,7 +1,7 @@
 import 'package:booxy/config/booxy-config.dart';
 
 import '../models/company.dart';
-import '../models/image.dart';
+import '../models/booxy-image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
