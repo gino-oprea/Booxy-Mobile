@@ -1,5 +1,11 @@
 import 'dart:convert';
 
+import '../providers/booking-provider.dart';
+
+import '../models/level-as-filter.dart';
+
+import '../models/company.dart';
+
 import '../models/booking-entity.dart';
 
 import '../models/booking.dart';
@@ -15,6 +21,9 @@ class CompanyBookingScreen extends StatefulWidget {
 
 class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
   DateTime _pickedDate = DateTime.now();
+  bool _isInit = true;
+  Company _company;
+  List<LevelAsFilter> _levels;
 
   final _ent2FocusNode = FocusNode();
   final _firstNameFocusNode = FocusNode();
@@ -86,6 +95,32 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
     ];
 
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    if (_isInit) {
+      this._company = ModalRoute.of(context).settings.arguments as Company;
+      var weekDates = [
+        '2020-03-23',
+        '2020-03-24',
+        '2020-03-25',
+        '2020-03-26',
+        '2020-03-27',
+        '2020-03-28',
+        '2020-03-29'
+      ];
+      BookingProvider()
+          .getLevelsAsFilters(this._company.id, weekDates)
+          .then((result) {
+        setState(() {
+          this._levels = result;
+        });
+      });
+    }
+    _isInit = false;
+
+    super.didChangeDependencies();
   }
 
   void saveForm() {

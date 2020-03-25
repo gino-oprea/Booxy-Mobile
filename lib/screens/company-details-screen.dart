@@ -245,7 +245,8 @@ class CompanyDetailsScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          Navigator.of(context).pushNamed(CompanyBookingScreen.routeName);
+          Navigator.of(context)
+              .pushNamed(CompanyBookingScreen.routeName, arguments: company);
         },
         label: Text('Programeaza acum'),
         icon: Icon(Icons.thumb_up),
