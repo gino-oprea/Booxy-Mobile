@@ -1,17 +1,17 @@
 import 'dart:convert';
+import '../models/entities-link.dart';
 
-import '../models/booxy-image.dart';
-import '../models/selected-entity-per-level.dart';
 import '../helpers/dates-helper.dart';
 import '../providers/booking-provider.dart';
 import '../models/level-as-filter.dart';
 import '../models/company.dart';
-import '../models/booking-entity.dart';
+
 import '../models/booking.dart';
 import '../models/entity.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../providers/booxy-image-provider.dart';
+import '../providers/level-linking-provider.dart';
 
 class CompanyBookingScreen extends StatefulWidget {
   static const String routeName = '/company-booking';
@@ -26,6 +26,7 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
   Company _company;
   List<LevelAsFilter> _levels;
   List<LevelAsFilter> _filteredLevels;
+  List<List<Entity>> allEntityCombinations = [];
 
   final _firstNameFocusNode = FocusNode();
   final _lastNameFocusNode = FocusNode();
@@ -64,11 +65,20 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
       this._company = ModalRoute.of(context).settings.arguments as Company;
       var weekDates = DatesHelper.getWeekDates(_pickedDate);
 
-      BookingProvider()
-          .getLevelsAsFilters(this._company.id, weekDates)
-          .then((result) {
+      Future.wait([
+        BookingProvider().getLevelsAsFilters(this._company.id, weekDates),
+        LevelLinkingProvider().getEntitiesLinking(null, this._company.id)
+      ]).then((results) {
         setState(() {
-          this._levels = result;
+          this._levels = results[0];
+
+          addChildEntityIdsToParentEntities(results[1]);
+          List<Entity> firstLevelEntities =
+              this._levels.firstWhere((l) => l.orderIndex == 1).entities;
+          List<Entity> currentCombination = [];
+          this.getAllLinkedEntitiesCombinations(firstLevelEntities,
+              currentCombination, this.allEntityCombinations);
+
           this._filteredLevels = [];
           this._levels.forEach((l) {
             this._filteredLevels.add(new LevelAsFilter().clone(l));
@@ -79,6 +89,53 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
     _isInit = false;
 
     super.didChangeDependencies();
+  }
+
+  void addChildEntityIdsToParentEntities(List<EntitiesLink> entityLinks) {
+    this._levels.forEach((l) {
+      l.entities.forEach((e) {
+        entityLinks.forEach((el) {
+          if (e.childEntityIds == null) e.childEntityIds = [];
+          if (e.id == el.idParentEntity) e.childEntityIds.add(el.idChildEntity);
+        });
+      });
+    });
+  }
+
+  void getAllLinkedEntitiesCombinations(List<Entity> currentEntities,
+      List<Entity> currentCombination, List<List<Entity>> resultCombinations) {
+    for (var i = 0; i < currentEntities.length; i++) {
+      var currentEntity = currentEntities[i];
+      currentCombination.add(currentEntity);
+
+      if (currentEntity.childEntityIds != null &&
+          currentEntity.childEntityIds.length > 0) {
+        var childEntities = this.getEntitiesByIds(currentEntity.childEntityIds);
+        this.getAllLinkedEntitiesCombinations(
+            childEntities, currentCombination, resultCombinations);
+      } else {
+        ////copy id list
+        List<Entity> tempEntList = [];
+        currentCombination.forEach((e) {
+          tempEntList.add(e);
+        });
+        resultCombinations.add(tempEntList);
+      }
+      currentCombination.removeAt(currentCombination.length -
+          1); //backtracking cu un pas mai sus pe combinatia gasita ca sa sare pe copilul urmator
+    }
+  }
+
+  List<Entity> getEntitiesByIds(List<int> entityIds) {
+    List<Entity> resultEntities = [];
+    entityIds.forEach((ei) {
+      this._levels.forEach((l) {
+        l.entities.forEach((e) {
+          if (ei == e.id) resultEntities.add(e);
+        });
+      });
+    });
+    return resultEntities;
   }
 
   void saveForm() {
@@ -112,6 +169,21 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
         'https://i.ya-webdesign.com/images/vector-buildings-logo-1.png');
   }
 
+  void onEntityChange(Entity newValue, LevelAsFilter level) {
+    var selectedEnt = _selectedEntities.firstWhere((e) => e.idLevel == level.id,
+        orElse: () => null);
+    if (selectedEnt != null) {
+      _selectedEntities.removeAt(_selectedEntities.indexOf(selectedEnt));
+    }
+
+    BooxyImageProvider().getEntityImage(newValue.id).then((img) {
+      setState(() {
+        if (img != null) newValue.images = [img];
+        _selectedEntities.add(newValue);
+      });
+    });
+  }
+
   List<Widget> generateEntitiesDdls() {
     List<Widget> wdgs = [];
 
@@ -141,20 +213,7 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
                       : null;
                 },
                 onChanged: (Entity newValue) {
-                  var selectedEnt = _selectedEntities.firstWhere(
-                      (e) => e.idLevel == level.id,
-                      orElse: () => null);
-                  if (selectedEnt != null) {
-                    _selectedEntities
-                        .removeAt(_selectedEntities.indexOf(selectedEnt));
-                  }
-
-                  BooxyImageProvider().getEntityImage(newValue.id).then((img) {
-                    setState(() {
-                      if (img != null) newValue.images = [img];
-                      _selectedEntities.add(newValue);
-                    });
-                  });
+                  onEntityChange(newValue, level);
                 },
                 onSaved: (value) {
                   //this._editedBooking.entities.add(value);
