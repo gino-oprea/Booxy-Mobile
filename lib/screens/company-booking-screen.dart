@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import '../models/booxy-image.dart';
 import '../models/selected-entity-per-level.dart';
 import '../helpers/dates-helper.dart';
 import '../providers/booking-provider.dart';
@@ -8,6 +11,7 @@ import '../models/booking.dart';
 import '../models/entity.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../providers/booxy-image-provider.dart';
 
 class CompanyBookingScreen extends StatefulWidget {
   static const String routeName = '/company-booking';
@@ -97,6 +101,17 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
     return list;
   }
 
+  Image getEntityImageForDdl(LevelAsFilter level) {
+    var selectedEnt = _selectedEntities.firstWhere((e) => e.idLevel == level.id,
+        orElse: () => null);
+    if (selectedEnt != null) {
+      if (selectedEnt.images != null)
+        return Image.memory(base64Decode(selectedEnt.images[0].img));
+    }
+    return Image.network(
+        'https://i.ya-webdesign.com/images/vector-buildings-logo-1.png');
+  }
+
   List<Widget> generateEntitiesDdls() {
     List<Widget> wdgs = [];
 
@@ -113,28 +128,34 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
                       borderSide:
                           BorderSide(color: Theme.of(context).accentColor)),
                 ),
-                
                 value: _selectedEntities.firstWhere(
                     (e) => e.idLevel == level.id,
                     orElse: () => null),
                 items: getDdlEntities(level),
                 validator: (_) {
                   return _selectedEntities.firstWhere(
-                    (e) => e.idLevel == level.id,
-                    orElse: () => null) == null ? 'camp obligatoriu' : null;
+                              (e) => e.idLevel == level.id,
+                              orElse: () => null) ==
+                          null
+                      ? 'camp obligatoriu'
+                      : null;
                 },
                 onChanged: (Entity newValue) {
-                  setState(() {
-                    var selectedEnt = _selectedEntities.firstWhere(
-                        (e) => e.idLevel == level.id,
-                        orElse: () => null);
-                    if (selectedEnt != null) {
-                      _selectedEntities
-                          .removeAt(_selectedEntities.indexOf(selectedEnt));
-                    }
-                    _selectedEntities.add(newValue);
+                  var selectedEnt = _selectedEntities.firstWhere(
+                      (e) => e.idLevel == level.id,
+                      orElse: () => null);
+                  if (selectedEnt != null) {
+                    _selectedEntities
+                        .removeAt(_selectedEntities.indexOf(selectedEnt));
+                  }
+
+                  BooxyImageProvider().getEntityImage(newValue.id).then((img) {
+                    setState(() {
+                      if (img != null) newValue.images = [img];
+                      _selectedEntities.add(newValue);
+                    });
                   });
-                },                
+                },
                 onSaved: (value) {
                   //this._editedBooking.entities.add(value);
                 },
@@ -145,8 +166,7 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
               height: 80,
               margin: EdgeInsets.only(left: 10),
               child: FittedBox(
-                child: Image.network(
-                    'https://i.ya-webdesign.com/images/vector-buildings-logo-1.png'),
+                child: getEntityImageForDdl(level),
                 fit: BoxFit.cover,
               ),
             ),
@@ -249,17 +269,20 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
                     this._editedBooking.email = value;
                   },
                 ),
+                SizedBox(
+                  height: 15,
+                ),
                 ...entitiesDdls,
                 SizedBox(
                   height: 15,
                 ),
                 Container(
-                  alignment: AlignmentDirectional.bottomEnd,
+                  alignment: AlignmentDirectional.bottomStart,
                   child: RaisedButton.icon(
                     onPressed: () {
                       setState(() {
-                      _selectedEntities = [];  
-                      });                      
+                        _selectedEntities = [];
+                      });
                     },
                     icon: Icon(Icons.refresh),
                     label: Text('Reset'),
