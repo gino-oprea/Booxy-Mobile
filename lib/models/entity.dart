@@ -1,5 +1,4 @@
 import './booxy-image.dart';
-
 import './working-hours.dart';
 
 class Entity {
@@ -41,6 +40,28 @@ class Entity {
       this.childEntityIds,
       this.linkedIdUser,
       this.workingHours});
+
+  Entity clone(Entity objToClone) {
+    this.id = objToClone.id;
+    this.idLevel = objToClone.idLevel;
+    this.entityName_RO = objToClone.entityName_RO;
+    this.entityName_EN = objToClone.entityName_EN;
+    this.entityDescription_RO = objToClone.entityDescription_RO;
+    this.entityDescription_EN = objToClone.entityDescription_EN;
+    this.defaultServiceDuration = objToClone.defaultServiceDuration;
+    this.idDurationType = objToClone.idDurationType;
+    this.defaultServicePrice = objToClone.defaultServicePrice;
+    this.hasCustomWorkingHours = objToClone.hasCustomWorkingHours;
+    this.hasVariableProgramme = objToClone.hasVariableProgramme;
+    this.idCustomWorkingHours = objToClone.idCustomWorkingHours;
+    this.maximumMultipleBookings = objToClone.maximumMultipleBookings;
+    this.isEnabled = objToClone.isEnabled;
+    this.childEntityIds = objToClone.childEntityIds;
+    this.linkedIdUser = objToClone.linkedIdUser;
+    this.workingHours = new WorkingHours().clone(objToClone.workingHours);
+
+    return this;
+  }
 
   Entity fromJson(Map json) {
     this.id = json['id'];

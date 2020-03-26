@@ -1,14 +1,11 @@
-import 'dart:convert';
-
+import '../models/selected-entity-per-level.dart';
+import '../helpers/dates-helper.dart';
 import '../providers/booking-provider.dart';
-
 import '../models/level-as-filter.dart';
-
 import '../models/company.dart';
-
 import '../models/booking-entity.dart';
-
 import '../models/booking.dart';
+import '../models/entity.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -24,13 +21,12 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
   bool _isInit = true;
   Company _company;
   List<LevelAsFilter> _levels;
+  List<LevelAsFilter> _filteredLevels;
 
-  final _ent2FocusNode = FocusNode();
   final _firstNameFocusNode = FocusNode();
   final _lastNameFocusNode = FocusNode();
   final _phoneFocusNode = FocusNode();
   final _emailFocusNode = FocusNode();
-  final _startTimeFocusNode = FocusNode();
   final _form = GlobalKey<FormState>();
   var _editedBooking = Booking(
       entities: [],
@@ -41,59 +37,20 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
       startDate: null,
       startTime: null);
 
-  List<BookingEntity> _entities1 = [];
-  List<BookingEntity> _entities2 = [];
+  List<Entity> _selectedEntities = [];
 
-  BookingEntity _selectedEntity1;
-  BookingEntity _selectedEntity2;
+  @override
+  void dispose() {
+    _firstNameFocusNode.dispose();
+    _lastNameFocusNode.dispose();
+    _phoneFocusNode.dispose();
+    _emailFocusNode.dispose();
+
+    super.dispose();
+  }
 
   @override
   void initState() {
-    this._entities1 = [
-      BookingEntity(
-        idEntity: 1,
-        entityName_RO: 'ent 1',
-      ),
-      BookingEntity(
-        idEntity: 2,
-        entityName_RO: 'ent 2',
-      ),
-      BookingEntity(
-        idEntity: 3,
-        entityName_RO: 'ent 3',
-      ),
-      BookingEntity(
-        idEntity: 4,
-        entityName_RO: 'ent 4',
-      ),
-      BookingEntity(
-        idEntity: 5,
-        entityName_RO: 'ent 5',
-      ),
-    ];
-    this._entities2 = [
-      BookingEntity(
-        idEntity: 6,
-        entityName_RO: 'ent 6',
-      ),
-      BookingEntity(
-        idEntity: 7,
-        entityName_RO: 'ent 7',
-      ),
-      BookingEntity(
-        idEntity: 8,
-        entityName_RO: 'ent 8',
-      ),
-      BookingEntity(
-        idEntity: 9,
-        entityName_RO: 'ent 9',
-      ),
-      BookingEntity(
-        idEntity: 10,
-        entityName_RO: 'ent 10',
-      ),
-    ];
-
     super.initState();
   }
 
@@ -101,20 +58,17 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
   void didChangeDependencies() {
     if (_isInit) {
       this._company = ModalRoute.of(context).settings.arguments as Company;
-      var weekDates = [
-        '2020-03-23',
-        '2020-03-24',
-        '2020-03-25',
-        '2020-03-26',
-        '2020-03-27',
-        '2020-03-28',
-        '2020-03-29'
-      ];
+      var weekDates = DatesHelper.getWeekDates(_pickedDate);
+
       BookingProvider()
           .getLevelsAsFilters(this._company.id, weekDates)
           .then((result) {
         setState(() {
           this._levels = result;
+          this._filteredLevels = [];
+          this._levels.forEach((l) {
+            this._filteredLevels.add(new LevelAsFilter().clone(l));
+          });
         });
       });
     }
@@ -131,8 +85,84 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
     this._editedBooking.startDate = this._pickedDate;
   }
 
+  List<DropdownMenuItem<Entity>> getDdlEntities(LevelAsFilter lvl) {
+    List<DropdownMenuItem<Entity>> list = [];
+    list.addAll(lvl.entities.map((ent) {
+      return new DropdownMenuItem<Entity>(
+        value: ent,
+        child: new Text(ent.entityName_RO),
+      );
+    }).toList());
+
+    return list;
+  }
+
+  List<Widget> generateEntitiesDdls() {
+    List<Widget> wdgs = [];
+
+    if (_filteredLevels != null)
+      _filteredLevels.forEach((level) {
+        var ddl = Row(
+          children: <Widget>[
+            Expanded(
+              child: DropdownButtonFormField<Entity>(
+                isDense: true,
+                decoration: InputDecoration(
+                  labelText: level.levelName_RO,
+                  enabledBorder: UnderlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Theme.of(context).accentColor)),
+                ),
+                
+                value: _selectedEntities.firstWhere(
+                    (e) => e.idLevel == level.id,
+                    orElse: () => null),
+                items: getDdlEntities(level),
+                validator: (_) {
+                  return _selectedEntities.firstWhere(
+                    (e) => e.idLevel == level.id,
+                    orElse: () => null) == null ? 'camp obligatoriu' : null;
+                },
+                onChanged: (Entity newValue) {
+                  setState(() {
+                    var selectedEnt = _selectedEntities.firstWhere(
+                        (e) => e.idLevel == level.id,
+                        orElse: () => null);
+                    if (selectedEnt != null) {
+                      _selectedEntities
+                          .removeAt(_selectedEntities.indexOf(selectedEnt));
+                    }
+                    _selectedEntities.add(newValue);
+                  });
+                },                
+                onSaved: (value) {
+                  //this._editedBooking.entities.add(value);
+                },
+              ),
+            ),
+            Container(
+              width: 80,
+              height: 80,
+              margin: EdgeInsets.only(left: 10),
+              child: FittedBox(
+                child: Image.network(
+                    'https://i.ya-webdesign.com/images/vector-buildings-logo-1.png'),
+                fit: BoxFit.cover,
+              ),
+            ),
+          ],
+        );
+
+        wdgs.add(ddl);
+      });
+
+    return wdgs;
+  }
+
   @override
   Widget build(BuildContext context) {
+    var entitiesDdls = generateEntitiesDdls();
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Programare'),
@@ -144,92 +174,6 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
             padding: const EdgeInsets.all(15.0),
             child: Column(
               children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: DropdownButtonFormField<BookingEntity>(
-                        isDense: true,
-                        decoration: InputDecoration(
-                          labelText: 'Nivel 1',
-                          enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: Theme.of(context).accentColor)),
-                        ),
-                        validator: (value) {
-                          return value == null ? 'camp obligatoriu' : null;
-                        },
-                        value: _selectedEntity1,
-                        items: _entities1.map((ent) {
-                          return new DropdownMenuItem<BookingEntity>(
-                            value: ent,
-                            child: new Text(ent.entityName_RO),
-                          );
-                        }).toList(),
-                        onChanged: (BookingEntity newValue) {
-                          setState(() {
-                            _selectedEntity1 = newValue;
-                          });
-                        },
-                        onSaved: (value) {
-                          this._editedBooking.entities.add(value);
-                        },
-                      ),
-                    ),
-                    Container(
-                      width: 80,
-                      height: 80,
-                      margin: EdgeInsets.only(left: 10),
-                      child: FittedBox(
-                        child: Image.network(
-                            'https://i.ya-webdesign.com/images/vector-buildings-logo-1.png'),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: DropdownButtonFormField<BookingEntity>(
-                        isDense: true,
-                        decoration: InputDecoration(
-                          labelText: 'Nivel 2',
-                          enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: Theme.of(context).accentColor)),
-                        ),
-                        validator: (value) {
-                          return value == null ? 'camp obligatoriu' : null;
-                        },
-                        value: _selectedEntity2,
-                        items: _entities2.map((ent) {
-                          return new DropdownMenuItem<BookingEntity>(
-                            value: ent,
-                            child: new Text(ent.entityName_RO),
-                          );
-                        }).toList(),
-                        onChanged: (BookingEntity newValue) {
-                          setState(() {
-                            _selectedEntity2 = newValue;
-                          });
-                        },
-                        onSaved: (value) {
-                          this._editedBooking.entities.add(value);
-                        },
-                      ),
-                    ),
-                    Container(
-                      width: 80,
-                      height: 80,
-                      margin: EdgeInsets.only(left: 10),
-                      child: FittedBox(
-                        child: Image.network(
-                            'https://i.ya-webdesign.com/images/vector-buildings-logo-1.png'),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ],
-                ),
                 TextFormField(
                   focusNode: _firstNameFocusNode,
                   decoration: InputDecoration(
@@ -301,12 +245,29 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
                     ),
                   ),
                   textInputAction: TextInputAction.next,
-                  onFieldSubmitted: (_) {
-                    FocusScope.of(context).requestFocus(_startTimeFocusNode);
-                  },
                   onSaved: (value) {
                     this._editedBooking.email = value;
                   },
+                ),
+                ...entitiesDdls,
+                SizedBox(
+                  height: 15,
+                ),
+                Container(
+                  alignment: AlignmentDirectional.bottomEnd,
+                  child: RaisedButton.icon(
+                    onPressed: () {
+                      setState(() {
+                      _selectedEntities = [];  
+                      });                      
+                    },
+                    icon: Icon(Icons.refresh),
+                    label: Text('Reset'),
+                    elevation: 1,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    color: Theme.of(context).accentColor,
+                    textColor: Colors.white,
+                  ),
                 ),
                 SizedBox(
                   height: 15,
@@ -359,7 +320,6 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
                   children: <Widget>[
                     Expanded(
                       child: TextFormField(
-                        focusNode: _startTimeFocusNode,
                         decoration: InputDecoration(
                           labelText: 'Ora inceput',
                           enabledBorder: UnderlineInputBorder(
@@ -370,9 +330,6 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
                         textInputAction: TextInputAction.done,
                         validator: (value) {
                           return value.isEmpty ? 'camp obligatoriu' : null;
-                        },
-                        onFieldSubmitted: (_) {
-                          saveForm();
                         },
                       ),
                     ),

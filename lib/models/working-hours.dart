@@ -24,6 +24,21 @@ class WorkingHours {
       this.saturday,
       this.sunday});
 
+  WorkingHours clone(WorkingHours objToClone) {
+    this.id = objToClone.id;
+    this.idParent = objToClone.idParent;
+    this.name = objToClone.name;
+    this.monday = new WorkingDay().clone(objToClone.monday);
+    this.tuesday = new WorkingDay().clone(objToClone.tuesday);
+    this.wednesday = new WorkingDay().clone(objToClone.wednesday);
+    this.thursday = new WorkingDay().clone(objToClone.thursday);
+    this.friday = new WorkingDay().clone(objToClone.friday);
+    this.saturday = new WorkingDay().clone(objToClone.saturday);
+    this.sunday = new WorkingDay().clone(objToClone.sunday);
+
+    return this;
+  }
+
   WorkingHours fromJson(json) {
     this.id = json['id'];
     this.idParent = json['idParent'];

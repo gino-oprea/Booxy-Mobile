@@ -28,6 +28,29 @@ class LevelAsFilter {
       this.entitiesNo,
       this.entities});
 
+  LevelAsFilter clone(LevelAsFilter objToClone) {
+    this.id = objToClone.id;
+    this.idCompany = objToClone.idCompany;
+    this.orderIndex = objToClone.orderIndex;
+    this.levelName_RO = objToClone.levelName_RO;
+    this.levelName_EN = objToClone.levelName_EN;
+    this.idLevelType = objToClone.idLevelType;
+    this.isFrontOption = objToClone.isFrontOption;
+    this.isMultipleBooking = objToClone.isMultipleBooking;
+    this.defaultDuration = objToClone.defaultDuration;
+    this.idDurationType = objToClone.idDurationType;
+    this.entitiesNo = objToClone.entitiesNo;
+
+    this.entities = new List<Entity>();
+    for (int i = 0; i < objToClone.entities.length; i++) {
+      var entity = new Entity().clone(objToClone.entities[i]);
+
+      entities.add(entity);
+    }
+
+    return this;
+  }
+
   LevelAsFilter fromJson(Map json) {
     this.id = json['id'];
     this.idCompany = json['idCompany'];
