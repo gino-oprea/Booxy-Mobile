@@ -51,4 +51,44 @@ class Booking {
       this.clientRating,
       this.clientReview,
       this.idStatus});
+
+  Booking fromJson(Map json) {
+    this.id = json['id'];
+    this.idCompany = json['idCompany'];
+    this.companyName = json['companyName'];
+    this.companyAddress = json['companyAddress'];
+    this.companyEmail = json['companyEmail'];
+    this.companyPhone = json['companyPhone'];
+    this.lat = json['lat'];
+    this.lng = json['lng'];
+    this.entities = new List<BookingEntity>();
+    List<dynamic> rawEntities = json['entities'];
+    for (int i = 0; i < rawEntities.length; i++) {
+      var entMap = rawEntities[i];
+      var entity = new BookingEntity().fromJson(entMap);
+
+      entities.add(entity);
+    }
+    this.idUser = json['idUser'];
+    this.firstName = json['firstName'];
+    this.lastName = json['lastName'];
+    this.phone = json['phone'];
+    this.email = json['email'];
+    this.startDate =
+        json['startDate'] == null ? null : DateTime.parse(json['startDate']);
+    this.endDate =
+        json['endDate'] == null ? null : DateTime.parse(json['endDate']);
+    this.startTime =
+        json['startTime'] == null ? null : DateTime.parse(json['startTime']);
+    this.endTime =
+        json['endTime'] == null ? null : DateTime.parse(json['endTime']);
+    this.bookingPrice = json['bookingPrice'];
+    this.isPaidRetainer = json['isPaidRetainer'];
+    this.isPaidFull = json['isPaidFull'];
+    this.clientRating = json['clientRating'];
+    this.clientReview = json['clientReview'];
+    this.idStatus = json['idStatus'];   
+
+    return this;
+  }
 }

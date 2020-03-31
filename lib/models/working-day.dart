@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 class WorkingDay {
   String workHours;
   DateTime date;
@@ -17,5 +19,14 @@ class WorkingDay {
     this.date = json['date'] == null ? null : DateTime.parse(json['date']);
 
     return this;
+  }
+
+  Map toJson() {
+    Map obj = {
+      'workHours': this.workHours,
+      'date': DateFormat('yyyy-MM-dd').format(this.date)
+    };
+
+    return obj;
   }
 }

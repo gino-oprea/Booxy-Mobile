@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import './booxy-image.dart';
 import './working-hours.dart';
 
@@ -40,6 +42,9 @@ class Entity {
       this.childEntityIds,
       this.linkedIdUser,
       this.workingHours});
+
+  bool operator ==(e) => e is Entity && e.id == this.id; //New
+  int get hashCode => id.hashCode;
 
   Entity clone(Entity objToClone) {
     this.id = objToClone.id;
@@ -85,5 +90,29 @@ class Entity {
     this.workingHours = new WorkingHours().fromJson(json['workingHours']);
 
     return this;
+  }
+
+  Map toJson() {
+    Map obj= {
+      'id':this.id,
+      'idLevel':this.idLevel,
+      'entityName_RO':this.entityName_RO,
+      'entityName_EN':this.entityName_EN,
+      'entityDecription_RO':this.entityDescription_RO,
+      'entityDescription_EN':this.entityDescription_EN,
+      'defaultServiceDuration':this.defaultServiceDuration,
+      'idDurationType':this.idDurationType,
+      'defaultServicePrice':this.defaultServicePrice,
+      'hasCustomWorkingHours':this.hasCustomWorkingHours,
+      'hasVariableProgramme':this.hasVariableProgramme,
+      'idCustomWorkingHours':this.idCustomWorkingHours,
+      'maximumMultipleBookings':this.maximumMultipleBookings,
+      'isEnabled':this.isEnabled,
+      'childEntityIds':this.childEntityIds,
+      'linkedIdUser':this.linkedIdUser,
+      'workingHours': this.workingHours.toJson(),
+    };
+
+    return obj;
   }
 }

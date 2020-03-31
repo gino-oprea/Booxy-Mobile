@@ -13,17 +13,41 @@ class BookingEntity {
   int orderIndex;
   int idLevelType;
 
-  BookingEntity({
-    this.idEntity,
-  this.isAutoAssigned,
-  this.idLevel,
-  this.isMultipleBooking,
-  this.images,
-  this.entityName_RO,
-  this.entityName_EN,
-  this.levelName_RO,
-  this.levelName_EN,
-  this.orderIndex,
-  this.idLevelType
-  });
+  BookingEntity(
+      {this.idEntity,
+      this.isAutoAssigned,
+      this.idLevel,
+      this.isMultipleBooking,
+      this.images,
+      this.entityName_RO,
+      this.entityName_EN,
+      this.levelName_RO,
+      this.levelName_EN,
+      this.orderIndex,
+      this.idLevelType});
+
+  BookingEntity fromJson(Map json) {
+    this.idEntity = json['idEntity'];
+    this.isAutoAssigned = json['isAutoAssigned'];
+    this.idLevel = json['idLevel'];
+    this.isMultipleBooking = json['isMultipleBooking'];
+
+    this.images = new List<BooxyImage>();
+    List<dynamic> rawImages = json['images'];
+    for (int i = 0; i < rawImages.length; i++) {
+      var imgMap = rawImages[i];
+      var image = new BooxyImage().fromJson(imgMap);
+
+      images.add(image);
+    }
+
+    this.entityName_RO = json['entityName_RO'];
+    this.entityName_EN = json['entityName_EN'];
+    this.levelName_RO = json['levelName_RO'];
+    this.levelName_EN = json['levelName_EN'];
+    this.orderIndex = json['orderIndex'];
+    this.idLevelType = json['idLevelType'];
+
+    return this;
+  }
 }

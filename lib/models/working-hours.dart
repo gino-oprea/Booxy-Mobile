@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import './working-day.dart';
 
 class WorkingHours {
@@ -52,5 +54,22 @@ class WorkingHours {
     this.sunday = new WorkingDay().fromJson(json['sunday']);
 
     return this;
+  }
+
+  Map toJson() {
+    Map obj = {
+      'id': this.id,
+      'idParent': this.idParent,
+      'name': this.name,
+      'monday': this.monday.toJson(),
+      'tuesday': this.tuesday.toJson(),
+      'wednesday': this.wednesday.toJson(),
+      'thursday': this.thursday.toJson(),
+      'friday': this.friday.toJson(),
+      'saturday': this.saturday.toJson(),
+      'sunday': this.sunday.toJson(),
+    };
+
+    return obj;
   }
 }

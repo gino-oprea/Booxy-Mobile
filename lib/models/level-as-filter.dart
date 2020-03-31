@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import './entity.dart';
 
 class LevelAsFilter {
@@ -74,5 +76,24 @@ class LevelAsFilter {
     }
 
     return this;
+  }
+
+  Map toJson() {
+    Map obj = {
+      'id': this.id,
+      'idCompany': this.idCompany,
+      'orderIndex': this.orderIndex,
+      'levelName_RO': this.levelName_RO,
+      'levelName_EN': this.levelName_EN,
+      'idLevelType': this.idLevelType,
+      'isFrontOption': this.isFrontOption,
+      'isMultipleBooking': this.isMultipleBooking,
+      'defaultDuration': this.defaultDuration,
+      'idDurationType': this.idDurationType,
+      'entitiesNo': this.entitiesNo,
+      'entities': this.entities != null ? this.entities.map((e) => e.toJson()).toList() : null
+    };
+
+    return obj;
   }
 }

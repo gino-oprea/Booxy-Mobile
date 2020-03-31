@@ -26,6 +26,7 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
   Company _company;
   List<LevelAsFilter> _levels;
   List<LevelAsFilter> _filteredLevels;
+  List<LevelAsFilter> _filteredLevelsForApiCall;
   List<List<Entity>> allEntityCombinations = [];
 
   final _firstNameFocusNode = FocusNode();
@@ -79,16 +80,60 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
           this.getAllLinkedEntitiesCombinations(firstLevelEntities,
               currentCombination, this.allEntityCombinations);
 
-          this._filteredLevels = [];
-          this._levels.forEach((l) {
-            this._filteredLevels.add(new LevelAsFilter().clone(l));
-          });
+          this.initFilteredLevels();
+          this.initFilteredLevelsForApiCall();
         });
       });
     }
     _isInit = false;
 
     super.didChangeDependencies();
+  }
+
+  void initFilteredLevels() {
+    this._filteredLevels = [];
+    this._levels.forEach((l) {
+      this._filteredLevels.add(new LevelAsFilter().clone(l));
+    });
+  }
+
+  void initFilteredLevelsForApiCall() {
+    this._filteredLevelsForApiCall = [];
+    this._levels.forEach((l) {
+      this._filteredLevelsForApiCall.add(new LevelAsFilter().clone(l));
+    });
+  }
+
+  void setupFilterObjectForApiCall(
+      List<List<Entity>> filteredEntititesPerLevel) {
+    //le punem in obiectul care trebuie emis
+    for (int i = 0; i < filteredEntititesPerLevel.length; i++) {
+      var filteredEntities = filteredEntititesPerLevel[i];
+      for (int j = 0; j < this._filteredLevelsForApiCall.length; j++) {
+        var filteredLevel = this._filteredLevelsForApiCall[j];
+        if (filteredEntities.length > 0) if (filteredLevel.id ==
+            filteredEntities[0].idLevel)
+          filteredLevel.entities = filteredEntities;
+      }
+    }
+    ////
+  }
+
+  void setupFilterObjectForDropdowns(
+      List<List<Entity>> filteredEntititesPerLevel, int idLevel) {
+    //le punem in obiectul legat la interfata -- diferenta e ca aici nu filtram dropdown-ul care a declansat filtrarea si trebuie reinitializate valorile ca sa nu fie afectate de filtrari repetate
+    this.initFilteredLevels();
+    for (int i = 0; i < filteredEntititesPerLevel.length; i++) {
+      var filteredEntities = filteredEntititesPerLevel[i];
+      for (var j = 0; j < this._filteredLevels.length; j++) {
+        var filteredLevelForDropdowns = this._filteredLevels[j];
+        if (filteredEntities.length > 0) if (filteredLevelForDropdowns.id ==
+                filteredEntities[0].idLevel &&
+            filteredLevelForDropdowns.id != idLevel)
+          filteredLevelForDropdowns.entities = filteredEntities;
+      }
+    }
+    ///////
   }
 
   void addChildEntityIdsToParentEntities(List<EntitiesLink> entityLinks) {
@@ -138,6 +183,72 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
     return resultEntities;
   }
 
+  List<List<Entity>> getFilteredEntitiesPerLevel() {
+    List<List<Entity>> filteredEntitiesPerLevel = [];
+
+    //filtram path-urile dupa selected entities(trebuie pastrate doar cele care contin toate entitatile selectate)
+    List<List<Entity>> filteredCombinations = [];
+    for (var i = 0; i < this.allEntityCombinations.length; i++) {
+      if (this.isValidCombination(this.allEntityCombinations[i]))
+        filteredCombinations.add(this.allEntityCombinations[i]);
+    }
+    /////
+
+    ////grupare per nivel
+    if (filteredCombinations.length > 0) {
+      int levelsNumber = this.getMaxDepth(filteredCombinations);
+
+      for (var i = 0; i < levelsNumber; i++) {
+        List<Entity> levelEntitites = [];
+        filteredCombinations.forEach((combination) {
+          if (combination.length > i) {
+            var exists = levelEntitites.where((e) => e.id == combination[i].id);
+            if (exists.length == 0) //nu mai exista
+              levelEntitites.add(combination[i]);
+          }
+        });
+        filteredEntitiesPerLevel.add(levelEntitites);
+      }
+    }
+    return filteredEntitiesPerLevel;
+  }
+
+  bool isValidCombination(
+      List<Entity>
+          combination) //filtreaza combinatiile pe baza selectiei utilizatorului
+  {
+    var containsAll = true;
+
+    for (var i = 0; i < this._selectedEntities.length; i++) {
+      var isFound = false;
+      var selectedEntity = this._selectedEntities[i];
+      for (var j = 0; j < combination.length; j++) {
+        if (selectedEntity.id == combination[j].id) {
+          isFound = true;
+          break;
+        }
+      }
+
+      if (!isFound) {
+        containsAll = false;
+        break;
+      }
+    }
+
+    return containsAll;
+  }
+
+  int getMaxDepth(List<List<Entity>> combinations) {
+    if (combinations.length > 0) {
+      var max = combinations[0].length;
+      for (var i = 0; i < combinations.length; i++) {
+        if (combinations[0].length > max) max = combinations[0].length;
+      }
+      return max;
+    } else
+      return 0;
+  }
+
   void saveForm() {
     final isValid = _form.currentState.validate();
     if (!isValid) return;
@@ -156,6 +267,19 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
     }).toList());
 
     return list;
+  }
+
+  void resetInvalidSelections(int idSelectedLevel) {
+    var foundValidCombination = false;
+    for (var i = 0; i < this.allEntityCombinations.length; i++) {
+      if (this.isValidCombination(this.allEntityCombinations[i])) {
+        foundValidCombination = true;
+        break;
+      }
+    }
+    if (!foundValidCombination) {
+      this._selectedEntities.removeWhere((e) => e.idLevel != idSelectedLevel);
+    }
   }
 
   Image getEntityImageForDdl(LevelAsFilter level) {
@@ -180,6 +304,14 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
       setState(() {
         if (img != null) newValue.images = [img];
         _selectedEntities.add(newValue);
+
+        this.resetInvalidSelections(level.id);
+        var filteredEntititesPerLevel = this.getFilteredEntitiesPerLevel();
+        this.setupFilterObjectForApiCall(filteredEntititesPerLevel);
+        this.setupFilterObjectForDropdowns(filteredEntititesPerLevel, level.id);
+
+        BookingProvider().generateHoursMatrix(this._company.id,
+            DatesHelper.getWeekDates(_pickedDate), _filteredLevelsForApiCall);
       });
     });
   }
@@ -335,35 +467,43 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
                 SizedBox(
                   height: 15,
                 ),
-                Container(
-                  alignment: AlignmentDirectional.bottomStart,
-                  child: RaisedButton.icon(
-                    onPressed: () {
-                      setState(() {
-                        _selectedEntities = [];
-                      });
-                    },
-                    icon: Icon(Icons.refresh),
-                    label: Text('Reset'),
-                    elevation: 1,
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    color: Theme.of(context).accentColor,
-                    textColor: Colors.white,
-                  ),
+                Row(
+                  children: <Widget>[
+                    Container(
+                      alignment: AlignmentDirectional.bottomStart,
+                      child: RaisedButton.icon(
+                        onPressed: () {
+                          setState(() {
+                            _selectedEntities = [];
+                            this.initFilteredLevels();
+                            this.initFilteredLevelsForApiCall();
+                          });
+                        },
+                        icon: Icon(Icons.refresh),
+                        label: Text('Reset'),
+                        elevation: 1,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        color: Theme.of(context).accentColor,
+                        textColor: Colors.white,
+                      ),
+                    ),
+                    SizedBox(
+                      width: 15,
+                    ),
+                    Expanded(
+                      child: Container(
+                        alignment: AlignmentDirectional.center,
+                        child: Text(
+                          'Pret: 100 RON',
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 SizedBox(
                   height: 15,
-                ),
-                Container(
-                  color: Colors.lightGreenAccent,
-                  child: Row(
-                    children: <Widget>[
-                      Text(
-                        'Pret: 100 RON',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                    ],
-                  ),
                 ),
                 Row(
                   children: <Widget>[
