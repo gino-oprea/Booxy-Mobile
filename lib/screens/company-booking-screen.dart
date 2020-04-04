@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:booxy/models/timeslot.dart';
+
 import '../models/entities-link.dart';
 
 import '../helpers/dates-helper.dart';
@@ -28,6 +30,8 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
   List<LevelAsFilter> _filteredLevels;
   List<LevelAsFilter> _filteredLevelsForApiCall;
   List<List<Entity>> allEntityCombinations = [];
+  List<Timeslot> _timeslots = [];
+  Timeslot _selectedTimeslot = null;
 
   final _firstNameFocusNode = FocusNode();
   final _lastNameFocusNode = FocusNode();
@@ -301,19 +305,48 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
     }
 
     BooxyImageProvider().getEntityImage(newValue.id).then((img) {
-      setState(() {
-        if (img != null) newValue.images = [img];
-        _selectedEntities.add(newValue);
+      // setState(() {
+      if (img != null) newValue.images = [img];
+      _selectedEntities.add(newValue);
 
-        this.resetInvalidSelections(level.id);
-        var filteredEntititesPerLevel = this.getFilteredEntitiesPerLevel();
-        this.setupFilterObjectForApiCall(filteredEntititesPerLevel);
-        this.setupFilterObjectForDropdowns(filteredEntititesPerLevel, level.id);
+      this.resetInvalidSelections(level.id);
+      var filteredEntititesPerLevel = this.getFilteredEntitiesPerLevel();
+      this.setupFilterObjectForApiCall(filteredEntititesPerLevel);
+      this.setupFilterObjectForDropdowns(filteredEntititesPerLevel, level.id);
 
-        BookingProvider().generateHoursMatrix(this._company.id,
-            DatesHelper.getWeekDates(_pickedDate), _filteredLevelsForApiCall);
+      BookingProvider()
+          .generateHoursMatrix(this._company.id,
+              DatesHelper.getWeekDates(_pickedDate), _filteredLevelsForApiCall)
+          .then((timeslotsMatrix) {
+        setState(() {
+          var flatTimeslots = flattenTimeslotMatrix(timeslotsMatrix);
+          _timeslots = flatTimeslots.where((t) {
+            return DateFormat('yyyy-MM-dd').format(t.startTime) ==
+                    DateFormat('yyyy-MM-dd').format(_pickedDate) &&
+                t.isSelectable &&
+                !t.isFullBooked;
+          }).toList();
+        });
       });
+      // });
     });
+  }
+
+  List<Timeslot> flattenTimeslotMatrix(List<List<List<Timeslot>>> matrix) {
+    List<Timeslot> timeslots = [];
+
+    for (var i = 0; i < matrix.length; i++) {
+      var l1 = matrix[i];
+      for (var j = 0; j < l1.length; j++) {
+        var l2 = l1[j];
+        for (var k = 0; k < l2.length; k++) {
+          var l3 = l2[k];
+          timeslots.add(l3);
+        }
+      }
+    }
+
+    return timeslots;
   }
 
   List<Widget> generateEntitiesDdls() {
@@ -323,11 +356,16 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
       _filteredLevels.forEach((level) {
         var ddl = Row(
           children: <Widget>[
+            IconButton(
+              onPressed: () {},
+              icon: Icon(Icons.settings),
+            ),
             Expanded(
               child: DropdownButtonFormField<Entity>(
                 isDense: true,
                 decoration: InputDecoration(
                   labelText: level.levelName_RO,
+                  contentPadding: EdgeInsets.all(0),
                   enabledBorder: UnderlineInputBorder(
                       borderSide:
                           BorderSide(color: Theme.of(context).accentColor)),
@@ -385,91 +423,148 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
             padding: const EdgeInsets.all(15.0),
             child: Column(
               children: <Widget>[
-                TextFormField(
-                  focusNode: _firstNameFocusNode,
-                  decoration: InputDecoration(
-                    labelText: 'Prenume',
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide:
-                          BorderSide(color: Theme.of(context).accentColor),
+                Row(
+                  children: <Widget>[
+                    IconButton(
+                      icon: Icon(
+                        Icons.person,
+                      ),
+                      onPressed: () {},
                     ),
-                  ),
-                  textInputAction: TextInputAction.next,
-                  validator: (value) {
-                    return value.isEmpty ? 'camp obligatoriu' : null;
-                  },
-                  onFieldSubmitted: (_) {
-                    FocusScope.of(context).requestFocus(_lastNameFocusNode);
-                  },
-                  onSaved: (value) {
-                    this._editedBooking.firstName = value;
-                  },
-                ),
-                TextFormField(
-                  focusNode: _lastNameFocusNode,
-                  decoration: InputDecoration(
-                    labelText: 'Nume',
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide:
-                          BorderSide(color: Theme.of(context).accentColor),
+                    Expanded(
+                      child: TextFormField(
+                        focusNode: _firstNameFocusNode,
+                        decoration: InputDecoration(
+                          labelText: 'Prenume',
+                          contentPadding: EdgeInsets.all(0),
+                          enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Theme.of(context).accentColor),
+                          ),
+                        ),
+                        textInputAction: TextInputAction.next,
+                        validator: (value) {
+                          return value.isEmpty ? 'camp obligatoriu' : null;
+                        },
+                        onFieldSubmitted: (_) {
+                          FocusScope.of(context)
+                              .requestFocus(_lastNameFocusNode);
+                        },
+                        onSaved: (value) {
+                          this._editedBooking.firstName = value;
+                        },
+                      ),
                     ),
-                  ),
-                  textInputAction: TextInputAction.next,
-                  validator: (value) {
-                    return value.isEmpty ? 'camp obligatoriu' : null;
-                  },
-                  onFieldSubmitted: (_) {
-                    FocusScope.of(context).requestFocus(_phoneFocusNode);
-                  },
-                  onSaved: (value) {
-                    this._editedBooking.lastName = value;
-                  },
-                ),
-                TextFormField(
-                  focusNode: _phoneFocusNode,
-                  decoration: InputDecoration(
-                    labelText: 'Telefon',
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide:
-                          BorderSide(color: Theme.of(context).accentColor),
-                    ),
-                  ),
-                  keyboardType: TextInputType.phone,
-                  textInputAction: TextInputAction.next,
-                  validator: (value) {
-                    return value.isEmpty ? 'camp obligatoriu' : null;
-                  },
-                  onFieldSubmitted: (_) {
-                    FocusScope.of(context).requestFocus(_emailFocusNode);
-                  },
-                  onSaved: (value) {
-                    this._editedBooking.phone = value;
-                  },
-                ),
-                TextFormField(
-                  focusNode: _emailFocusNode,
-                  decoration: InputDecoration(
-                    labelText: 'Email',
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide:
-                          BorderSide(color: Theme.of(context).accentColor),
-                    ),
-                  ),
-                  textInputAction: TextInputAction.next,
-                  onSaved: (value) {
-                    this._editedBooking.email = value;
-                  },
+                  ],
                 ),
                 SizedBox(
-                  height: 15,
+                  height: 10,
+                ),
+                Row(
+                  children: <Widget>[
+                    IconButton(
+                      icon: Icon(Icons.person),
+                      onPressed: () {},
+                    ),
+                    Expanded(
+                      child: TextFormField(
+                        focusNode: _lastNameFocusNode,
+                        decoration: InputDecoration(
+                          labelText: 'Nume',
+                          contentPadding: EdgeInsets.all(0),
+                          enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Theme.of(context).accentColor),
+                          ),
+                        ),
+                        textInputAction: TextInputAction.next,
+                        validator: (value) {
+                          return value.isEmpty ? 'camp obligatoriu' : null;
+                        },
+                        onFieldSubmitted: (_) {
+                          FocusScope.of(context).requestFocus(_phoneFocusNode);
+                        },
+                        onSaved: (value) {
+                          this._editedBooking.lastName = value;
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  children: <Widget>[
+                    IconButton(
+                      onPressed: () {},
+                      icon: Icon(Icons.phone),
+                    ),
+                    Expanded(
+                      child: TextFormField(
+                        focusNode: _phoneFocusNode,
+                        decoration: InputDecoration(
+                          labelText: 'Telefon',
+                          contentPadding: EdgeInsets.all(0),
+                          enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Theme.of(context).accentColor),
+                          ),
+                        ),
+                        keyboardType: TextInputType.phone,
+                        textInputAction: TextInputAction.next,
+                        validator: (value) {
+                          return value.isEmpty ? 'camp obligatoriu' : null;
+                        },
+                        onFieldSubmitted: (_) {
+                          FocusScope.of(context).requestFocus(_emailFocusNode);
+                        },
+                        onSaved: (value) {
+                          this._editedBooking.phone = value;
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  children: <Widget>[
+                    IconButton(
+                      icon: Icon(Icons.email),
+                      onPressed: () {},
+                    ),
+                    Expanded(
+                      child: TextFormField(
+                        focusNode: _emailFocusNode,
+                        decoration: InputDecoration(
+                          labelText: 'Email',
+                          contentPadding: EdgeInsets.all(0),
+                          enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Theme.of(context).accentColor),
+                          ),
+                        ),
+                        textInputAction: TextInputAction.next,
+                        onSaved: (value) {
+                          this._editedBooking.email = value;
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 10,
                 ),
                 ...entitiesDdls,
                 SizedBox(
-                  height: 15,
+                  height: 10,
                 ),
                 Row(
                   children: <Widget>[
                     Container(
+                      padding: EdgeInsets.all(8),
                       alignment: AlignmentDirectional.bottomStart,
                       child: RaisedButton.icon(
                         onPressed: () {
@@ -492,7 +587,7 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
                     ),
                     Expanded(
                       child: Container(
-                        alignment: AlignmentDirectional.center,
+                        alignment: AlignmentDirectional.centerEnd,
                         child: Text(
                           'Pret: 100 RON',
                           style: TextStyle(
@@ -503,15 +598,18 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
                   ],
                 ),
                 SizedBox(
-                  height: 15,
+                  height: 10,
                 ),
                 Row(
                   children: <Widget>[
                     Expanded(
-                      child: Text(
-                        'Data: ' +
-                            DateFormat('dd-MMM-yyyy').format(_pickedDate),
-                        style: TextStyle(fontSize: 18),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          'Data: ' +
+                              DateFormat('dd-MMM-yyyy').format(_pickedDate),
+                          style: TextStyle(fontSize: 18),
+                        ),
                       ),
                     ),
                     Center(
@@ -541,18 +639,33 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
                     Expanded(
-                      child: TextFormField(
-                        decoration: InputDecoration(
-                          labelText: 'Ora inceput',
-                          enabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Theme.of(context).accentColor),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: DropdownButtonFormField<Timeslot>(
+                          isDense: true,
+                          decoration: InputDecoration(
+                            labelText: 'Ora inceput',
+                            contentPadding: EdgeInsets.all(0),
+                            enabledBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Theme.of(context).accentColor)),
                           ),
+                          value: _selectedTimeslot,
+                          items: _timeslots.map((timeslot) {
+                            return new DropdownMenuItem<Timeslot>(
+                              child: Text(DateFormat('hh:mm')
+                                  .format(timeslot.startTime)),
+                              value: timeslot,
+                            );
+                          }).toList(),
+                          validator: (_) {
+                            return _selectedTimeslot == null
+                                ? 'camp obligatoriu'
+                                : null;
+                          },
+                          onChanged: (Timeslot newValue) {},
+                          onSaved: (value) {},
                         ),
-                        textInputAction: TextInputAction.done,
-                        validator: (value) {
-                          return value.isEmpty ? 'camp obligatoriu' : null;
-                        },
                       ),
                     ),
                     Expanded(child: Text('Ora sfarsit: ...')),

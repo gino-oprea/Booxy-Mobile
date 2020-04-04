@@ -60,7 +60,7 @@ class BookingProvider with ChangeNotifier {
 
     url += httpParams;
 
-    var bdyObj =json.encode(selectedLevels.map((l)=>l.toJson()).toList());
+    var bdyObj = json.encode(selectedLevels.map((l) => l.toJson()).toList());
 
     final response = await http.post(url,
         headers: {'Content-Type': 'application/json'}, body: bdyObj);
@@ -73,5 +73,22 @@ class BookingProvider with ChangeNotifier {
 
     final List<dynamic> objList = extractedData["objList"];
     if (objList.length == 0) return null;
+
+    for (int i = 0; i < objList.length; i++) {
+      var days = objList[i] as List<dynamic>;
+      List<List<Timeslot>> t_days = [];
+      for (int j = 0; j < days.length; j++) {
+        var hours = days[j] as List<dynamic>;
+        List<Timeslot> t_hours = [];
+        for (int k = 0; k < hours.length; k++) {
+          var slot = hours[k];
+          var timeslot = Timeslot().fromJson(slot);
+          t_hours.add(timeslot);
+        }
+        t_days.add(t_hours);
+      }
+      timeslots.add(t_days);
+    }
+    return timeslots;
   }
 }
