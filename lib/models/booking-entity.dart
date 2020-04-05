@@ -50,4 +50,23 @@ class BookingEntity {
 
     return this;
   }
+
+  Map toJson() {
+    Map obj = {
+      'idEntity': this.idEntity,
+      'isAutoAssigned': this.isAutoAssigned,
+      'idLevel': this.idLevel,
+      'isMultipleBooking': this.isMultipleBooking,
+      'images': this.images != null
+          ? this.images.map((i) => i.toJson()).toList()
+          : null,
+      'entityName_RO': this.entityName_RO,
+      'entityName_EN': this.entityName_EN,
+      'levelName_RO': this.levelName_RO,
+      'levelName_EN': this.levelName_EN,
+      'orderIndex': this.orderIndex,
+      'idLevelType': this.idLevelType
+    };
+    return obj;
+  }
 }

@@ -14,4 +14,14 @@ class BooxyImage {
 
     return this;
   }
+
+  Map toJson() {
+    Map obj = {
+      'id': this.id,
+      'idParent': this.idParent,
+      'img': this.img,
+      'isDefaultImage': this.isDefaultImage
+    };
+    return obj;
+  }
 }

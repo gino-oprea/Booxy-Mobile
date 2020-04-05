@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 import './booking-entity.dart';
 
 class Booking {
@@ -87,8 +89,40 @@ class Booking {
     this.isPaidFull = json['isPaidFull'];
     this.clientRating = json['clientRating'];
     this.clientReview = json['clientReview'];
-    this.idStatus = json['idStatus'];   
+    this.idStatus = json['idStatus'];
 
     return this;
+  }
+
+  Map toJson() {
+    Map obj = {
+      'id': this.id,
+      'idCompany': this.idCompany,
+      'companyName': this.companyName,
+      'companyAddress': this.companyAddress,
+      'companyEmail': this.companyEmail,
+      'companyPhone': this.companyPhone,
+      'lat': this.lat,
+      'lng': this.lng,
+      'entities': this.entities != null
+          ? this.entities.map((e) => e.toJson()).toList()
+          : null,
+      'idUser': this.idUser,
+      'firstName': this.firstName,
+      'lastName': this.lastName,
+      'phone': this.phone,
+      'email': this.email,
+      'startDate': DateFormat('yyyy-MM-dd').format(this.startDate),
+      'endDate': DateFormat('yyyy-MM-dd').format(this.endDate),
+      'startTime': DateFormat('yyyy-MM-dd hh:mm').format(this.startTime),
+      'endTime': DateFormat('yyyy-MM-dd hh:mm').format(this.endTime),
+      'bookingPrice': this.bookingPrice,
+      'isPaidRetainer': this.isPaidRetainer,
+      'isPaidFull': this.isPaidFull,
+      'clientRating': this.clientRating,
+      'clientReview': this.clientReview,
+      'idStatus': this.idStatus
+    };
+    return obj;
   }
 }

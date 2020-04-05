@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 import './booking.dart';
 
 class Timeslot {
@@ -42,5 +44,22 @@ class Timeslot {
     }
 
     return this;
+  }
+
+  Map toJson() {
+    Map obj = {
+      'startTime': DateFormat('yyyy-MM-dd hh:mm').format(this.startTime),
+      'endTime': DateFormat('yyyy-MM-dd hh:mm').format(this.endTime),
+      'isSelectable': this.isSelectable,
+      'isSelected': this.isSelected,
+      'bookings': this.bookings != null
+          ? this.bookings.map((b) => b.toJson()).toList()
+          : null,
+      'isBooked': this.isBooked,
+      'isFullBooked': this.isFullBooked,
+      'hasFilteredBooking': this.hasFilteredBooking
+    };
+
+    return obj;
   }
 }
