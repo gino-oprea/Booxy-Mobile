@@ -22,6 +22,9 @@ class Timeslot {
       this.isFullBooked,
       this.hasFilteredBooking});
 
+  // bool operator ==(e) => e is Timeslot && e.startTime == this.startTime; //New
+  // int get hashCode => startTime.hashCode;
+
   Timeslot fromJson(Map json) {
     this.startTime =
         json['startTime'] == null ? null : DateTime.parse(json['startTime']);

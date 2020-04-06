@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:booxy/models/timeslot.dart';
+import '../models/timeslot.dart';
 
 import '../models/entities-link.dart';
 
@@ -23,7 +23,7 @@ class CompanyBookingScreen extends StatefulWidget {
 }
 
 class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
-  DateTime _pickedDate = DateTime.now();
+  DateTime _pickedDate = DateTime.now().add(Duration(days: 1));
   bool _isInit = true;
   Company _company;
   List<LevelAsFilter> _levels;
