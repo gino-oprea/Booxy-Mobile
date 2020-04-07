@@ -1,4 +1,8 @@
 import 'dart:convert';
+import '../models/auto-assign-payload.dart';
+
+import '../models/auto-assigned-entity-combination.dart';
+
 import '../models/timeslot.dart';
 import '../models/level-as-filter.dart';
 import '../config/booxy-config.dart';
@@ -90,5 +94,24 @@ class BookingProvider with ChangeNotifier {
       timeslots.add(t_days);
     }
     return timeslots;
+  }
+
+  Future<AutoAssignedEntityCombination> autoAssignEntitiesToBooking(
+      int idCompany,
+      String bookingDate,
+      String startTime,
+      AutoAssignPayload autoAssignPayload) async {
+    String url = BooxyConfig.api_endpoint +
+        'Booking/AutoAssignEntitiesToBooking/' +
+        idCompany.toString() +
+        '?bookingDate=' +
+        bookingDate +
+        '&startTime=' +
+        startTime;
+
+    var bdyObj = json.encode(autoAssignPayload.toJson());
+
+    final response = await http.post(url,
+        headers: {'Content-Type': 'application/json'}, body: bdyObj);
   }
 }

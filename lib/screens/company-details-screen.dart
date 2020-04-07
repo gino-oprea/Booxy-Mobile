@@ -40,6 +40,8 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
   Timeslot _selectedTimeslot = null;
   List<Entity> _selectedEntities = [];
 
+  final _form = GlobalKey<FormState>();
+
   @override
   void didChangeDependencies() {
     if (_isInit) {
@@ -50,20 +52,18 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
         BookingProvider().getLevelsAsFilters(this._company.id, weekDates),
         LevelLinkingProvider().getEntitiesLinking(null, this._company.id)
       ]).then((results) {
-        setState(() {
-          this._levels = results[0];
+        this._levels = results[0];
 
-          addChildEntityIdsToParentEntities(results[1]);
-          List<Entity> firstLevelEntities =
-              this._levels.firstWhere((l) => l.orderIndex == 1).entities;
-          List<Entity> currentCombination = [];
-          this.getAllLinkedEntitiesCombinations(firstLevelEntities,
-              currentCombination, this.allEntityCombinations);
+        addChildEntityIdsToParentEntities(results[1]);
+        List<Entity> firstLevelEntities =
+            this._levels.firstWhere((l) => l.orderIndex == 1).entities;
+        List<Entity> currentCombination = [];
+        this.getAllLinkedEntitiesCombinations(
+            firstLevelEntities, currentCombination, this.allEntityCombinations);
 
-          this.initFilteredLevels();
-          this.initFilteredLevelsForApiCall();
-          this.initTimeslots();
-        });
+        this.initFilteredLevels();
+        this.initFilteredLevelsForApiCall();
+        this.initTimeslots();
       });
     }
     _isInit = false;
@@ -77,12 +77,14 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
             DatesHelper.getWeekDates(_pickedDate), _filteredLevelsForApiCall)
         .then((timeslotsMatrix) {
       var flatTimeslots = flattenTimeslotMatrix(timeslotsMatrix);
-      _timeslots = flatTimeslots.where((t) {
-        return DateFormat('yyyy-MM-dd').format(t.startTime) ==
-                DateFormat('yyyy-MM-dd').format(_pickedDate) &&
-            t.isSelectable &&
-            !t.isFullBooked;
-      }).toList();
+      setState(() {
+        _timeslots = flatTimeslots.where((t) {
+          return DateFormat('yyyy-MM-dd').format(t.startTime) ==
+                  DateFormat('yyyy-MM-dd').format(_pickedDate) &&
+              t.isSelectable &&
+              !t.isFullBooked;
+        }).toList();
+      });
     });
   }
 
@@ -345,7 +347,7 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
             Container(
               width: 80,
               height: 80,
-              margin: EdgeInsets.only(left: 10),
+              padding: EdgeInsets.all(5),
               child: FittedBox(
                 child: getEntityImageForDdl(level),
                 fit: BoxFit.cover,
@@ -355,22 +357,25 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
               width: 10,
             ),
             Expanded(
-              child: DropdownButtonFormField<Entity>(
-                  isDense: true,
-                  decoration: InputDecoration(
-                    labelText: level.levelName_RO,
-                    contentPadding: EdgeInsets.all(0),
-                    enabledBorder: UnderlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Theme.of(context).accentColor)),
-                  ),
-                  value: _selectedEntities.firstWhere(
-                      (e) => e.idLevel == level.id,
-                      orElse: () => null),
-                  items: getDdlEntities(level),
-                  onChanged: (Entity newValue) {
-                    onEntityChange(newValue, level);
-                  }),
+              child: Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: DropdownButtonFormField<Entity>(
+                    isDense: true,
+                    decoration: InputDecoration(
+                      labelText: level.levelName_RO,
+                      contentPadding: EdgeInsets.all(0),
+                      enabledBorder: UnderlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Theme.of(context).accentColor)),
+                    ),
+                    value: _selectedEntities.firstWhere(
+                        (e) => e.idLevel == level.id,
+                        orElse: () => null),
+                    items: getDdlEntities(level),
+                    onChanged: (Entity newValue) {
+                      onEntityChange(newValue, level);
+                    }),
+              ),
             ),
           ],
         );
@@ -379,6 +384,14 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
       });
 
     return wdgs;
+  }
+
+  void bookNow() {
+    final isValid = _form.currentState.validate();
+    if (!isValid) return;
+
+    Navigator.of(context)
+        .pushNamed(CompanyBookingScreen.routeName, arguments: _company);
   }
 
   @override
@@ -397,205 +410,223 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            Container(
-              height: 150,
-              width: double.infinity,
-              child: GoogleMap(
-                initialCameraPosition: CameraPosition(
-                    target: LatLng(_company.lat, _company.lng), zoom: 16),
-                mapType: MapType.normal,
-                markers: {
-                  Marker(
-                      markerId: MarkerId('m1'),
-                      position: LatLng(_company.lat, _company.lng)),
-                },
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8, 5, 8, 0),
+              child: Card(
+                child: Row(
+                  children: <Widget>[
+                    Container(
+                      height: 120,
+                      width: 120,
+                      child: _company.image.length > 0
+                          ? Image.memory(
+                              base64Decode(_company.image[0].img),
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                            )
+                          : Image.network(
+                              'https://i.ya-webdesign.com/images/vector-buildings-logo-1.png',
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                            ),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            'Adresa: ' + _company.address,
+                            textAlign: TextAlign.left,
+                            maxLines: 3,
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: Colors.black,
+                            ),
+                          ),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                            'Telefon: ' + _company.phone,
+                            textAlign: TextAlign.left,
+                            maxLines: 3,
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: Colors.black,
+                            ),
+                          ),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                            'Email: ' + _company.email,
+                            textAlign: TextAlign.left,
+                            maxLines: 3,
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              // Image.network(
-              //   GoogleMapsHelper.generateLocationPreviewImage(
-              //       latitude: company.lat, longitude: company.lng),
-              //   fit: BoxFit.cover,
-              //   width: double.infinity,
-              // ),
             ),
-            SizedBox(
-              height: 10,
-            ),
-            Row(
-              children: <Widget>[
-                Container(
-                  height: 120,
-                  width: 120,
-                  child: _company.image.length > 0
-                      ? Image.memory(
-                          base64Decode(_company.image[0].img),
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                        )
-                      : Image.network(
-                          'https://i.ya-webdesign.com/images/vector-buildings-logo-1.png',
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                        ),
-                ),
-                SizedBox(
-                  width: 5,
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        'Adresa: ' + _company.address,
-                        textAlign: TextAlign.left,
-                        maxLines: 3,
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: Colors.black,
-                        ),
-                      ),
-                      SizedBox(
-                        height: 5,
-                      ),
-                      Text(
-                        'Telefon: ' + _company.phone,
-                        textAlign: TextAlign.left,
-                        maxLines: 3,
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: Colors.black,
-                        ),
-                      ),
-                      SizedBox(
-                        height: 5,
-                      ),
-                      Text(
-                        'Email: ' + _company.email,
-                        textAlign: TextAlign.left,
-                        maxLines: 3,
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: 5,
-            ),
-            ...entitiesDdls,
-            SizedBox(
-              height: 5,
-            ),
-            Row(
-              children: <Widget>[
-                Center(
-                  child: IconButton(
-                    icon: Icon(Icons.calendar_today),
-                    onPressed: () {
-                      showDatePicker(
-                              context: context,
-                              initialDate: DateTime.now(),
-                              firstDate: DateTime(DateTime.now().year,
-                                  DateTime.now().month, DateTime.now().day),
-                              lastDate: DateTime(2100))
-                          .then((selectedDate) {
-                        if (selectedDate == null)
-                          return;
-                        else
-                          setState(() {
-                            _pickedDate = selectedDate;
-                            _selectedTimeslot = null;
 
-                            var filteredEntititesPerLevel =
-                                this.getFilteredEntitiesPerLevel();
-                            this.setupFilterObjectForApiCall(
-                                filteredEntititesPerLevel);
-                            this.initTimeslots();
-                          });
-                      });
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+              child: Card(
+                child: Container(
+                  height: 150,
+                  width: double.infinity,
+                  child: GoogleMap(
+                    initialCameraPosition: CameraPosition(
+                        target: LatLng(_company.lat, _company.lng), zoom: 16),
+                    mapType: MapType.normal,
+                    markers: {
+                      Marker(
+                          markerId: MarkerId('m1'),
+                          position: LatLng(_company.lat, _company.lng)),
                     },
                   ),
                 ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      'Data: ' + DateFormat('dd-MMM-yyyy').format(_pickedDate),
-                      style: TextStyle(fontSize: 18),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+              child: Card(
+                child: Column(
+                  children: <Widget>[
+                    ...entitiesDdls,
+                    SizedBox(
+                      height: 5,
                     ),
-                  ),
-                ),
-                SizedBox(
-                  width: 10,
-                ),
-                Container(
-                  padding: EdgeInsets.all(8),
-                  alignment: AlignmentDirectional.bottomStart,
-                  child: RaisedButton.icon(
-                    onPressed: () {
-                      setState(() {
-                        _selectedEntities = [];
-                        _selectedTimeslot = null;
-                        this.initFilteredLevels();
-                        this.initFilteredLevelsForApiCall();
-                        this.initTimeslots();
-                      });
-                    },
-                    shape: RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(18.0)),
-                    icon: Icon(Icons.refresh),
-                    label: Text('Reset'),
-                    elevation: 1,
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    color: Theme.of(context).accentColor,
-                    textColor: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: 5,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                IconButton(
-                  onPressed: () {},
-                  icon: Icon(Icons.access_time),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: DropdownButtonFormField<Timeslot>(
-                      isDense: true,
-                      decoration: InputDecoration(
-                        labelText: 'Ora inceput',
-                        contentPadding: EdgeInsets.all(0),
-                        enabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Theme.of(context).accentColor)),
+                    Row(
+                      children: <Widget>[
+                        Center(
+                          child: IconButton(
+                            icon: Icon(Icons.calendar_today),
+                            onPressed: () {
+                              showDatePicker(
+                                      context: context,
+                                      initialDate: DateTime.now(),
+                                      firstDate: DateTime(
+                                          DateTime.now().year,
+                                          DateTime.now().month,
+                                          DateTime.now().day),
+                                      lastDate: DateTime(2100))
+                                  .then((selectedDate) {
+                                if (selectedDate == null)
+                                  return;
+                                else
+                                  _pickedDate = selectedDate;
+                                _selectedTimeslot = null;
+
+                                var filteredEntititesPerLevel =
+                                    this.getFilteredEntitiesPerLevel();
+                                this.setupFilterObjectForApiCall(
+                                    filteredEntititesPerLevel);
+                                this.initTimeslots();
+                              });
+                            },
+                          ),
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              'Data: ' +
+                                  DateFormat('dd-MMM-yyyy').format(_pickedDate),
+                              style: TextStyle(fontSize: 18),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Container(
+                          padding: EdgeInsets.all(8),
+                          alignment: AlignmentDirectional.bottomStart,
+                          child: RaisedButton.icon(
+                            onPressed: () {
+                              _selectedEntities = [];
+                              _selectedTimeslot = null;
+                              this.initFilteredLevels();
+                              this.initFilteredLevelsForApiCall();
+                              this.initTimeslots();
+                            },
+                            shape: RoundedRectangleBorder(
+                                borderRadius: new BorderRadius.circular(18.0)),
+                            icon: Icon(Icons.refresh),
+                            label: Text('Reset'),
+                            elevation: 1,
+                            materialTapTargetSize:
+                                MaterialTapTargetSize.shrinkWrap,
+                            color: Theme.of(context).accentColor,
+                            textColor: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Form(
+                      key: _form,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          IconButton(
+                            onPressed: () {},
+                            icon: Icon(Icons.access_time),
+                          ),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: DropdownButtonFormField<Timeslot>(
+                                isDense: true,
+                                decoration: InputDecoration(
+                                  labelText: 'Ora inceput',
+                                  contentPadding: EdgeInsets.all(0),
+                                  enabledBorder: UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color:
+                                              Theme.of(context).accentColor)),
+                                ),
+                                value: _selectedTimeslot,
+                                items: _timeslots.map((timeslot) {
+                                  return new DropdownMenuItem<Timeslot>(
+                                    child: Text(DateFormat('HH:mm')
+                                        .format(timeslot.startTime)),
+                                    value: timeslot,
+                                  );
+                                }).toList(),
+                                validator: (_) {
+                                  return _selectedTimeslot == null
+                                      ? 'camp obligatoriu'
+                                      : null;
+                                },
+                                onChanged: (Timeslot newValue) {
+                                  setState(() {
+                                    _selectedTimeslot = newValue;
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                      value: _selectedTimeslot,
-                      items: _timeslots.map((timeslot) {
-                        return new DropdownMenuItem<Timeslot>(
-                          child: Text(
-                              DateFormat('hh:mm').format(timeslot.startTime)),
-                          value: timeslot,
-                        );
-                      }).toList(),
-                      onChanged: (Timeslot newValue) {
-                        setState(() {
-                          _selectedTimeslot = newValue;
-                        });
-                      },
                     ),
-                  ),
+                  ],
                 ),
-              ],
+              ),
             ),
+
             // Row(
             //   children: <Widget>[
             //     Container(
@@ -637,8 +668,7 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          Navigator.of(context)
-              .pushNamed(CompanyBookingScreen.routeName, arguments: _company);
+          this.bookNow();
         },
         label: Text('Programeaza acum'),
         icon: Icon(Icons.thumb_up),
