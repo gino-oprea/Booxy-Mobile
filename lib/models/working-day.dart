@@ -24,7 +24,7 @@ class WorkingDay {
   Map toJson() {
     Map obj = {
       'workHours': this.workHours,
-      'date': DateFormat('yyyy-MM-dd').format(this.date)
+      'date': DateFormat('yyyy-MM-ddTHH:mm:ss').format(this.date)
     };
 
     return obj;

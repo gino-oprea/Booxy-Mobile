@@ -113,5 +113,19 @@ class BookingProvider with ChangeNotifier {
 
     final response = await http.post(url,
         headers: {'Content-Type': 'application/json'}, body: bdyObj);
+
+    final extractedData = json.decode(response.body) as Map<String, dynamic>;
+    if (extractedData == null) {
+      return null;
+    }
+
+    final List<dynamic> objList = extractedData["objList"];
+    if (objList == null || objList.length == 0) return null;
+
+    var value = objList[0];
+    var autoAssignedEntityCompbination =
+        new AutoAssignedEntityCombination().fromJson(value);
+
+    return autoAssignedEntityCompbination;
   }
 }

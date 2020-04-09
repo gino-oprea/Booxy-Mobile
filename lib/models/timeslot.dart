@@ -51,8 +51,8 @@ class Timeslot {
 
   Map toJson() {
     Map obj = {
-      'startTime': DateFormat('yyyy-MM-dd hh:mm').format(this.startTime),
-      'endTime': DateFormat('yyyy-MM-dd hh:mm').format(this.endTime),
+      'startTime': DateFormat('yyyy-MM-ddThh:mm:ss').format(this.startTime),
+      'endTime': DateFormat('yyyy-MM-ddThh:mm:ss').format(this.endTime),
       'isSelectable': this.isSelectable,
       'isSelected': this.isSelected,
       'bookings': this.bookings != null

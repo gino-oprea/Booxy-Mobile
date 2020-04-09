@@ -1,4 +1,7 @@
 import 'dart:convert';
+import 'package:booxy/models/auto-assign-payload.dart';
+import 'package:booxy/models/booking-confirmation-payload.dart';
+
 import '../providers/booxy-image-provider.dart';
 import 'package:intl/intl.dart';
 
@@ -36,6 +39,7 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
   List<LevelAsFilter> _filteredLevels;
   List<LevelAsFilter> _filteredLevelsForApiCall;
   List<List<Entity>> allEntityCombinations = [];
+  List<List<List<Timeslot>>> _timeslotMatrix = [];
   List<Timeslot> _timeslots = [];
   Timeslot _selectedTimeslot = null;
   List<Entity> _selectedEntities = [];
@@ -76,6 +80,7 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
         .generateHoursMatrix(this._company.id,
             DatesHelper.getWeekDates(_pickedDate), _filteredLevelsForApiCall)
         .then((timeslotsMatrix) {
+      this._timeslotMatrix = timeslotsMatrix;
       var flatTimeslots = flattenTimeslotMatrix(timeslotsMatrix);
       setState(() {
         _timeslots = flatTimeslots.where((t) {
@@ -307,6 +312,7 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
               DatesHelper.getWeekDates(_pickedDate), _filteredLevelsForApiCall)
           .then((timeslotsMatrix) {
         setState(() {
+          this._timeslotMatrix = timeslotsMatrix;
           var flatTimeslots = flattenTimeslotMatrix(timeslotsMatrix);
           _timeslots = flatTimeslots.where((t) {
             return DateFormat('yyyy-MM-dd').format(t.startTime) ==
@@ -390,8 +396,27 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
     final isValid = _form.currentState.validate();
     if (!isValid) return;
 
-    Navigator.of(context)
-        .pushNamed(CompanyBookingScreen.routeName, arguments: _company);
+    var autoAssignPayload = AutoAssignPayload(
+        selectedLevels: this._filteredLevels,
+        bookingDayTimeslots: this._timeslotMatrix.firstWhere((t) =>
+            DateFormat('yyyy-MM-dd').format(t[0][0].startTime) ==
+            DateFormat('yyyy-MM-dd').format(_pickedDate)));
+
+    BookingProvider()
+        .autoAssignEntitiesToBooking(
+            this._company.id,
+            DateFormat('yyyy-MM-dd').format(this._pickedDate),
+            DateFormat('HH:mm')
+                .format(this._selectedTimeslot.startTime),
+            autoAssignPayload)
+        .then((autoAssignedEntities) {
+      if (autoAssignedEntities != null)
+        Navigator.of(context).pushNamed(CompanyBookingScreen.routeName,
+            arguments: BookingConfirmationPayload(
+                company: this._company,
+                autoAssignedEntityCombination: autoAssignedEntities, 
+                bookingStartDate: this._selectedTimeslot.startTime));
+    });
   }
 
   @override
