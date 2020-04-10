@@ -1,4 +1,6 @@
 import 'dart:convert';
+import '../providers/booking-provider.dart';
+
 import '../models/auto-assigned-entity-combination.dart';
 import '../models/booking-confirmation-payload.dart';
 import '../models/company.dart';
@@ -13,12 +15,11 @@ class CompanyBookingScreen extends StatefulWidget {
   _CompanyBookingScreenState createState() => _CompanyBookingScreenState();
 }
 
-class _CompanyBookingScreenState extends State<CompanyBookingScreen> {  
+class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
   bool _isInit = true;
   Company _company;
   AutoAssignedEntityCombination _autoAssignedEntityCombination;
   DateTime _bookingDateTime;
-  
 
   final _firstNameFocusNode = FocusNode();
   final _lastNameFocusNode = FocusNode();
@@ -43,6 +44,9 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
     _phoneFocusNode.dispose();
     _emailFocusNode.dispose();
 
+    BookingProvider().removePotentialBooking(
+        this._autoAssignedEntityCombination.idPotentialBooking);
+
     super.dispose();
   }
 
@@ -63,21 +67,19 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
           .autoAssignedEntityCombination;
       this._bookingDateTime = (ModalRoute.of(context).settings.arguments
               as BookingConfirmationPayload)
-          .bookingStartDate;      
+          .bookingStartDate;
     }
     _isInit = false;
 
     super.didChangeDependencies();
   }
 
-  
-
   void saveForm() {
     final isValid = _form.currentState.validate();
     if (!isValid) return;
 
-    _form.currentState.save(); //triggers onSaved on every form field    
-  }  
+    _form.currentState.save(); //triggers onSaved on every form field
+  }
 
   List<Widget> generateEntitiesTxts() {
     List<Widget> wdgs = [];
@@ -86,7 +88,6 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
         this._autoAssignedEntityCombination.entityCombination != null)
       this._autoAssignedEntityCombination.entityCombination.forEach((entity) {
         var ddl = Row(
-          
           children: <Widget>[
             Container(
               width: 100,
@@ -103,14 +104,14 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
               width: 10,
             ),
             // Expanded(
-              // child: 
-              Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: Text(
-                  entity.entityName_RO,
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),               
+            // child:
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: Text(
+                entity.entityName_RO,
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
+            ),
             // ),
           ],
         );
@@ -287,7 +288,7 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
                               fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                       ),
-                    ),                   
+                    ),
                     SizedBox(
                       width: 15,
                     ),
@@ -320,7 +321,7 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
                               DateFormat('HH:mm').format(this._bookingDateTime),
                           style: TextStyle(
                               fontSize: 18, fontWeight: FontWeight.bold),
-                        ),                        
+                        ),
                       ),
                     ),
                   ],

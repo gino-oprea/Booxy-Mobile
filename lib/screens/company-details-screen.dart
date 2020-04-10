@@ -1,26 +1,18 @@
 import 'dart:convert';
-import 'package:booxy/models/auto-assign-payload.dart';
-import 'package:booxy/models/booking-confirmation-payload.dart';
-
+import '../models/auto-assign-payload.dart';
+import '../models/auto-assigned-entity-combination.dart';
+import '../models/booking-confirmation-payload.dart';
 import '../providers/booxy-image-provider.dart';
 import 'package:intl/intl.dart';
-
 import './company-booking-screen.dart';
-import '../providers/working-hours-provider.dart';
-import '../models/working-hours.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../models/company.dart';
 import 'package:flutter/material.dart';
 import '../models/timeslot.dart';
-
 import '../models/entities-link.dart';
-
 import '../helpers/dates-helper.dart';
 import '../providers/booking-provider.dart';
 import '../models/level-as-filter.dart';
-import '../models/company.dart';
-
-import '../models/booking.dart';
 import '../models/entity.dart';
 import '../providers/level-linking-provider.dart';
 
@@ -406,16 +398,18 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
         .autoAssignEntitiesToBooking(
             this._company.id,
             DateFormat('yyyy-MM-dd').format(this._pickedDate),
-            DateFormat('HH:mm')
-                .format(this._selectedTimeslot.startTime),
+            DateFormat('HH:mm').format(this._selectedTimeslot.startTime),
             autoAssignPayload)
-        .then((autoAssignedEntities) {
-      if (autoAssignedEntities != null)
+        .then((gro) {
+      if (gro.objList.length > 0) {
+        var obj = gro.objList[
+            0]; //AutoAssignedEntityCombination().fromJson(gro.objList[0]);
         Navigator.of(context).pushNamed(CompanyBookingScreen.routeName,
             arguments: BookingConfirmationPayload(
                 company: this._company,
-                autoAssignedEntityCombination: autoAssignedEntities, 
+                autoAssignedEntityCombination: obj,
                 bookingStartDate: this._selectedTimeslot.startTime));
+      }
     });
   }
 

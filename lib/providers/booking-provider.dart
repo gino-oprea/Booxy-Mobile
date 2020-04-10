@@ -1,4 +1,6 @@
 import 'dart:convert';
+import '../models/generic-response-object.dart';
+
 import '../models/auto-assign-payload.dart';
 
 import '../models/auto-assigned-entity-combination.dart';
@@ -96,11 +98,9 @@ class BookingProvider with ChangeNotifier {
     return timeslots;
   }
 
-  Future<AutoAssignedEntityCombination> autoAssignEntitiesToBooking(
-      int idCompany,
-      String bookingDate,
-      String startTime,
-      AutoAssignPayload autoAssignPayload) async {
+  Future<GenericResponseObject<AutoAssignedEntityCombination>>
+      autoAssignEntitiesToBooking(int idCompany, String bookingDate,
+          String startTime, AutoAssignPayload autoAssignPayload) async {
     String url = BooxyConfig.api_endpoint +
         'Booking/AutoAssignEntitiesToBooking/' +
         idCompany.toString() +
@@ -119,13 +119,37 @@ class BookingProvider with ChangeNotifier {
       return null;
     }
 
-    final List<dynamic> objList = extractedData["objList"];
-    if (objList == null || objList.length == 0) return null;
+    GenericResponseObject<AutoAssignedEntityCombination> gro =
+        GenericResponseObject<AutoAssignedEntityCombination>()
+            .fromJson(extractedData);
+    return gro;
 
-    var value = objList[0];
-    var autoAssignedEntityCompbination =
-        new AutoAssignedEntityCombination().fromJson(value);
+    // final List<dynamic> objList = extractedData["objList"];
+    // if (objList == null || objList.length == 0) return null;
 
-    return autoAssignedEntityCompbination;
+    // var value = objList[0];
+    // var autoAssignedEntityCompbination =
+    //     new AutoAssignedEntityCombination().fromJson(value);
+
+    // return autoAssignedEntityCompbination;
+  }
+
+  Future<GenericResponseObject> removePotentialBooking(
+      int idPotentialBooking) async {
+    String url = BooxyConfig.api_endpoint +
+        'booking/RemovePotentialBooking/' +
+        idPotentialBooking.toString();
+
+    final response = await http.delete(url);
+
+    final extractedData = json.decode(response.body) as Map<String, dynamic>;
+    if (extractedData == null) {
+      return null;
+    }
+
+    final GenericResponseObject gro =
+        GenericResponseObject().fromJson(extractedData);
+
+    return gro;
   }
 }
