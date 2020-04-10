@@ -270,15 +270,35 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
   }
 
   Widget getEntityImageForDdl(LevelAsFilter level) {
+    Widget imageWidget;
     var selectedEnt = _selectedEntities.firstWhere((e) => e.idLevel == level.id,
         orElse: () => null);
     if (selectedEnt != null) {
-      if (selectedEnt.images != null)
-        return Image.memory(base64Decode(selectedEnt.images[0].img));
+      if (selectedEnt.images != null) {
+        imageWidget = Image.memory(base64Decode(selectedEnt.images[0].img));
+        return Container(
+          width: 100,
+          height: 100,
+          padding: EdgeInsets.all(5),
+          child: FittedBox(
+            child: imageWidget,
+            fit: BoxFit.cover,
+          ),
+        );
+      }
     }
     // return Image.network(
     //     'https://i.ya-webdesign.com/images/vector-buildings-logo-1.png');
-    return Icon(Icons.extension);
+    imageWidget = Icon(Icons.extension);
+    return Container(
+      width: 50,
+      height: 50,
+      padding: EdgeInsets.all(5),
+      child: FittedBox(
+        child: imageWidget,
+        fit: BoxFit.cover,
+      ),
+    );
   }
 
   void onEntityChange(Entity newValue, LevelAsFilter level) {
@@ -342,15 +362,7 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
       _filteredLevels.forEach((level) {
         var ddl = Row(
           children: <Widget>[
-            Container(
-              width: 80,
-              height: 80,
-              padding: EdgeInsets.all(5),
-              child: FittedBox(
-                child: getEntityImageForDdl(level),
-                fit: BoxFit.cover,
-              ),
-            ),
+            getEntityImageForDdl(level),
             SizedBox(
               width: 10,
             ),
@@ -384,33 +396,39 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
     return wdgs;
   }
 
-  void bookNow() {
+  Future<String> bookNow() async {
     final isValid = _form.currentState.validate();
-    if (!isValid) return;
+    if (!isValid) return '';
 
     var autoAssignPayload = AutoAssignPayload(
-        selectedLevels: this._filteredLevels,
+        selectedLevels: this._filteredLevelsForApiCall,
         bookingDayTimeslots: this._timeslotMatrix.firstWhere((t) =>
             DateFormat('yyyy-MM-dd').format(t[0][0].startTime) ==
             DateFormat('yyyy-MM-dd').format(_pickedDate)));
 
-    BookingProvider()
-        .autoAssignEntitiesToBooking(
-            this._company.id,
-            DateFormat('yyyy-MM-dd').format(this._pickedDate),
-            DateFormat('HH:mm').format(this._selectedTimeslot.startTime),
-            autoAssignPayload)
-        .then((gro) {
-      if (gro.objList.length > 0) {
-        var obj = gro.objList[
-            0]; //AutoAssignedEntityCombination().fromJson(gro.objList[0]);
-        Navigator.of(context).pushNamed(CompanyBookingScreen.routeName,
-            arguments: BookingConfirmationPayload(
-                company: this._company,
-                autoAssignedEntityCombination: obj,
-                bookingStartDate: this._selectedTimeslot.startTime));
-      }
-    });
+    var gro = await BookingProvider().autoAssignEntitiesToBooking(
+        this._company.id,
+        DateFormat('yyyy-MM-dd').format(this._pickedDate),
+        DateFormat('HH:mm').format(this._selectedTimeslot.startTime),
+        autoAssignPayload);
+
+    if (gro.objList.length > 0) {
+      var obj = gro.objList[
+          0]; //AutoAssignedEntityCombination().fromJson(gro.objList[0]);
+      Navigator.of(context)
+          .pushNamed(CompanyBookingScreen.routeName,
+              arguments: BookingConfirmationPayload(
+                  company: this._company,
+                  autoAssignedEntityCombination: obj,
+                  bookingStartDate: this._selectedTimeslot.startTime))
+          .then((_) {
+        this._selectedTimeslot = null;
+        this.initTimeslots();
+      });
+
+      return '';
+    } else
+      return 'not_available';
   }
 
   @override
@@ -519,129 +537,134 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
               child: Card(
-                child: Column(
-                  children: <Widget>[
-                    ...entitiesDdls,
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Row(
-                      children: <Widget>[
-                        Center(
-                          child: IconButton(
-                            icon: Icon(Icons.calendar_today),
-                            onPressed: () {
-                              showDatePicker(
-                                      context: context,
-                                      initialDate: DateTime.now(),
-                                      firstDate: DateTime(
-                                          DateTime.now().year,
-                                          DateTime.now().month,
-                                          DateTime.now().day),
-                                      lastDate: DateTime(2100))
-                                  .then((selectedDate) {
-                                if (selectedDate == null)
-                                  return;
-                                else
-                                  _pickedDate = selectedDate;
-                                _selectedTimeslot = null;
-
-                                var filteredEntititesPerLevel =
-                                    this.getFilteredEntitiesPerLevel();
-                                this.setupFilterObjectForApiCall(
-                                    filteredEntititesPerLevel);
-                                this.initTimeslots();
-                              });
-                            },
-                          ),
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              'Data: ' +
-                                  DateFormat('dd-MMM-yyyy').format(_pickedDate),
-                              style: TextStyle(fontSize: 18),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Container(
-                          padding: EdgeInsets.all(8),
-                          alignment: AlignmentDirectional.bottomStart,
-                          child: RaisedButton.icon(
-                            onPressed: () {
-                              _selectedEntities = [];
-                              _selectedTimeslot = null;
-                              this.initFilteredLevels();
-                              this.initFilteredLevelsForApiCall();
-                              this.initTimeslots();
-                            },
-                            shape: RoundedRectangleBorder(
-                                borderRadius: new BorderRadius.circular(18.0)),
-                            icon: Icon(Icons.refresh),
-                            label: Text('Reset'),
-                            elevation: 1,
-                            materialTapTargetSize:
-                                MaterialTapTargetSize.shrinkWrap,
-                            color: Theme.of(context).accentColor,
-                            textColor: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Form(
-                      key: _form,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    children: <Widget>[
+                      ...entitiesDdls,
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Row(
                         children: <Widget>[
-                          IconButton(
-                            onPressed: () {},
-                            icon: Icon(Icons.access_time),
+                          Center(
+                            child: IconButton(
+                              icon: Icon(Icons.calendar_today),
+                              onPressed: () {
+                                showDatePicker(
+                                        context: context,
+                                        initialDate: DateTime.now(),
+                                        firstDate: DateTime(
+                                            DateTime.now().year,
+                                            DateTime.now().month,
+                                            DateTime.now().day),
+                                        lastDate: DateTime(2100))
+                                    .then((selectedDate) {
+                                  if (selectedDate == null)
+                                    return;
+                                  else
+                                    _pickedDate = selectedDate;
+                                  _selectedTimeslot = null;
+
+                                  var filteredEntititesPerLevel =
+                                      this.getFilteredEntitiesPerLevel();
+                                  this.setupFilterObjectForApiCall(
+                                      filteredEntititesPerLevel);
+                                  this.initTimeslots();
+                                });
+                              },
+                            ),
                           ),
                           Expanded(
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: DropdownButtonFormField<Timeslot>(
-                                isDense: true,
-                                decoration: InputDecoration(
-                                  labelText: 'Ora inceput',
-                                  contentPadding: EdgeInsets.all(0),
-                                  enabledBorder: UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                          color:
-                                              Theme.of(context).accentColor)),
-                                ),
-                                value: _selectedTimeslot,
-                                items: _timeslots.map((timeslot) {
-                                  return new DropdownMenuItem<Timeslot>(
-                                    child: Text(DateFormat('HH:mm')
-                                        .format(timeslot.startTime)),
-                                    value: timeslot,
-                                  );
-                                }).toList(),
-                                validator: (_) {
-                                  return _selectedTimeslot == null
-                                      ? 'camp obligatoriu'
-                                      : null;
-                                },
-                                onChanged: (Timeslot newValue) {
-                                  setState(() {
-                                    _selectedTimeslot = newValue;
-                                  });
-                                },
+                              child: Text(
+                                'Data: ' +
+                                    DateFormat('dd-MMM-yyyy')
+                                        .format(_pickedDate),
+                                style: TextStyle(fontSize: 18),
                               ),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            alignment: AlignmentDirectional.bottomStart,
+                            child: RaisedButton.icon(
+                              onPressed: () {
+                                _selectedEntities = [];
+                                _selectedTimeslot = null;
+                                this.initFilteredLevels();
+                                this.initFilteredLevelsForApiCall();
+                                this.initTimeslots();
+                              },
+                              shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      new BorderRadius.circular(18.0)),
+                              icon: Icon(Icons.refresh),
+                              label: Text('Reset'),
+                              elevation: 1,
+                              materialTapTargetSize:
+                                  MaterialTapTargetSize.shrinkWrap,
+                              color: Theme.of(context).accentColor,
+                              textColor: Colors.white,
                             ),
                           ),
                         ],
                       ),
-                    ),
-                  ],
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Form(
+                        key: _form,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: <Widget>[
+                            IconButton(
+                              onPressed: () {},
+                              icon: Icon(Icons.access_time),
+                            ),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: DropdownButtonFormField<Timeslot>(
+                                  isDense: true,
+                                  decoration: InputDecoration(
+                                    labelText: 'Ora inceput',
+                                    contentPadding: EdgeInsets.all(0),
+                                    enabledBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color:
+                                                Theme.of(context).accentColor)),
+                                  ),
+                                  value: _selectedTimeslot,
+                                  items: _timeslots.map((timeslot) {
+                                    return new DropdownMenuItem<Timeslot>(
+                                      child: Text(DateFormat('HH:mm')
+                                          .format(timeslot.startTime)),
+                                      value: timeslot,
+                                    );
+                                  }).toList(),
+                                  validator: (_) {
+                                    return _selectedTimeslot == null
+                                        ? 'camp obligatoriu'
+                                        : null;
+                                  },
+                                  onChanged: (Timeslot newValue) {
+                                    setState(() {
+                                      _selectedTimeslot = newValue;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -685,12 +708,22 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          this.bookNow();
-        },
-        label: Text('Programeaza acum'),
-        icon: Icon(Icons.thumb_up),
+      floatingActionButton: Builder(
+        builder: (context) => FloatingActionButton.extended(
+          onPressed: () async {
+            String res = await this.bookNow();
+            if (res == 'not_available') {
+              Scaffold.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Ora indisponibila'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
+            }
+          },
+          label: Text('Programeaza acum'),
+          icon: Icon(Icons.thumb_up),
+        ),
       ),
     );
   }

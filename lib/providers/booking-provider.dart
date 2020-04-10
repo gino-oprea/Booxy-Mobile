@@ -1,4 +1,6 @@
 import 'dart:convert';
+import '../models/booking.dart';
+
 import '../models/generic-response-object.dart';
 
 import '../models/auto-assign-payload.dart';
@@ -98,9 +100,11 @@ class BookingProvider with ChangeNotifier {
     return timeslots;
   }
 
-  Future<GenericResponseObject<AutoAssignedEntityCombination>>
-      autoAssignEntitiesToBooking(int idCompany, String bookingDate,
-          String startTime, AutoAssignPayload autoAssignPayload) async {
+  Future<GenericResponseObject> autoAssignEntitiesToBooking(
+      int idCompany,
+      String bookingDate,
+      String startTime,
+      AutoAssignPayload autoAssignPayload) async {
     String url = BooxyConfig.api_endpoint +
         'Booking/AutoAssignEntitiesToBooking/' +
         idCompany.toString() +
@@ -119,19 +123,44 @@ class BookingProvider with ChangeNotifier {
       return null;
     }
 
-    GenericResponseObject<AutoAssignedEntityCombination> gro =
-        GenericResponseObject<AutoAssignedEntityCombination>()
-            .fromJson(extractedData);
+    GenericResponseObject gro = GenericResponseObject().fromJson(extractedData);
+
+    gro.objList = new List<AutoAssignedEntityCombination>();
+
+    if (gro.objListAsMap != null)
+      for (int i = 0; i < gro.objListAsMap.length; i++) {
+        var obj =
+            new AutoAssignedEntityCombination().fromJson(gro.objListAsMap[i]);
+        gro.objList.add(obj);
+      }
+
     return gro;
+  }
 
-    // final List<dynamic> objList = extractedData["objList"];
-    // if (objList == null || objList.length == 0) return null;
+  Future<GenericResponseObject> addBooking(Booking booking) async {
+    String url = BooxyConfig.api_endpoint + 'Booking?culture=RO';
 
-    // var value = objList[0];
-    // var autoAssignedEntityCompbination =
-    //     new AutoAssignedEntityCombination().fromJson(value);
+    var bdyObj = json.encode(booking.toJson());
 
-    // return autoAssignedEntityCompbination;
+    final response = await http.post(url,
+        headers: {'Content-Type': 'application/json'}, body: bdyObj);
+
+    final extractedData = json.decode(response.body) as Map<String, dynamic>;
+    if (extractedData == null) {
+      return null;
+    }
+
+    GenericResponseObject gro = GenericResponseObject().fromJson(extractedData);
+
+    gro.objList = new List<AutoAssignedEntityCombination>();
+    if (gro.objListAsMap != null)
+      for (int i = 0; i < gro.objListAsMap.length; i++) {
+        var obj =
+            new AutoAssignedEntityCombination().fromJson(gro.objListAsMap[i]);
+        gro.objList.add(obj);
+      }
+
+    return gro;
   }
 
   Future<GenericResponseObject> removePotentialBooking(

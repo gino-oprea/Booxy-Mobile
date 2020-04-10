@@ -1,4 +1,7 @@
 import 'dart:convert';
+import '../models/booking-entity.dart';
+import '../models/generic-response-object.dart';
+
 import '../providers/booking-provider.dart';
 
 import '../models/auto-assigned-entity-combination.dart';
@@ -27,13 +30,15 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
   final _emailFocusNode = FocusNode();
   final _form = GlobalKey<FormState>();
   var _editedBooking = Booking(
+      idUser: null,
       entities: [],
       firstName: null,
       lastName: null,
       phone: null,
       email: null,
       startDate: null,
-      startTime: null);
+      startTime: null,
+      endTime: null);
 
   // List<Entity> _selectedEntities = [];
 
@@ -74,11 +79,32 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
     super.didChangeDependencies();
   }
 
-  void saveForm() {
+  Future<GenericResponseObject> saveForm() async {
     final isValid = _form.currentState.validate();
-    if (!isValid) return;
+    if (!isValid) return null;
 
     _form.currentState.save(); //triggers onSaved on every form field
+
+    this.prepareBookingForSubmit();
+
+    //submit
+    return await BookingProvider().addBooking(this._editedBooking);
+  }
+
+  void prepareBookingForSubmit() {
+    this._editedBooking.entities = [];
+    this._autoAssignedEntityCombination.entityCombination.forEach((e) {
+      this._editedBooking.entities.add(BookingEntity(
+          idEntity: e.id,
+          isAutoAssigned: false,
+          entityName_RO: e.entityName_RO,
+          entityName_EN: e.entityName_EN));
+    });
+    this._editedBooking.idCompany = this._company.id;
+    this._editedBooking.startDate = this._bookingDateTime;
+    this._editedBooking.startTime = this._bookingDateTime;
+    this._editedBooking.endTime = this._bookingDateTime.add(
+        Duration(milliseconds: this._autoAssignedEntityCombination.duration));
   }
 
   List<Widget> generateEntitiesTxts() {
@@ -122,6 +148,16 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
     return wdgs;
   }
 
+  String getBookingPrice() {
+    var ent = this
+        ._autoAssignedEntityCombination
+        .entityCombination
+        .firstWhere((e) => e.defaultServicePrice != null, orElse: () => null);
+    if (ent == null) return '';
+
+    return ent.defaultServicePrice.toStringAsFixed(0) + ' RON';
+  }
+
   @override
   Widget build(BuildContext context) {
     var entitiesTxts = generateEntitiesTxts();
@@ -133,208 +169,303 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
       body: Form(
         key: _form,
         child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: Column(
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    IconButton(
-                      icon: Icon(
-                        Icons.person,
-                      ),
-                      onPressed: () {},
-                    ),
-                    Expanded(
-                      child: TextFormField(
-                        focusNode: _firstNameFocusNode,
-                        decoration: InputDecoration(
-                          labelText: 'Prenume',
-                          contentPadding: EdgeInsets.all(0),
-                          enabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Theme.of(context).accentColor),
-                          ),
+          child: Column(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(5, 10, 10, 20),
+                    child: Column(
+                      children: <Widget>[
+                        Row(
+                          children: <Widget>[
+                            IconButton(
+                              icon: Icon(
+                                Icons.person,
+                              ),
+                              onPressed: () {},
+                            ),
+                            Expanded(
+                              child: TextFormField(
+                                focusNode: _firstNameFocusNode,
+                                decoration: InputDecoration(
+                                  labelText: 'Prenume',
+                                  contentPadding: EdgeInsets.all(0),
+                                  enabledBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Theme.of(context).accentColor),
+                                  ),
+                                ),
+                                textInputAction: TextInputAction.next,
+                                validator: (value) {
+                                  return value.isEmpty
+                                      ? 'camp obligatoriu'
+                                      : null;
+                                },
+                                onFieldSubmitted: (_) {
+                                  FocusScope.of(context)
+                                      .requestFocus(_lastNameFocusNode);
+                                },
+                                onSaved: (value) {
+                                  this._editedBooking.firstName = value;
+                                },
+                              ),
+                            ),
+                          ],
                         ),
-                        textInputAction: TextInputAction.next,
-                        validator: (value) {
-                          return value.isEmpty ? 'camp obligatoriu' : null;
-                        },
-                        onFieldSubmitted: (_) {
-                          FocusScope.of(context)
-                              .requestFocus(_lastNameFocusNode);
-                        },
-                        onSaved: (value) {
-                          this._editedBooking.firstName = value;
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Row(
-                  children: <Widget>[
-                    IconButton(
-                      icon: Icon(Icons.person),
-                      onPressed: () {},
-                    ),
-                    Expanded(
-                      child: TextFormField(
-                        focusNode: _lastNameFocusNode,
-                        decoration: InputDecoration(
-                          labelText: 'Nume',
-                          contentPadding: EdgeInsets.all(0),
-                          enabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Theme.of(context).accentColor),
-                          ),
+                        SizedBox(
+                          height: 10,
                         ),
-                        textInputAction: TextInputAction.next,
-                        validator: (value) {
-                          return value.isEmpty ? 'camp obligatoriu' : null;
-                        },
-                        onFieldSubmitted: (_) {
-                          FocusScope.of(context).requestFocus(_phoneFocusNode);
-                        },
-                        onSaved: (value) {
-                          this._editedBooking.lastName = value;
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Row(
-                  children: <Widget>[
-                    IconButton(
-                      onPressed: () {},
-                      icon: Icon(Icons.phone),
-                    ),
-                    Expanded(
-                      child: TextFormField(
-                        focusNode: _phoneFocusNode,
-                        decoration: InputDecoration(
-                          labelText: 'Telefon',
-                          contentPadding: EdgeInsets.all(0),
-                          enabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Theme.of(context).accentColor),
-                          ),
+                        Row(
+                          children: <Widget>[
+                            IconButton(
+                              icon: Icon(Icons.person),
+                              onPressed: () {},
+                            ),
+                            Expanded(
+                              child: TextFormField(
+                                focusNode: _lastNameFocusNode,
+                                decoration: InputDecoration(
+                                  labelText: 'Nume',
+                                  contentPadding: EdgeInsets.all(0),
+                                  enabledBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Theme.of(context).accentColor),
+                                  ),
+                                ),
+                                textInputAction: TextInputAction.next,
+                                validator: (value) {
+                                  return value.isEmpty
+                                      ? 'camp obligatoriu'
+                                      : null;
+                                },
+                                onFieldSubmitted: (_) {
+                                  FocusScope.of(context)
+                                      .requestFocus(_phoneFocusNode);
+                                },
+                                onSaved: (value) {
+                                  this._editedBooking.lastName = value;
+                                },
+                              ),
+                            ),
+                          ],
                         ),
-                        keyboardType: TextInputType.phone,
-                        textInputAction: TextInputAction.next,
-                        validator: (value) {
-                          return value.isEmpty ? 'camp obligatoriu' : null;
-                        },
-                        onFieldSubmitted: (_) {
-                          FocusScope.of(context).requestFocus(_emailFocusNode);
-                        },
-                        onSaved: (value) {
-                          this._editedBooking.phone = value;
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Row(
-                  children: <Widget>[
-                    IconButton(
-                      icon: Icon(Icons.email),
-                      onPressed: () {},
-                    ),
-                    Expanded(
-                      child: TextFormField(
-                        focusNode: _emailFocusNode,
-                        decoration: InputDecoration(
-                          labelText: 'Email',
-                          contentPadding: EdgeInsets.all(0),
-                          enabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Theme.of(context).accentColor),
-                          ),
+                        SizedBox(
+                          height: 10,
                         ),
-                        textInputAction: TextInputAction.next,
-                        onSaved: (value) {
-                          this._editedBooking.email = value;
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                ...entitiesTxts,
-                SizedBox(
-                  height: 10,
-                ),
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          'Data: ' +
-                              DateFormat('dd-MMM-yyyy')
-                                  .format(this._bookingDateTime),
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
+                        Row(
+                          children: <Widget>[
+                            IconButton(
+                              onPressed: () {},
+                              icon: Icon(Icons.phone),
+                            ),
+                            Expanded(
+                              child: TextFormField(
+                                focusNode: _phoneFocusNode,
+                                decoration: InputDecoration(
+                                  labelText: 'Telefon',
+                                  contentPadding: EdgeInsets.all(0),
+                                  enabledBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Theme.of(context).accentColor),
+                                  ),
+                                ),
+                                keyboardType: TextInputType.phone,
+                                textInputAction: TextInputAction.next,
+                                validator: (value) {
+                                  return value.isEmpty
+                                      ? 'camp obligatoriu'
+                                      : null;
+                                },
+                                onFieldSubmitted: (_) {
+                                  FocusScope.of(context)
+                                      .requestFocus(_emailFocusNode);
+                                },
+                                onSaved: (value) {
+                                  this._editedBooking.phone = value;
+                                },
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 15,
-                    ),
-                    Expanded(
-                      child: Container(
-                        alignment: AlignmentDirectional.centerEnd,
-                        child: Text(
-                          'Pret: 100 RON',
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
+                        SizedBox(
+                          height: 10,
                         ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          'Ora: ' +
-                              DateFormat('HH:mm')
-                                  .format(this._bookingDateTime) +
-                              ' - ' +
-                              DateFormat('HH:mm').format(this._bookingDateTime),
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
+                        Row(
+                          children: <Widget>[
+                            IconButton(
+                              icon: Icon(Icons.email),
+                              onPressed: () {},
+                            ),
+                            Expanded(
+                              child: TextFormField(
+                                focusNode: _emailFocusNode,
+                                decoration: InputDecoration(
+                                  labelText: 'Email',
+                                  contentPadding: EdgeInsets.all(0),
+                                  enabledBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Theme.of(context).accentColor),
+                                  ),
+                                ),
+                                textInputAction: TextInputAction.next,
+                                onSaved: (value) {
+                                  this._editedBooking.email = value;
+                                },
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ],
-            ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Column(
+                      children: <Widget>[
+                        ...entitiesTxts,
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Column(
+                      children: <Widget>[
+                        Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: <Widget>[
+                                    Text(
+                                      'Data: ',
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text(
+                                      DateFormat('dd-MMM-yyyy')
+                                          .format(this._bookingDateTime),
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              width: 15,
+                            ),
+                            Expanded(
+                              child: Container(
+                                alignment: AlignmentDirectional.centerEnd,
+                                child: Row(
+                                  children: <Widget>[
+                                    Text(
+                                      'Pret: ',
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text(
+                                      this.getBookingPrice(),
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: <Widget>[
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: <Widget>[
+                                    Text(
+                                      'Ora: ',
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text(
+                                      DateFormat('HH:mm')
+                                              .format(this._bookingDateTime) +
+                                          ' - ' +
+                                          DateFormat('HH:mm').format(this
+                                              ._bookingDateTime
+                                              .add(Duration(
+                                                  milliseconds: this
+                                                      ._autoAssignedEntityCombination
+                                                      .duration))),
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: saveForm,
-        label: Text('Salveaza'),
-        icon: Icon(Icons.check),
+      floatingActionButton: Builder(
+        builder: (context) => FloatingActionButton.extended(
+          onPressed: () async {
+            var gro = await saveForm();
+            if (gro != null) {
+              if (gro.error != '')
+                Scaffold.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(gro.error),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              else
+                Scaffold.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Programare salvata'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+
+              Future.delayed(Duration(seconds: 2), () {
+                Navigator.of(context).pop();
+              });
+            }
+          },
+          label: Text('Salveaza'),
+          icon: Icon(Icons.check),
+        ),
       ),
     );
   }

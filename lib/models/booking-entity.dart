@@ -34,12 +34,13 @@ class BookingEntity {
 
     this.images = new List<BooxyImage>();
     List<dynamic> rawImages = json['images'];
-    for (int i = 0; i < rawImages.length; i++) {
-      var imgMap = rawImages[i];
-      var image = new BooxyImage().fromJson(imgMap);
+    if (rawImages != null)
+      for (int i = 0; i < rawImages.length; i++) {
+        var imgMap = rawImages[i];
+        var image = new BooxyImage().fromJson(imgMap);
 
-      images.add(image);
-    }
+        images.add(image);
+      }
 
     this.entityName_RO = json['entityName_RO'];
     this.entityName_EN = json['entityName_EN'];
@@ -55,17 +56,17 @@ class BookingEntity {
     Map obj = {
       'idEntity': this.idEntity,
       'isAutoAssigned': this.isAutoAssigned,
-      'idLevel': this.idLevel,
-      'isMultipleBooking': this.isMultipleBooking,
-      'images': this.images != null
-          ? this.images.map((i) => i.toJson()).toList()
-          : null,
+      //'idLevel': this.idLevel,
+      //'isMultipleBooking': this.isMultipleBooking,
+      // 'images': this.images != null
+      //     ? this.images.map((i) => i.toJson()).toList()
+      //     : null,
       'entityName_RO': this.entityName_RO,
       'entityName_EN': this.entityName_EN,
       'levelName_RO': this.levelName_RO,
-      'levelName_EN': this.levelName_EN,
-      'orderIndex': this.orderIndex,
-      'idLevelType': this.idLevelType
+      'levelName_EN': this.levelName_EN
+      //'orderIndex': this.orderIndex,
+      //'idLevelType': this.idLevelType
     };
     return obj;
   }

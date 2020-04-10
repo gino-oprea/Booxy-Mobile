@@ -96,14 +96,14 @@ class Booking {
 
   Map toJson() {
     Map obj = {
-      'id': this.id,
+      //'id': this.id,
       'idCompany': this.idCompany,
-      'companyName': this.companyName,
-      'companyAddress': this.companyAddress,
-      'companyEmail': this.companyEmail,
-      'companyPhone': this.companyPhone,
-      'lat': this.lat,
-      'lng': this.lng,
+      // 'companyName': this.companyName,
+      // 'companyAddress': this.companyAddress,
+      // 'companyEmail': this.companyEmail,
+      // 'companyPhone': this.companyPhone,
+      // 'lat': this.lat,
+      // 'lng': this.lng,
       'entities': this.entities != null
           ? this.entities.map((e) => e.toJson()).toList()
           : null,
@@ -112,16 +112,24 @@ class Booking {
       'lastName': this.lastName,
       'phone': this.phone,
       'email': this.email,
-      'startDate': DateFormat('yyyy-MM-dd').format(this.startDate),
-      'endDate': DateFormat('yyyy-MM-dd').format(this.endDate),
-      'startTime': DateFormat('yyyy-MM-dd hh:mm').format(this.startTime),
-      'endTime': DateFormat('yyyy-MM-dd hh:mm').format(this.endTime),
-      'bookingPrice': this.bookingPrice,
-      'isPaidRetainer': this.isPaidRetainer,
-      'isPaidFull': this.isPaidFull,
-      'clientRating': this.clientRating,
-      'clientReview': this.clientReview,
-      'idStatus': this.idStatus
+      'startDate': this.startDate != null
+          ? DateFormat('yyyy-MM-ddTHH:mm').format(this.startDate)
+          : null,
+      'endDate': this.endDate != null
+          ? DateFormat('yyyy-MM-ddTHH:mm').format(this.endDate)
+          : null,
+      'startTime': this.startTime != null
+          ? DateFormat('yyyy-MM-ddTHH:mm').format(this.startTime)
+          : null,
+      'endTime': this.endTime != null
+          ? DateFormat('yyyy-MM-ddTHH:mm').format(this.endTime)
+          : null,
+      // 'bookingPrice': this.bookingPrice,
+      // 'isPaidRetainer': this.isPaidRetainer,
+      // 'isPaidFull': this.isPaidFull,
+      // 'clientRating': this.clientRating,
+      // 'clientReview': this.clientReview,
+      // 'idStatus': this.idStatus
     };
     return obj;
   }

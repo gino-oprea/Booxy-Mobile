@@ -22,8 +22,8 @@ class Timeslot {
       this.isFullBooked,
       this.hasFilteredBooking});
 
-  // bool operator ==(e) => e is Timeslot && e.startTime == this.startTime; //New
-  // int get hashCode => startTime.hashCode;
+   bool operator ==(e) => e is Timeslot && DateFormat('HH:mm').format(e.startTime) ==  DateFormat('HH:mm').format(this.startTime); //New
+   int get hashCode => startTime.hashCode;
 
   Timeslot fromJson(Map json) {
     this.startTime =
@@ -51,8 +51,8 @@ class Timeslot {
 
   Map toJson() {
     Map obj = {
-      'startTime': DateFormat('yyyy-MM-ddThh:mm:ss').format(this.startTime),
-      'endTime': DateFormat('yyyy-MM-ddThh:mm:ss').format(this.endTime),
+      'startTime': DateFormat('yyyy-MM-ddTHH:mm:ss').format(this.startTime),
+      'endTime': DateFormat('yyyy-MM-ddTHH:mm:ss').format(this.endTime),
       'isSelectable': this.isSelectable,
       'isSelected': this.isSelected,
       'bookings': this.bookings != null
