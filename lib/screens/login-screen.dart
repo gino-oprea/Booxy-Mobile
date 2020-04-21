@@ -1,3 +1,5 @@
+import '../providers/login-provider.dart';
+
 import '../models/generic-response-object.dart';
 import 'package:flutter/material.dart';
 
@@ -14,6 +16,11 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailFocusNode = FocusNode();
   final _passwordFocusNode = FocusNode();
 
+  Map<String, String> _authData = {
+    'email': '',
+    'password': '',
+  };
+
   Future<GenericResponseObject> saveForm() async {
     final isValid = _form.currentState.validate();
     if (!isValid) return null;
@@ -21,6 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
     _form.currentState.save(); //triggers onSaved on every form field
 
     //submit
+    await LoginProvider().login(_authData['email'], _authData['password']);
   }
 
   @override
@@ -52,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[                
+              children: <Widget>[
                 Card(
                   margin: EdgeInsets.all(25),
                   child: Padding(
@@ -69,7 +77,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             Expanded(
                               child: TextFormField(
-                                
                                 decoration: InputDecoration(
                                   labelText: 'Email',
                                   contentPadding: EdgeInsets.all(0),
@@ -88,7 +95,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   FocusScope.of(context)
                                       .requestFocus(_passwordFocusNode);
                                 },
-                                onSaved: (value) {},
+                                onSaved: (value) {
+                                  _authData['email'] = value;
+                                },
                               ),
                             ),
                           ],
@@ -120,9 +129,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                       ? 'camp obligatoriu'
                                       : null;
                                 },
-                                onFieldSubmitted: (_) {},
-                                onSaved: (value) {
+                                onFieldSubmitted: (_) {
                                   saveForm();
+                                },
+                                onSaved: (value) {
+                                  _authData['password'] = value;
                                 },
                               ),
                             ),
@@ -157,7 +168,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
-                
               ],
             ),
           ),
