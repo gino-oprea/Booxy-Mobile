@@ -1,3 +1,5 @@
+import 'package:booxy/screens/login-screen.dart';
+
 import '../screens/my-account-screen.dart';
 import '../screens/my-bookings-screen.dart';
 import '../screens/my-companies-screen.dart';
@@ -11,9 +13,17 @@ class AppDrawer extends StatelessWidget {
         child: Column(
           children: <Widget>[
             AppBar(
-              title: Text('Login'),
+              title: Text('Booxy'),
               automaticallyImplyLeading: false,
             ),
+            ListTile(
+              onTap: () {
+                Navigator.of(context).pushNamed(LoginScreen.routeName);
+              },
+              leading: Icon(Icons.perm_identity),
+              title: Text('Login'),
+            ),
+            Divider(),
             ListTile(
               onTap: () {
                 Navigator.of(context).pushNamed(MyAccountScreen.routeName);
