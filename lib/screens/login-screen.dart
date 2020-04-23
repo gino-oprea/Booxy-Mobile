@@ -12,6 +12,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _form = GlobalKey<FormState>();
+  final _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   final _emailFocusNode = FocusNode();
   final _passwordFocusNode = FocusNode();
@@ -21,14 +22,25 @@ class _LoginScreenState extends State<LoginScreen> {
     'password': '',
   };
 
-  Future<GenericResponseObject> saveForm() async {
+  Future<void> saveForm(BuildContext context) async {
     final isValid = _form.currentState.validate();
     if (!isValid) return null;
 
     _form.currentState.save(); //triggers onSaved on every form field
 
     //submit
-    await LoginProvider().login(_authData['email'], _authData['password']);
+    bool isLoggedIn =
+        await LoginProvider().login(_authData['email'], _authData['password']);
+
+    if (!isLoggedIn)
+      _scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text('Invalid login'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    else
+      Navigator.of(context).pop();
   }
 
   @override
@@ -48,6 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
       title: Text('Login'),
     );
     return Scaffold(
+      key: _scaffoldKey,
       appBar: appBar,
       body: Form(
         key: _form,
@@ -130,7 +143,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       : null;
                                 },
                                 onFieldSubmitted: (_) {
-                                  saveForm();
+                                  saveForm(context);
                                 },
                                 onSaved: (value) {
                                   _authData['password'] = value;
@@ -153,7 +166,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 icon: Icon(Icons.done),
                                 label: Text('Login'),
                                 onPressed: () {
-                                  saveForm();
+                                  saveForm(context);
                                 },
                                 elevation: 1,
                                 materialTapTargetSize:

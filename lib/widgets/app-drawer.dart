@@ -1,11 +1,24 @@
-import 'package:booxy/screens/login-screen.dart';
+import '../providers/login-provider.dart';
+import '../screens/login-screen.dart';
 
 import '../screens/my-account-screen.dart';
 import '../screens/my-bookings-screen.dart';
 import '../screens/my-companies-screen.dart';
 import 'package:flutter/material.dart';
 
-class AppDrawer extends StatelessWidget {
+class AppDrawer extends StatefulWidget {
+  @override
+  _AppDrawerState createState() => _AppDrawerState();
+}
+
+class _AppDrawerState extends State<AppDrawer> {
+  bool isAuth = false;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -16,12 +29,23 @@ class AppDrawer extends StatelessWidget {
               title: Text('Booxy'),
               automaticallyImplyLeading: false,
             ),
-            ListTile(
-              onTap: () {
-                Navigator.of(context).pushNamed(LoginScreen.routeName);
+            FutureBuilder<bool>(
+              future: LoginProvider().isAuth,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  if (snapshot.data != true) {
+                    return ListTile(
+                      onTap: () {
+                        Navigator.of(context).pushNamed(LoginScreen.routeName);
+                      },
+                      leading: Icon(Icons.perm_identity),
+                      title: Text('Login'),
+                    );
+                  } else
+                    return Container();
+                } else
+                  return Container();
               },
-              leading: Icon(Icons.perm_identity),
-              title: Text('Login'),
             ),
             Divider(),
             ListTile(
@@ -59,6 +83,10 @@ class AppDrawer extends StatelessWidget {
               thickness: 1.0,
             ),
             ListTile(
+              onTap: () {
+                LoginProvider().logout();
+                Navigator.of(context).pop();
+              },
               leading: Icon(Icons.exit_to_app),
               title: Text('Logout'),
             ),
