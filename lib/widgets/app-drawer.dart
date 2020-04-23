@@ -34,11 +34,6 @@ class _AppDrawerState extends State<AppDrawer> {
               title: Text('Booxy'),
               automaticallyImplyLeading: false,
             ),
-            // FutureBuilder<bool>(
-            //   future: LoginProvider().isAuth,
-            //   builder: (context, snapshot) {
-            //     if (snapshot.connectionState == ConnectionState.done) {
-            // if (snapshot.data != true) {
             if (!this.isAuth)
               ListTile(
                 onTap: () {
@@ -47,20 +42,15 @@ class _AppDrawerState extends State<AppDrawer> {
                 leading: Icon(Icons.perm_identity),
                 title: Text('Login'),
               ),
-            //       } else
-            //         return Container();
-            //     } else
-            //       return Container();
-            //   },
-            // ),
-            Divider(),
-            ListTile(
-              onTap: () {
-                Navigator.of(context).pushNamed(MyAccountScreen.routeName);
-              },
-              leading: Icon(Icons.account_circle),
-              title: Text('Contul meu'),
-            ),
+            if (this.isAuth) Divider(),
+            if (this.isAuth)
+              ListTile(
+                onTap: () {
+                  Navigator.of(context).pushNamed(MyAccountScreen.routeName);
+                },
+                leading: Icon(Icons.account_circle),
+                title: Text('Contul meu'),
+              ),
             Divider(),
             ListTile(
               onTap: () {
@@ -69,33 +59,37 @@ class _AppDrawerState extends State<AppDrawer> {
               leading: Icon(Icons.search),
               title: Text('Cauta companii'),
             ),
-            Divider(),
-            ListTile(
-              onTap: () {
-                Navigator.of(context).pushNamed(MyBookingsScreen.routeName);
-              },
-              leading: Icon(Icons.access_time),
-              title: Text('Programari'),
-            ),
-            Divider(),
-            ListTile(
-              onTap: () {
-                Navigator.of(context).pushNamed(MyCompaniesScreen.routeName);
-              },
-              leading: Icon(Icons.business),
-              title: Text('Companiile mele'),
-            ),
-            Divider(
-              thickness: 1.0,
-            ),
-            ListTile(
-              onTap: () {
-                LoginProvider().logout();
-                Navigator.of(context).pop();
-              },
-              leading: Icon(Icons.exit_to_app),
-              title: Text('Logout'),
-            ),
+            if (this.isAuth) Divider(),
+            if (this.isAuth)
+              ListTile(
+                onTap: () {
+                  Navigator.of(context).pushNamed(MyBookingsScreen.routeName);
+                },
+                leading: Icon(Icons.access_time),
+                title: Text('Programari'),
+              ),
+            if (this.isAuth) Divider(),
+            if (this.isAuth)
+              ListTile(
+                onTap: () {
+                  Navigator.of(context).pushNamed(MyCompaniesScreen.routeName);
+                },
+                leading: Icon(Icons.business),
+                title: Text('Companiile mele'),
+              ),
+            if (this.isAuth)
+              Divider(
+                thickness: 1.0,
+              ),
+            if (this.isAuth)
+              ListTile(
+                onTap: () {
+                  LoginProvider().logout();
+                  Navigator.of(context).pop();
+                },
+                leading: Icon(Icons.exit_to_app),
+                title: Text('Logout'),
+              ),
           ],
         ),
       ),
