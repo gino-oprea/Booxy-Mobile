@@ -17,6 +17,11 @@ class _AppDrawerState extends State<AppDrawer> {
   @override
   void initState() {
     super.initState();
+    LoginProvider().isAuth.then((auth) {
+      setState(() {
+        this.isAuth = auth;
+      });
+    });
   }
 
   @override
@@ -29,24 +34,25 @@ class _AppDrawerState extends State<AppDrawer> {
               title: Text('Booxy'),
               automaticallyImplyLeading: false,
             ),
-            FutureBuilder<bool>(
-              future: LoginProvider().isAuth,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  if (snapshot.data != true) {
-                    return ListTile(
-                      onTap: () {
-                        Navigator.of(context).pushNamed(LoginScreen.routeName);
-                      },
-                      leading: Icon(Icons.perm_identity),
-                      title: Text('Login'),
-                    );
-                  } else
-                    return Container();
-                } else
-                  return Container();
-              },
-            ),
+            // FutureBuilder<bool>(
+            //   future: LoginProvider().isAuth,
+            //   builder: (context, snapshot) {
+            //     if (snapshot.connectionState == ConnectionState.done) {
+            // if (snapshot.data != true) {
+            if (!this.isAuth)
+              ListTile(
+                onTap: () {
+                  Navigator.of(context).pushNamed(LoginScreen.routeName);
+                },
+                leading: Icon(Icons.perm_identity),
+                title: Text('Login'),
+              ),
+            //       } else
+            //         return Container();
+            //     } else
+            //       return Container();
+            //   },
+            // ),
             Divider(),
             ListTile(
               onTap: () {
