@@ -1,3 +1,4 @@
+import '../models/booxy-image.dart';
 import 'package:intl/intl.dart';
 
 import './booking-entity.dart';
@@ -28,6 +29,8 @@ class Booking {
   String clientReview;
   int idStatus;
 
+  List<BooxyImage> image;
+
   Booking(
       {this.id,
       this.idCompany,
@@ -52,7 +55,8 @@ class Booking {
       this.isPaidFull,
       this.clientRating,
       this.clientReview,
-      this.idStatus});
+      this.idStatus,
+      this.image});
 
   Booking fromJson(Map json) {
     this.id = json['id'];
@@ -90,6 +94,8 @@ class Booking {
     this.clientRating = json['clientRating'];
     this.clientReview = json['clientReview'];
     this.idStatus = json['idStatus'];
+
+    this.image = null;
 
     return this;
   }

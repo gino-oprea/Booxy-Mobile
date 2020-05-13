@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:io';
 
+import '../models/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/token.dart';
@@ -33,11 +35,47 @@ class LoginProvider {
     final tokenData = json.encode(token.toJson());
     prefs.setString('tokenData', tokenData);
 
+    User currentUser =
+        await this.getUserByEmail(email.trim(), token.access_token);
+    currentUser.password = password;
+    currentUser.token = token.access_token;
+
+    final userData = json.encode(currentUser.toJson());
+    prefs.setString('authUser', userData);
+
     return true;
+  }
+
+  Future<User> getUserByEmail(String email, String authToken) async {
+    final url = BooxyConfig.api_endpoint + 'users/getbyemail/' + email;
+    final response = await http.get(url,
+        headers: {HttpHeaders.authorizationHeader: "Bearer " + authToken});
+    final extractedData = json.decode(response.body) as Map<String, dynamic>;
+    if (extractedData == null) {
+      return null;
+    }    
+
+    User user = new User().fromJson(extractedData);
+
+    return user;
   }
 
   Future<bool> get isAuth async {
     return await token != null;
+  }
+
+  Future<User> get currentUser async {
+    final prefs = await SharedPreferences.getInstance();
+
+    if (!prefs.containsKey('authUser')) return null;
+
+    var currentUser = new User().fromJson(
+        json.decode(prefs.getString('authUser')) as Map<String, Object>);
+
+    if (currentUser != null) {
+      return currentUser;
+    }
+    return null;
   }
 
   Future<Token> get token async {
@@ -54,8 +92,9 @@ class LoginProvider {
     return null;
   }
 
-  Future<void> logout()  async{
+  Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.remove('tokenData');
+    prefs.remove('authUser');
   }
 }

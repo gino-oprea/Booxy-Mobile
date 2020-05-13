@@ -226,6 +226,9 @@ class _CompanyFiltersScreenState extends State<CompanyFiltersScreen> {
               children: <Widget>[
                 RaisedButton.icon(
                   icon: Icon(Icons.done),
+                  shape: RoundedRectangleBorder(
+                                    borderRadius:
+                                        new BorderRadius.circular(18.0)),
                   label: Text('Aplica filtre'),
                   onPressed: () {
                     Navigator.of(context).pop<CompanyFilter>(_getFilter());
@@ -242,6 +245,9 @@ class _CompanyFiltersScreenState extends State<CompanyFiltersScreen> {
                       Navigator.of(context).pop<CompanyFilter>(_getFilter());
                     },
                     icon: Icon(Icons.refresh),
+                    shape: RoundedRectangleBorder(
+                                    borderRadius:
+                                        new BorderRadius.circular(18.0)),
                     label: Text('Sterge filtre'),
                     elevation: 1,
                     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,

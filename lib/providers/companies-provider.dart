@@ -37,7 +37,7 @@ class CompaniesProvider with ChangeNotifier {
       var value = objList[i];
       var comp = new Company().fromJson(value);
 
-      await getCompanyImages(comp);
+      comp.image = await getCompanyImages(comp.id);
       loadedCompanies.add(comp);
     }
     
@@ -45,15 +45,15 @@ class CompaniesProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> getCompanyImages(Company comp) async {
+  Future<List<BooxyImage>> getCompanyImages(int idCompany) async {
     final url = BooxyConfig.api_endpoint +
         'Image/GetCompanyImages/' +
-        comp.id.toString();
+        idCompany.toString();
     final response = await http.get(url);
     final List<BooxyImage> loadedImages = [];
     final extractedData = json.decode(response.body) as Map<String, dynamic>;
     if (extractedData == null) {
-      return;
+      return null;
     }
 
     final objList = extractedData["objList"];
@@ -61,6 +61,6 @@ class CompaniesProvider with ChangeNotifier {
       loadedImages.add(new BooxyImage().fromJson(value));
     });
 
-    comp.image = loadedImages;
+    return loadedImages;
   }
 }

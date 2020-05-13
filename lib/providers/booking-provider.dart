@@ -1,4 +1,11 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:intl/intl.dart';
+
+import '../providers/companies-provider.dart';
+
+import '../providers/login-provider.dart';
+
 import '../models/booking.dart';
 
 import '../models/generic-response-object.dart';
@@ -178,6 +185,35 @@ class BookingProvider with ChangeNotifier {
 
     final GenericResponseObject gro =
         GenericResponseObject().fromJson(extractedData);
+
+    return gro;
+  }
+
+  Future<GenericResponseObject> getCurrentUserBookings() async {
+    var currentUser = await LoginProvider().currentUser;
+    var token = await LoginProvider().token;
+    final url = BooxyConfig.api_endpoint +
+        'booking/GetBookingsByUser/' +
+        currentUser.id.toString() + '?date=' +
+        DateFormat('yyyy-MM-dd').format(DateTime.now());
+    final response = await http.get(url, headers: {
+      HttpHeaders.authorizationHeader: "Bearer " + token.access_token
+    });
+    final extractedData = json.decode(response.body) as Map<String, dynamic>;
+    if (extractedData == null) {
+      return null;
+    }
+
+    GenericResponseObject gro = GenericResponseObject().fromJson(extractedData);
+
+    gro.objList = new List<Booking>();
+    if (gro.objListAsMap != null)
+      for (int i = 0; i < gro.objListAsMap.length; i++) {
+        var obj = new Booking().fromJson(gro.objListAsMap[i]);
+        obj.image =
+            await CompaniesProvider(null).getCompanyImages(obj.idCompany);
+        gro.objList.add(obj);
+      }
 
     return gro;
   }

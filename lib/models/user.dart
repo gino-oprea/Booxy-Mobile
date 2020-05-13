@@ -4,7 +4,7 @@ import './user-role.dart';
 
 class User {
   int id;
-  int email;
+  String email;
   List<UserRole> roles;
   String firstName;
   String lastName;
