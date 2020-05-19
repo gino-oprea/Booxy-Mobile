@@ -189,6 +189,31 @@ class BookingProvider with ChangeNotifier {
     return gro;
   }
 
+  Future<GenericResponseObject> cancelBooking(int idBooking,
+      [bool withClientNotification = false]) async {
+    String url = BooxyConfig.api_endpoint +
+        'booking/CancelBooking/' +
+        idBooking.toString() +
+        '?withClientNotification=' +
+        withClientNotification.toString() +
+        '&culture=RO';
+
+    var token = await LoginProvider().token;
+
+    final response = await http.delete(url, headers: {
+      HttpHeaders.authorizationHeader: "Bearer " + token.access_token
+    });
+
+    final extractedData = json.decode(response.body) as Map<String, dynamic>;
+
+    if (extractedData == null) return null;
+
+    final GenericResponseObject gro =
+        GenericResponseObject().fromJson(extractedData);
+
+    return gro;
+  }
+
   Future<GenericResponseObject> getCurrentUserBookings() async {
     var currentUser = await LoginProvider().currentUser;
     var token = await LoginProvider().token;

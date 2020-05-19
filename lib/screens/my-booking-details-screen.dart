@@ -1,6 +1,7 @@
 import 'dart:convert';
 
-import 'package:booxy/providers/booxy-image-provider.dart';
+import '../providers/booking-provider.dart';
+import '../providers/booxy-image-provider.dart';
 import 'package:intl/intl.dart';
 
 import '../models/booking.dart';
@@ -17,6 +18,7 @@ class _MyBookingDetailsScreenState extends State<MyBookingDetailsScreen> {
   bool _isInit = true;
   Booking booking;
   List<Widget> entitiesTxts;
+  final _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -90,6 +92,7 @@ class _MyBookingDetailsScreenState extends State<MyBookingDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text('Programarea mea'),
       ),
@@ -101,29 +104,33 @@ class _MyBookingDetailsScreenState extends State<MyBookingDetailsScreen> {
               child: Card(
                 child: Padding(
                   padding: const EdgeInsets.all(10),
-                  child: Column(                    
+                  child: Column(
                     children: <Widget>[
                       Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              'Adresa: ',
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            'Adresa: ',
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Flexible(
+                            child: Text(
+                              this.booking.companyAddress,
+                              maxLines: 3,
                               style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                            SizedBox(width: 10,),
-                            Flexible(
-                                                          child: Text(
-                                this.booking.companyAddress,
-                                maxLines: 3,
-                                style: TextStyle(
-                                  fontSize: 18,
-                                ),
+                                fontSize: 18,
                               ),
                             ),
-                          ],
-                        ),
-                      SizedBox(height: 10,),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: <Widget>[
@@ -132,7 +139,9 @@ class _MyBookingDetailsScreenState extends State<MyBookingDetailsScreen> {
                             style: TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold),
                           ),
-                          SizedBox(width: 10,),
+                          SizedBox(
+                            width: 10,
+                          ),
                           Text(
                             this.booking.companyEmail,
                             style: TextStyle(
@@ -141,7 +150,9 @@ class _MyBookingDetailsScreenState extends State<MyBookingDetailsScreen> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 10,),
+                      SizedBox(
+                        height: 10,
+                      ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: <Widget>[
@@ -150,7 +161,9 @@ class _MyBookingDetailsScreenState extends State<MyBookingDetailsScreen> {
                             style: TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold),
                           ),
-                          SizedBox(width: 10,),
+                          SizedBox(
+                            width: 10,
+                          ),
                           Text(
                             this.booking.companyPhone,
                             style: TextStyle(
@@ -246,12 +259,30 @@ class _MyBookingDetailsScreenState extends State<MyBookingDetailsScreen> {
           ],
         ),
       ),
-    floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          // Add your onPressed code here!
+          BookingProvider().cancelBooking(this.booking.id).then((gro) {
+            if (gro.error != '')
+              _scaffoldKey.currentState.showSnackBar(
+                SnackBar(
+                  content: Text(gro.error),
+                  duration: Duration(seconds: 2),
+                ),
+              );
+            else
+              _scaffoldKey.currentState.showSnackBar(
+                SnackBar(
+                  content: Text('Programare anulata'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
+            Future.delayed(const Duration(milliseconds: 2000), () {
+              Navigator.of(context).pop();
+            });
+          });
         },
         label: Text('Anuleaza programare'),
-        icon: Icon(Icons.delete),        
+        icon: Icon(Icons.delete),
       ),
     );
   }

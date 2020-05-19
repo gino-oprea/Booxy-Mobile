@@ -43,6 +43,14 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
     });
   }
 
+  // void reloadBookings() {
+  //   BookingProvider().getCurrentUserBookings().then((gro) {
+  //     setState(() {
+  //       this.bookings = gro.objList as List<Booking>;
+  //     });
+  //   });
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,14 +63,24 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
             )
           : RefreshIndicator(
               onRefresh: () => loadBookings(),
-              child: Container(
-                child: bookings.length>0 ? ListView.builder(
-                    itemCount: bookings.length,
-                    itemBuilder: (ctx, i) {
-                      return BookingListItem(bookings[i]);
-                    }): Text('Nu aveti programari active'),
-              ),
-            ),
+              child: bookings.length > 0
+                  ? Container(
+                      child: ListView.builder(
+                          itemCount: bookings.length,
+                          itemBuilder: (ctx, i) {
+                            return BookingListItem(bookings[i], loadBookings);
+                          }))
+                  : Center(
+                      child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text('Nu aveti programari active'),
+                        IconButton(
+                          icon: Icon(Icons.refresh),
+                          onPressed: loadBookings,
+                        )
+                      ],
+                    ))),
     );
   }
 }
