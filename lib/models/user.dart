@@ -37,6 +37,7 @@ class User {
   User fromJson(Map json) {
     this.id = json['id'];
     this.email = json['email'];
+    this.password = json["password"] != null ? json["password"] : null;
 
     this.roles = new List<UserRole>();
     List<dynamic> rawRoles = json['roles'];

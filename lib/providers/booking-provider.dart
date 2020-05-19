@@ -194,7 +194,8 @@ class BookingProvider with ChangeNotifier {
     var token = await LoginProvider().token;
     final url = BooxyConfig.api_endpoint +
         'booking/GetBookingsByUser/' +
-        currentUser.id.toString() + '?date=' +
+        currentUser.id.toString() +
+        '?date=' +
         DateFormat('yyyy-MM-dd').format(DateTime.now());
     final response = await http.get(url, headers: {
       HttpHeaders.authorizationHeader: "Bearer " + token.access_token
@@ -210,9 +211,11 @@ class BookingProvider with ChangeNotifier {
     if (gro.objListAsMap != null)
       for (int i = 0; i < gro.objListAsMap.length; i++) {
         var obj = new Booking().fromJson(gro.objListAsMap[i]);
-        obj.image =
-            await CompaniesProvider(null).getCompanyImages(obj.idCompany);
-        gro.objList.add(obj);
+        if (!obj.startDate.isBefore(DateTime.now())) {
+          obj.image =
+              await CompaniesProvider(null).getCompanyImages(obj.idCompany);
+          gro.objList.add(obj);
+        }
       }
 
     return gro;

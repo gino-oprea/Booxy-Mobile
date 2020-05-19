@@ -56,11 +56,11 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
           : RefreshIndicator(
               onRefresh: () => loadBookings(),
               child: Container(
-                child: ListView.builder(
+                child: bookings.length>0 ? ListView.builder(
                     itemCount: bookings.length,
                     itemBuilder: (ctx, i) {
                       return BookingListItem(bookings[i]);
-                    }),
+                    }): Text('Nu aveti programari active'),
               ),
             ),
     );

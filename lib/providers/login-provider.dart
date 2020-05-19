@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -10,6 +11,8 @@ import '../config/booxy-config.dart';
 import 'package:http/http.dart' as http;
 
 class LoginProvider {
+  Timer _authTimer;
+
   Future<bool> login(String email, String password) async {
     String url = BooxyConfig.token_api_endpoint;
 
@@ -30,6 +33,7 @@ class LoginProvider {
     if (extractedData['error'] != null) return false;
 
     Token token = new Token().fromJson(extractedData);
+    token.token_generated = DateTime.now();
 
     final prefs = await SharedPreferences.getInstance();
     final tokenData = json.encode(token.toJson());
@@ -43,6 +47,7 @@ class LoginProvider {
     final userData = json.encode(currentUser.toJson());
     prefs.setString('authUser', userData);
 
+    autoLogin();
     return true;
   }
 
@@ -53,7 +58,7 @@ class LoginProvider {
     final extractedData = json.decode(response.body) as Map<String, dynamic>;
     if (extractedData == null) {
       return null;
-    }    
+    }
 
     User user = new User().fromJson(extractedData);
 
@@ -94,7 +99,48 @@ class LoginProvider {
 
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
+
+    if (_authTimer != null) {
+      _authTimer.cancel();
+      _authTimer = null;
+    }
+
     prefs.remove('tokenData');
     prefs.remove('authUser');
+  }
+
+  void autoLogin() {
+    if (_authTimer != null) {
+      _authTimer.cancel();
+    }
+
+    LoginProvider().token.then((token) {
+      if (token != null) {
+        var dur = Duration(seconds: 0);
+        if (token.isValid()) {
+          var expiryDate = token.token_generated.add(
+          Duration(
+            seconds: token.expires_in,
+          ),
+        );
+           var timeToExpiry = expiryDate.difference(DateTime.now()).inSeconds;
+          dur = Duration(seconds: timeToExpiry);
+        }
+
+        currentUser.then((currentUser) {
+          if (currentUser != null) {
+            _authTimer = Timer(dur, () {
+              login(currentUser.email, currentUser.password);
+            });
+          }
+        });
+      } else {
+        currentUser.then((currentUser) {
+          if (currentUser != null) {
+            login(currentUser.email, currentUser.password);
+          }
+        });
+      }
+    });
   }
 }

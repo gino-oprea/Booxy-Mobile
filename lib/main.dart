@@ -1,3 +1,7 @@
+import 'dart:async';
+
+import 'package:booxy/providers/login-provider.dart';
+
 import './screens/my-booking-details-screen.dart';
 
 import './screens/login-screen.dart';
@@ -21,12 +25,15 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    
+    LoginProvider().autoLogin();
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: CompaniesProvider([])),
-        ChangeNotifierProvider.value(value: CompanyLocationProvider([],[])),
-        ChangeNotifierProvider.value(value: CategoriesProvider([],[])),
-        ],
+        ChangeNotifierProvider.value(value: CompanyLocationProvider([], [])),
+        ChangeNotifierProvider.value(value: CategoriesProvider([], [])),
+      ],
       child: GestureDetector(
         onTap: () {
           FocusScopeNode currentFocus = FocusScope.of(context);
@@ -47,8 +54,8 @@ class MyApp extends StatelessWidget {
             MyCompaniesScreen.routeName: (ctx) => MyCompaniesScreen(),
             CompanyFiltersScreen.routeName: (ctx) => CompanyFiltersScreen(),
             CompanyBookingScreen.routeName: (ctx) => CompanyBookingScreen(),
-            LoginScreen.routeName: (ctx)=>LoginScreen(),
-            MyBookingDetailsScreen.routeName: (ctx)=>MyBookingDetailsScreen()
+            LoginScreen.routeName: (ctx) => LoginScreen(),
+            MyBookingDetailsScreen.routeName: (ctx) => MyBookingDetailsScreen()
           },
         ),
       ),
