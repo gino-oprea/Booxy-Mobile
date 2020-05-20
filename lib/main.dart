@@ -1,6 +1,8 @@
 import 'dart:async';
 
-import 'package:booxy/providers/login-provider.dart';
+import './screens/company-bookings-admin-screen.dart';
+
+import './providers/login-provider.dart';
 
 import './screens/my-booking-details-screen.dart';
 
@@ -55,7 +57,8 @@ class MyApp extends StatelessWidget {
             CompanyFiltersScreen.routeName: (ctx) => CompanyFiltersScreen(),
             CompanyBookingScreen.routeName: (ctx) => CompanyBookingScreen(),
             LoginScreen.routeName: (ctx) => LoginScreen(),
-            MyBookingDetailsScreen.routeName: (ctx) => MyBookingDetailsScreen()
+            MyBookingDetailsScreen.routeName: (ctx) => MyBookingDetailsScreen(),
+            CompanyBookingsAdminScreen.routeName: (ctx) => CompanyBookingsAdminScreen()
           },
         ),
       ),

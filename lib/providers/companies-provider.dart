@@ -1,10 +1,15 @@
-import 'package:booxy/config/booxy-config.dart';
+import 'dart:io';
+
+import '../config/booxy-config.dart';
+import '../models/generic-response-object.dart';
 
 import '../models/company.dart';
 import '../models/booxy-image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+import 'login-provider.dart';
 
 class CompaniesProvider with ChangeNotifier {
   List<Company> _companies = [];
@@ -40,9 +45,33 @@ class CompaniesProvider with ChangeNotifier {
       comp.image = await getCompanyImages(comp.id);
       loadedCompanies.add(comp);
     }
-    
+
     _companies = loadedCompanies;
     notifyListeners();
+  }
+
+  Future<GenericResponseObject> getMyCompanies(int idUser) async {
+    final url = BooxyConfig.api_endpoint + 'CompanyBack/' + idUser.toString();
+    var token = await LoginProvider().token;
+    final response = await http.get(url, headers: {
+      HttpHeaders.authorizationHeader: "Bearer " + token.access_token
+    });
+    final extractedData = json.decode(response.body) as Map<String, dynamic>;
+    if (extractedData == null) {
+      return null;
+    }
+
+    GenericResponseObject gro = GenericResponseObject().fromJson(extractedData);
+
+    gro.objList = new List<Company>();
+    if (gro.objListAsMap != null)
+      for (int i = 0; i < gro.objListAsMap.length; i++) {
+        var obj = new Company().fromJson(gro.objListAsMap[i]);
+        obj.image = await getCompanyImages(obj.id);
+        gro.objList.add(obj);
+      }
+
+    return gro;
   }
 
   Future<List<BooxyImage>> getCompanyImages(int idCompany) async {

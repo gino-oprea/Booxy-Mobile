@@ -1,4 +1,8 @@
 import 'dart:convert';
+import '../models/user.dart';
+
+import '../providers/login-provider.dart';
+
 import '../models/booking-entity.dart';
 import '../models/generic-response-object.dart';
 
@@ -23,12 +27,20 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
   Company _company;
   AutoAssignedEntityCombination _autoAssignedEntityCombination;
   DateTime _bookingDateTime;
+  User currentUser;
 
   final _firstNameFocusNode = FocusNode();
   final _lastNameFocusNode = FocusNode();
   final _phoneFocusNode = FocusNode();
   final _emailFocusNode = FocusNode();
+
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+
   final _form = GlobalKey<FormState>();
+
   var _editedBooking = Booking(
       idUser: null,
       entities: [],
@@ -73,6 +85,18 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
       this._bookingDateTime = (ModalRoute.of(context).settings.arguments
               as BookingConfirmationPayload)
           .bookingStartDate;
+
+      LoginProvider().currentUser.then((usr) {
+        if (usr != null)
+          setState(() {
+            this.currentUser = usr;
+            this._editedBooking.idUser = usr.id;
+            this._firstNameController.text = usr.firstName;
+            this._lastNameController.text = usr.lastName;
+            this._emailController.text = usr.email;
+            this._phoneController.text = usr.phone;
+          });
+      });
     }
     _isInit = false;
 
@@ -189,6 +213,7 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
                             Expanded(
                               child: TextFormField(
                                 focusNode: _firstNameFocusNode,
+                                controller: _firstNameController,
                                 decoration: InputDecoration(
                                   labelText: 'Prenume',
                                   contentPadding: EdgeInsets.all(0),
@@ -226,6 +251,7 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
                             Expanded(
                               child: TextFormField(
                                 focusNode: _lastNameFocusNode,
+                                controller: _lastNameController,
                                 decoration: InputDecoration(
                                   labelText: 'Nume',
                                   contentPadding: EdgeInsets.all(0),
@@ -263,6 +289,7 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
                             Expanded(
                               child: TextFormField(
                                 focusNode: _phoneFocusNode,
+                                controller: _phoneController,
                                 decoration: InputDecoration(
                                   labelText: 'Telefon',
                                   contentPadding: EdgeInsets.all(0),
@@ -301,6 +328,7 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
                             Expanded(
                               child: TextFormField(
                                 focusNode: _emailFocusNode,
+                                controller: _emailController,
                                 decoration: InputDecoration(
                                   labelText: 'Email',
                                   contentPadding: EdgeInsets.all(0),
