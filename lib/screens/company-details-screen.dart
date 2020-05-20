@@ -566,7 +566,6 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                                     _pickedDate = selectedDate;
 
                                   _selectedTimeslot = null;
-                                  _timeslots = [];
 
                                   var filteredEntititesPerLevel =
                                       this.getFilteredEntitiesPerLevel();

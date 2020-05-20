@@ -102,7 +102,7 @@ class Booking {
 
   Map toJson() {
     Map obj = {
-      //'id': this.id,
+      'id': this.id,
       'idCompany': this.idCompany,
       // 'companyName': this.companyName,
       // 'companyAddress': this.companyAddress,

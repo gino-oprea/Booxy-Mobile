@@ -246,13 +246,14 @@ class BookingProvider with ChangeNotifier {
     return gro;
   }
 
-  Future<GenericResponseObject> getCompanyBookings(int idCompany) async {    
+  Future<GenericResponseObject> getCompanyBookings(int idCompany) async {
     var token = await LoginProvider().token;
     final url = BooxyConfig.api_endpoint +
         'booking/GetBookings/' +
         idCompany.toString() +
         '?dateStart=' +
-        DateFormat('yyyy-MM-dd').format(DateTime.now().add(Duration(days: -1))) +
+        DateFormat('yyyy-MM-dd')
+            .format(DateTime.now().add(Duration(days: -1))) +
         '&dateEnd=' +
         DateFormat('yyyy-MM-dd')
             .format(DateTime.now().add(Duration(days: 365 * 10))) +
@@ -273,11 +274,38 @@ class BookingProvider with ChangeNotifier {
       for (int i = 0; i < gro.objListAsMap.length; i++) {
         var obj = new Booking().fromJson(gro.objListAsMap[i]);
         //if (!obj.startDate.isBefore(DateTime.now())) {
-          obj.image =
-              await CompaniesProvider(null).getCompanyImages(obj.idCompany);
-          gro.objList.add(obj);
+        obj.image =
+            await CompaniesProvider(null).getCompanyImages(obj.idCompany);
+        gro.objList.add(obj);
         //}
       }
+
+    return gro;
+  }
+
+  Future<GenericResponseObject> setBookingStatus(
+      Booking booking, int idStatus) async {
+    String url = BooxyConfig.api_endpoint +
+        'booking/SetBookingStatus/' +
+        idStatus.toString();
+
+    var token = await LoginProvider().token;
+
+    var bdyObj = json.encode(booking.toJson());
+
+    final response = await http.put(url,
+        headers: {
+          'Content-Type': 'application/json',
+          HttpHeaders.authorizationHeader: "Bearer " + token.access_token
+        },
+        body: bdyObj);
+
+    final extractedData = json.decode(response.body) as Map<String, dynamic>;
+    if (extractedData == null) {
+      return null;
+    }
+
+    GenericResponseObject gro = GenericResponseObject().fromJson(extractedData);
 
     return gro;
   }

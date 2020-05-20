@@ -70,7 +70,7 @@ class _CompanyBookingAdminTabScreenState
                     child: ListView.builder(
                         itemCount: bks.length,
                         itemBuilder: (ctx, i) {
-                          return BookingListItemAdmin(bks[i]);
+                          return BookingListItemAdmin(bks[i], loadBookings);
                         }))
                 : Center(
                     child: Row(

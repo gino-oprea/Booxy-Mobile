@@ -261,25 +261,50 @@ class _MyBookingDetailsScreenState extends State<MyBookingDetailsScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          BookingProvider().cancelBooking(this.booking.id).then((gro) {
-            if (gro.error != '')
-              _scaffoldKey.currentState.showSnackBar(
-                SnackBar(
-                  content: Text(gro.error),
-                  duration: Duration(seconds: 2),
-                ),
-              );
-            else
-              _scaffoldKey.currentState.showSnackBar(
-                SnackBar(
-                  content: Text('Programare anulata'),
-                  duration: Duration(seconds: 2),
-                ),
-              );
-            Future.delayed(const Duration(milliseconds: 2000), () {
-              Navigator.of(context).pop();
-            });
-          });
+          showDialog(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                    title: Text('Confirma anulare'),
+                    content: Text(
+                        'Sunteti sigur(a) ca doriti sa anulati programarea?'),
+                    actions: <Widget>[
+                      FlatButton(
+                        child: Text('Nu'),
+                        onPressed: () {
+                          Navigator.of(ctx).pop(false);
+                        },
+                      ),
+                      FlatButton(
+                        child: Text('Da'),
+                        onPressed: () {
+                          Navigator.of(ctx).pop(true);
+
+                          BookingProvider()
+                              .cancelBooking(this.booking.id)
+                              .then((gro) {
+                            if (gro.error != '')
+                              _scaffoldKey.currentState.showSnackBar(
+                                SnackBar(
+                                  content: Text(gro.error),
+                                  duration: Duration(seconds: 2),
+                                ),
+                              );
+                            else
+                              _scaffoldKey.currentState.showSnackBar(
+                                SnackBar(
+                                  content: Text('Programare anulata'),
+                                  duration: Duration(seconds: 2),
+                                ),
+                              );
+                            Future.delayed(const Duration(milliseconds: 2000),
+                                () {
+                              Navigator.of(context).pop();
+                            });
+                          });
+                        },
+                      ),
+                    ],
+                  ));
         },
         label: Text('Anuleaza programare'),
         icon: Icon(Icons.delete),

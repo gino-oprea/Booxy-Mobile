@@ -1,3 +1,4 @@
+import '../dialogs/booking-status-dialog.dart';
 import 'package:intl/intl.dart';
 
 import '../models/booking.dart';
@@ -7,8 +8,9 @@ enum BookingStatus { Active, Honored, Canceled }
 
 class BookingListItemAdmin extends StatefulWidget {
   final Booking booking;
+  Future<void> Function() onReloadBookings;
 
-  BookingListItemAdmin(this.booking);
+  BookingListItemAdmin(this.booking, this.onReloadBookings);
 
   @override
   _BookingListItemAdminState createState() => _BookingListItemAdminState();
@@ -21,8 +23,6 @@ class _BookingListItemAdminState extends State<BookingListItemAdmin> {
     if (idStatus == 2) color = Colors.green;
     if (idStatus == 3) color = Colors.grey;
 
-
-
     return Text(
       BookingStatus.values[idStatus - 1].toString().split('.').last,
       style: TextStyle(color: color, fontSize: 20),
@@ -31,102 +31,137 @@ class _BookingListItemAdminState extends State<BookingListItemAdmin> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Column(
-        children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  IconButton(
-                    icon: Icon(
-                      Icons.calendar_today,
+    return GestureDetector(
+      onTap: () {
+        showDialog(
+                context: context,
+                builder: (ctx) => BookingStatusDialog(widget.booking))
+            .then((value) {
+          if (value as String == '')
+            widget.onReloadBookings();
+          else
+            showDialog(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                      title: Text('Eroare'),
+                      content: Text(value),
+                      actions: <Widget>[
+                        FlatButton(
+                          child: Text('Ok'),
+                          onPressed: () {
+                            Navigator.of(ctx).pop(true);
+                          },
+                        )
+                      ],
+                    ));
+        });
+      },
+      child: Card(
+        child: Column(
+          children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    IconButton(
+                      icon: Icon(
+                        Icons.calendar_today,
+                      ),
+                      onPressed: () {},
                     ),
-                    onPressed: () {},
-                  ),
-                  Text(DateFormat('dd-MMM-yyyy')
-                      .format(widget.booking.startDate),style: TextStyle(fontSize: 16)),
-                ],
-              ),
-              Row(
-                children: <Widget>[
-                  IconButton(
-                    icon: Icon(
-                      Icons.person,
+                    Text(
+                        DateFormat('dd-MMM-yyyy')
+                            .format(widget.booking.startDate),
+                        style: TextStyle(fontSize: 16)),
+                  ],
+                ),
+                Row(
+                  children: <Widget>[
+                    IconButton(
+                      icon: Icon(
+                        Icons.person,
+                      ),
+                      onPressed: () {},
                     ),
-                    onPressed: () {},
-                  ),
-                  Text(
-                      widget.booking.firstName + ' ' + widget.booking.lastName,style: TextStyle(fontSize: 16)),
-                ],
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  IconButton(
-                    icon: Icon(
-                      Icons.access_time,
+                    Text(
+                        widget.booking.firstName +
+                            ' ' +
+                            widget.booking.lastName,
+                        style: TextStyle(fontSize: 16)),
+                  ],
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    IconButton(
+                      icon: Icon(
+                        Icons.access_time,
+                      ),
+                      onPressed: () {},
                     ),
-                    onPressed: () {},
-                  ),
-                  Text(DateFormat('HH:mm').format(widget.booking.startTime) +
-                      ' - ' +
-                      DateFormat('HH:mm').format(widget.booking.endTime),style: TextStyle(fontSize: 16)),
-                ],
-              ),
-              Row(
-                children: <Widget>[
-                  IconButton(
-                    icon: Icon(
-                      Icons.phone,
+                    Text(
+                        DateFormat('HH:mm').format(widget.booking.startTime) +
+                            ' - ' +
+                            DateFormat('HH:mm').format(widget.booking.endTime),
+                        style: TextStyle(fontSize: 16)),
+                  ],
+                ),
+                Row(
+                  children: <Widget>[
+                    IconButton(
+                      icon: Icon(
+                        Icons.phone,
+                      ),
+                      onPressed: () {},
                     ),
-                    onPressed: () {},
-                  ),
-                  Text(widget.booking.phone,style: TextStyle(fontSize: 16)),
-                ],
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  IconButton(
-                    icon: Icon(
-                      Icons.extension,
+                    Text(widget.booking.phone, style: TextStyle(fontSize: 16)),
+                  ],
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    IconButton(
+                      icon: Icon(
+                        Icons.extension,
+                      ),
+                      onPressed: () {},
                     ),
-                    onPressed: () {},
-                  ),
-                  Text(widget.booking.entities
-                      .map((e) => e.entityName_RO)
-                      .join(' - '),style: TextStyle(fontSize: 16)),
-                ],
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  IconButton(
-                    icon: Icon(
-                      Icons.slow_motion_video,
+                    Text(
+                        widget.booking.entities
+                            .map((e) => e.entityName_RO)
+                            .join(' - '),
+                        style: TextStyle(fontSize: 16)),
+                  ],
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    IconButton(
+                      icon: Icon(
+                        Icons.slow_motion_video,
+                      ),
+                      onPressed: () {},
                     ),
-                    onPressed: () {},
-                  ),
-                  getStatusColored(widget.booking.idStatus),
-                ],
-              ),
-            ],
-          ),
-        ],
+                    getStatusColored(widget.booking.idStatus),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
