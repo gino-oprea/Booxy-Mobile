@@ -102,7 +102,7 @@ class Booking {
 
   Map toJson() {
     Map obj = {
-      'id': this.id,
+      //'id': this.id,
       'idCompany': this.idCompany,
       // 'companyName': this.companyName,
       // 'companyAddress': this.companyAddress,
@@ -135,8 +135,14 @@ class Booking {
       // 'isPaidFull': this.isPaidFull,
       // 'clientRating': this.clientRating,
       // 'clientReview': this.clientReview,
-      // 'idStatus': this.idStatus
+
+      //'idStatus': this.idStatus != null ? this.idStatus : null
     };
+
+    if (this.id != null) obj['id'] = this.id;
+    if (this.idStatus != null) obj['idStatus'] = this.idStatus;
+
+
     return obj;
   }
 }

@@ -41,7 +41,7 @@ class BookingStatusDialog extends StatelessWidget {
               child: Text('Canceled'),
               color: Colors.grey,
               onPressed: () async {
-                var gro = await BookingProvider().setBookingStatus(booking, 3);
+                var gro = await BookingProvider().cancelBooking(booking.id);
                 Navigator.of(context).pop(gro.error);
               },
             )
