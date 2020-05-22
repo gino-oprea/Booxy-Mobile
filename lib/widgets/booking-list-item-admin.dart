@@ -37,23 +37,24 @@ class _BookingListItemAdminState extends State<BookingListItemAdmin> {
                 context: context,
                 builder: (ctx) => BookingStatusDialog(widget.booking))
             .then((value) {
-          if (value as String == '')
-            widget.onReloadBookings();
-          else
-            showDialog(
-                context: context,
-                builder: (ctx) => AlertDialog(
-                      title: Text('Eroare'),
-                      content: Text(value),
-                      actions: <Widget>[
-                        FlatButton(
-                          child: Text('Ok'),
-                          onPressed: () {
-                            Navigator.of(ctx).pop(true);
-                          },
-                        )
-                      ],
-                    ));
+          if (value != null) 
+            if (value as String == '')
+              widget.onReloadBookings();
+            else
+              showDialog(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                        title: Text('Eroare'),
+                        content: Text(value),
+                        actions: <Widget>[
+                          FlatButton(
+                            child: Text('Ok'),
+                            onPressed: () {
+                              Navigator.of(ctx).pop(true);
+                            },
+                          )
+                        ],
+                      ));
         });
       },
       child: Card(
