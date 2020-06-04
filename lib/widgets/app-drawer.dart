@@ -1,3 +1,5 @@
+import '../mixins/base-widget.dart';
+
 import '../providers/login-provider.dart';
 import '../screens/login-screen.dart';
 
@@ -6,7 +8,7 @@ import '../screens/my-bookings-screen.dart';
 import '../screens/my-companies-screen.dart';
 import 'package:flutter/material.dart';
 
-class AppDrawer extends StatefulWidget {
+class AppDrawer extends StatefulWidget with BaseWidget {
   @override
   _AppDrawerState createState() => _AppDrawerState();
 }
@@ -17,6 +19,7 @@ class _AppDrawerState extends State<AppDrawer> {
   @override
   void initState() {
     super.initState();
+
     LoginProvider().isAuth.then((auth) {
       setState(() {
         this.isAuth = auth;

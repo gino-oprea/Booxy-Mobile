@@ -1,19 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:intl/intl.dart';
-
 import '../providers/companies-provider.dart';
-
 import '../providers/login-provider.dart';
-
 import '../models/booking.dart';
-
 import '../models/generic-response-object.dart';
-
 import '../models/auto-assign-payload.dart';
-
 import '../models/auto-assigned-entity-combination.dart';
-
 import '../models/timeslot.dart';
 import '../models/level-as-filter.dart';
 import '../config/booxy-config.dart';
