@@ -1,40 +1,17 @@
+import '../base-widgets/base-stateful-widget.dart';
+
 import '../providers/login-provider.dart';
 import 'package:flutter/material.dart';
 
-class LangPickerDialog extends StatefulWidget {
+class LangPickerDialog extends BaseStatefulWidget {
   @override
-  _LangPickerDialogState createState() => _LangPickerDialogState();
+  _LangPickerDialogState createState() => _LangPickerDialogState([]);
 }
 
-class _LangPickerDialogState extends State<LangPickerDialog> {
-  var _isInit = true;
+class _LangPickerDialogState extends BaseState<LangPickerDialog> {
+  _LangPickerDialogState(List<String> labelsKeys) : super(labelsKeys);
 
-  String currentCulture = 'RO';
-
-  getCurrentCulture() {
-    LoginProvider().currentCulture.then((cult) {
-      setState(() {
-        this.currentCulture = cult;
-      });
-    });
-  }
-
-  setCurrentCulture() {
-    LoginProvider()
-        .setCurrentCulture(this.currentCulture)
-        .then((value) => this.getCurrentCulture());
-  }
-
-  @override
-  void didChangeDependencies() {
-    if (this._isInit) {
-      this.getCurrentCulture();
-    }
-
-    this._isInit = false;
-
-    super.didChangeDependencies();
-  }
+    
 
   @override
   Widget build(BuildContext context) {
@@ -49,9 +26,9 @@ class _LangPickerDialogState extends State<LangPickerDialog> {
               title: Text('RO'),
               value: 'RO',
               groupValue: this.currentCulture,
-              onChanged: (value) {
+              onChanged: (value) async {
                 this.currentCulture = value;
-                this.setCurrentCulture();
+                await this.setCurrentCulture();
                 Navigator.of(context).pop(this.currentCulture);
               },
             ),
@@ -59,9 +36,9 @@ class _LangPickerDialogState extends State<LangPickerDialog> {
               title: Text('EN'),
               value: 'EN',
               groupValue: this.currentCulture,
-              onChanged: (value) {
+              onChanged: (value) async {
                 this.currentCulture = value;
-                this.setCurrentCulture();
+                await this.setCurrentCulture();
                 Navigator.of(context).pop(this.currentCulture);
               },
             )

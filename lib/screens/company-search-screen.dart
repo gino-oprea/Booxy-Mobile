@@ -1,3 +1,5 @@
+import '../base-widgets/base-stateful-widget.dart';
+
 import '../models/company-filter.dart';
 
 import './company-filters-screen.dart';
@@ -9,19 +11,21 @@ import '../widgets/app-drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class CompanySearchScreen extends StatefulWidget {
+class CompanySearchScreen extends BaseStatefulWidget {
   static const routeName = '/company-search';
 
   @override
-  _CompanySearchScreenState createState() => _CompanySearchScreenState();
+  _CompanySearchScreenState createState() => _CompanySearchScreenState(['lblSearchCompany']);
 }
 
-class _CompanySearchScreenState extends State<CompanySearchScreen> {
+class _CompanySearchScreenState extends BaseState<CompanySearchScreen> {
   var _isInit = true;
   var _isLoading = false;
   CompanyFilter _advancedFilter = null;
 
   final _companyNameController = TextEditingController();
+
+  _CompanySearchScreenState(List<String> labelsKeys) : super(labelsKeys);
 
   @override
   void didChangeDependencies() {
@@ -112,7 +116,7 @@ class _CompanySearchScreenState extends State<CompanySearchScreen> {
                 ),
               ),
               prefixIcon: Icon(Icons.search),
-              hintText: 'Cauta companie',
+              hintText: this.getCurrentLabelValue('lblSearchCompany'),
               fillColor: Colors.white,
               filled: true,
               contentPadding: EdgeInsets.symmetric(vertical: 1),

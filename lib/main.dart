@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:booxy/providers/culture-provider.dart';
+
 import './screens/company-bookings-admin-screen.dart';
 
 import './providers/login-provider.dart';
@@ -35,6 +37,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider.value(value: CompaniesProvider([])),
         ChangeNotifierProvider.value(value: CompanyLocationProvider([], [])),
         ChangeNotifierProvider.value(value: CategoriesProvider([], [])),
+        ChangeNotifierProvider.value(value: CultureProvider('RO')),
       ],
       child: GestureDetector(
         onTap: () {

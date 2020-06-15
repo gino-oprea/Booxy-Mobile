@@ -1,6 +1,5 @@
-import 'package:booxy/dialogs/lang-picker-dialog.dart';
-
-import '../mixins/base-widget.dart';
+import '../base-widgets/base-stateful-widget.dart';
+import '../dialogs/lang-picker-dialog.dart';
 
 import '../providers/login-provider.dart';
 import '../screens/login-screen.dart';
@@ -10,12 +9,14 @@ import '../screens/my-bookings-screen.dart';
 import '../screens/my-companies-screen.dart';
 import 'package:flutter/material.dart';
 
-class AppDrawer extends StatefulWidget with BaseWidget {
+class AppDrawer extends BaseStatefulWidget {
   @override
-  _AppDrawerState createState() => _AppDrawerState();
+  _AppDrawerState createState() => _AppDrawerState(['lblMyAccount', 'lblLanguage','lblSearchCompany','lblBookings','lblMyCompanies']);
 }
 
-class _AppDrawerState extends State<AppDrawer> {
+class _AppDrawerState extends BaseState<AppDrawer> {
+  _AppDrawerState(List<String> labelsKeys) : super(labelsKeys);
+
   bool isAuth = false;
 
   @override
@@ -54,17 +55,20 @@ class _AppDrawerState extends State<AppDrawer> {
                   Navigator.of(context).pushNamed(MyAccountScreen.routeName);
                 },
                 leading: Icon(Icons.account_circle),
-                title: Text('Contul meu'),
+                title: Text(getCurrentLabelValue('lblMyAccount')),
               ),
             Divider(),
             ListTile(
               onTap: () {
                 showDialog(
                     context: context,
-                    builder: (ctx) => LangPickerDialog()).then((value) {});
+                    builder: (ctx) => LangPickerDialog()).then((value) {
+                  //this.currentCulture = value;
+                  //this.setCurrentCulture();
+                });
               },
               leading: Icon(Icons.language),
-              title: Text('Limba'),
+              title: Text(getCurrentLabelValue('lblLanguage')),
             ),
             Divider(),
             ListTile(
@@ -72,7 +76,7 @@ class _AppDrawerState extends State<AppDrawer> {
                 Navigator.of(context).pushReplacementNamed('/');
               },
               leading: Icon(Icons.search),
-              title: Text('Cauta companii'),
+              title: Text(getCurrentLabelValue('lblSearchCompany')),
             ),
             if (this.isAuth) Divider(),
             if (this.isAuth)
@@ -81,7 +85,7 @@ class _AppDrawerState extends State<AppDrawer> {
                   Navigator.of(context).pushNamed(MyBookingsScreen.routeName);
                 },
                 leading: Icon(Icons.access_time),
-                title: Text('Programari'),
+                title: Text(getCurrentLabelValue('lblBookings')),
               ),
             if (this.isAuth) Divider(),
             if (this.isAuth)
@@ -90,7 +94,7 @@ class _AppDrawerState extends State<AppDrawer> {
                   Navigator.of(context).pushNamed(MyCompaniesScreen.routeName);
                 },
                 leading: Icon(Icons.business),
-                title: Text('Companiile mele'),
+                title: Text(getCurrentLabelValue('lblMyCompanies')),
               ),
             if (this.isAuth)
               Divider(
