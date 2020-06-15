@@ -1,3 +1,5 @@
+import 'package:booxy/dialogs/lang-picker-dialog.dart';
+
 import '../mixins/base-widget.dart';
 
 import '../providers/login-provider.dart';
@@ -54,6 +56,16 @@ class _AppDrawerState extends State<AppDrawer> {
                 leading: Icon(Icons.account_circle),
                 title: Text('Contul meu'),
               ),
+            Divider(),
+            ListTile(
+              onTap: () {
+                showDialog(
+                    context: context,
+                    builder: (ctx) => LangPickerDialog()).then((value) {});
+              },
+              leading: Icon(Icons.language),
+              title: Text('Limba'),
+            ),
             Divider(),
             ListTile(
               onTap: () {

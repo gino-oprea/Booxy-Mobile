@@ -65,6 +65,17 @@ class LoginProvider {
     return user;
   }
 
+  Future<String> get currentCulture async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!prefs.containsKey('currentCulture')) return 'RO';
+    return prefs.getString('currentCulture');
+  }
+
+  Future<bool> setCurrentCulture(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.setString('currentCulture', value);
+  }
+
   Future<bool> get isAuth async {
     return await token != null;
   }
@@ -119,11 +130,11 @@ class LoginProvider {
         var dur = Duration(seconds: 0);
         if (token.isValid()) {
           var expiryDate = token.token_generated.add(
-          Duration(
-            seconds: token.expires_in,
-          ),
-        );
-           var timeToExpiry = expiryDate.difference(DateTime.now()).inSeconds;
+            Duration(
+              seconds: token.expires_in,
+            ),
+          );
+          var timeToExpiry = expiryDate.difference(DateTime.now()).inSeconds;
           dur = Duration(seconds: timeToExpiry);
         }
 
