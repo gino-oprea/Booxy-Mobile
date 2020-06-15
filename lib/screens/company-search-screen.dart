@@ -15,13 +15,14 @@ class CompanySearchScreen extends BaseStatefulWidget {
   static const routeName = '/company-search';
 
   @override
-  _CompanySearchScreenState createState() => _CompanySearchScreenState(['lblSearchCompany']);
+  _CompanySearchScreenState createState() =>
+      _CompanySearchScreenState(['lblSearchCompany']);
 }
 
 class _CompanySearchScreenState extends BaseState<CompanySearchScreen> {
   var _isInit = true;
   var _isLoading = false;
-  CompanyFilter _advancedFilter = null;
+  CompanyFilter _advancedFilter;
 
   final _companyNameController = TextEditingController();
 

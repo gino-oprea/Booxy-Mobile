@@ -1,6 +1,4 @@
 import '../base-widgets/base-stateful-widget.dart';
-
-import '../providers/login-provider.dart';
 import 'package:flutter/material.dart';
 
 class LangPickerDialog extends BaseStatefulWidget {
@@ -10,8 +8,6 @@ class LangPickerDialog extends BaseStatefulWidget {
 
 class _LangPickerDialogState extends BaseState<LangPickerDialog> {
   _LangPickerDialogState(List<String> labelsKeys) : super(labelsKeys);
-
-    
 
   @override
   Widget build(BuildContext context) {

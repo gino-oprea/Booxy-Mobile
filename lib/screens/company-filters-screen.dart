@@ -1,3 +1,5 @@
+import 'package:booxy/base-widgets/base-stateful-widget.dart';
+
 import '../providers/categories-provider.dart';
 import 'package:provider/provider.dart';
 import '../providers/company-location-provider.dart';
@@ -7,14 +9,22 @@ import '../models/generic-dictionary-item.dart';
 import '../models/county.dart';
 import 'package:flutter/material.dart';
 
-class CompanyFiltersScreen extends StatefulWidget {
+class CompanyFiltersScreen extends BaseStatefulWidget {
   static String routeName = '/company-filters';
 
   @override
-  _CompanyFiltersScreenState createState() => _CompanyFiltersScreenState();
+  _CompanyFiltersScreenState createState() => _CompanyFiltersScreenState([
+        'lblCompanyFilters',
+        'lblCounty',
+        'lblCity',
+        'lblCategory',
+        'lblSubCategory',
+        'lblApplyFilters',
+        'lblRemoveFilters'
+      ]);
 }
 
-class _CompanyFiltersScreenState extends State<CompanyFiltersScreen> {
+class _CompanyFiltersScreenState extends BaseState<CompanyFiltersScreen> {
   bool _isInit = true;
 
   County _selectedCounty;
@@ -22,7 +32,7 @@ class _CompanyFiltersScreenState extends State<CompanyFiltersScreen> {
   GenericDictionaryItem _selectedCategory;
   GenericDictionaryItem _selectedSubCategory;
 
-  bool _useRouteArgs = true;
+  _CompanyFiltersScreenState(List<String> labelsKeys) : super(labelsKeys);
 
   @override
   void initState() {
@@ -103,7 +113,7 @@ class _CompanyFiltersScreenState extends State<CompanyFiltersScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Filtre companie'),
+        title: Text(getCurrentLabelValue('lblCompanyFilters')),
       ),
       body: Column(
         mainAxisSize: MainAxisSize.max,
@@ -121,7 +131,7 @@ class _CompanyFiltersScreenState extends State<CompanyFiltersScreen> {
                             borderSide: BorderSide(
                                 color: Theme.of(context).accentColor)),
                       ),
-                      hint: Text('Judet'),
+                      hint: Text(getCurrentLabelValue('lblCounty')),
                       value: _selectedCounty,
                       items: companyLocationProvider.counties.map((county) {
                         return new DropdownMenuItem<County>(
@@ -146,7 +156,7 @@ class _CompanyFiltersScreenState extends State<CompanyFiltersScreen> {
                             borderSide: BorderSide(
                                 color: Theme.of(context).accentColor)),
                       ),
-                      hint: Text('Localitate'),
+                      hint: Text(getCurrentLabelValue('lblCity')),
                       value: _selectedCity,
                       items: companyLocationProvider.cities.map((city) {
                         return new DropdownMenuItem<City>(
@@ -170,7 +180,7 @@ class _CompanyFiltersScreenState extends State<CompanyFiltersScreen> {
                             borderSide: BorderSide(
                                 color: Theme.of(context).accentColor)),
                       ),
-                      hint: Text('Categorie'),
+                      hint: Text(getCurrentLabelValue('lblCategory')),
                       value: _selectedCategory,
                       items: categoriesProvider.categories.map((category) {
                         return new DropdownMenuItem<GenericDictionaryItem>(
@@ -196,7 +206,7 @@ class _CompanyFiltersScreenState extends State<CompanyFiltersScreen> {
                             borderSide: BorderSide(
                                 color: Theme.of(context).accentColor)),
                       ),
-                      hint: Text('Subcategorie'),
+                      hint: Text(getCurrentLabelValue('lblSubCategory')),
                       value: _selectedSubCategory,
                       items:
                           categoriesProvider.subCategories.map((subcategory) {
@@ -227,9 +237,8 @@ class _CompanyFiltersScreenState extends State<CompanyFiltersScreen> {
                 RaisedButton.icon(
                   icon: Icon(Icons.done),
                   shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                        new BorderRadius.circular(18.0)),
-                  label: Text('Aplica filtre'),
+                      borderRadius: new BorderRadius.circular(18.0)),
+                  label: Text(getCurrentLabelValue('lblApplyFilters')),
                   onPressed: () {
                     Navigator.of(context).pop<CompanyFilter>(_getFilter());
                   },
@@ -246,9 +255,8 @@ class _CompanyFiltersScreenState extends State<CompanyFiltersScreen> {
                     },
                     icon: Icon(Icons.refresh),
                     shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                        new BorderRadius.circular(18.0)),
-                    label: Text('Sterge filtre'),
+                        borderRadius: new BorderRadius.circular(18.0)),
+                    label: Text(getCurrentLabelValue('lblRemoveFilters')),
                     elevation: 1,
                     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     color: Theme.of(context).accentColor,

@@ -1,6 +1,6 @@
 import 'dart:convert';
 import '../models/auto-assign-payload.dart';
-import '../models/auto-assigned-entity-combination.dart';
+import '../base-widgets/base-stateful-widget.dart';
 import '../models/booking-confirmation-payload.dart';
 import '../providers/booxy-image-provider.dart';
 import 'package:intl/intl.dart';
@@ -16,14 +16,22 @@ import '../models/level-as-filter.dart';
 import '../models/entity.dart';
 import '../providers/level-linking-provider.dart';
 
-class CompanyDetailsScreen extends StatefulWidget {
+class CompanyDetailsScreen extends BaseStatefulWidget {
   static const routeName = '/company-details';
 
   @override
-  _CompanyDetailsScreenState createState() => _CompanyDetailsScreenState();
+  _CompanyDetailsScreenState createState() => _CompanyDetailsScreenState([
+        'lblDate',
+        'lblStartTime',
+        'lblBookNow',
+        'lblPhone',
+        'lblAddress',
+        'lblMandatoryField',
+        'lblTimeslotNotFit'
+      ]);
 }
 
-class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
+class _CompanyDetailsScreenState extends BaseState<CompanyDetailsScreen> {
   DateTime _pickedDate = DateTime.now().add(Duration(days: 1));
   bool _isInit = true;
   Company _company;
@@ -33,10 +41,12 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
   List<List<Entity>> allEntityCombinations = [];
   List<List<List<Timeslot>>> _timeslotMatrix = [];
   List<Timeslot> _timeslots = [];
-  Timeslot _selectedTimeslot = null;
+  Timeslot _selectedTimeslot;
   List<Entity> _selectedEntities = [];
 
   final _form = GlobalKey<FormState>();
+
+  _CompanyDetailsScreenState(List<String> labelsKeys) : super(labelsKeys);
 
   @override
   void didChangeDependencies() {
@@ -372,7 +382,9 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                 child: DropdownButtonFormField<Entity>(
                     isDense: true,
                     decoration: InputDecoration(
-                      labelText: level.levelName_RO,
+                      labelText: cultureProvider.getCurrentCulture() == 'EN'
+                          ? level.levelName_EN
+                          : level.levelName_RO,
                       contentPadding: EdgeInsets.all(0),
                       enabledBorder: UnderlineInputBorder(
                           borderSide:
@@ -475,7 +487,9 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text(
-                            'Adresa: ' + _company.address,
+                            getCurrentLabelValue('lblAddress') +
+                                ': ' +
+                                _company.address,
                             textAlign: TextAlign.left,
                             maxLines: 3,
                             style: TextStyle(
@@ -487,7 +501,9 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                             height: 5,
                           ),
                           Text(
-                            'Telefon: ' + _company.phone,
+                            getCurrentLabelValue('lblPhone') +
+                                ': ' +
+                                _company.phone,
                             textAlign: TextAlign.left,
                             maxLines: 3,
                             style: TextStyle(
@@ -580,7 +596,8 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Text(
-                                'Data: ' +
+                                getCurrentLabelValue('lblDate') +
+                                    ': ' +
                                     DateFormat('dd-MMM-yyyy')
                                         .format(_pickedDate),
                                 style: TextStyle(fontSize: 18),
@@ -633,7 +650,8 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                                 child: DropdownButtonFormField<Timeslot>(
                                   isDense: true,
                                   decoration: InputDecoration(
-                                    labelText: 'Ora inceput',
+                                    labelText:
+                                        getCurrentLabelValue('lblStartTime'),
                                     contentPadding: EdgeInsets.all(0),
                                     enabledBorder: UnderlineInputBorder(
                                         borderSide: BorderSide(
@@ -650,7 +668,8 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                                   }).toList(),
                                   validator: (_) {
                                     return _selectedTimeslot == null
-                                        ? 'camp obligatoriu'
+                                        ? getCurrentLabelValue(
+                                            'lblMandatoryField')
                                         : null;
                                   },
                                   onChanged: (Timeslot newValue) {
@@ -716,13 +735,13 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
             if (res == 'not_available') {
               Scaffold.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('Ora indisponibila'),
-                  duration: Duration(seconds: 2),
+                  content: Text(getCurrentLabelValue('lblTimeslotNotFit')),
+                  duration: Duration(seconds: 3),
                 ),
               );
             }
           },
-          label: Text('Programeaza acum'),
+          label: Text(getCurrentLabelValue('lblBookNow')),
           icon: Icon(Icons.thumb_up),
         ),
       ),
