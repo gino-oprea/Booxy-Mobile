@@ -1,20 +1,26 @@
+import '../base-widgets/base-stateful-widget.dart';
 import '../providers/user-provider.dart';
-
 import '../models/generic-response-object.dart';
-
 import '../providers/login-provider.dart';
-
 import '../models/user.dart';
 import 'package:flutter/material.dart';
 
-class MyAccountScreen extends StatefulWidget {
+class MyAccountScreen extends BaseStatefulWidget {
   static const routeName = '/my-account';
 
   @override
-  _MyAccountScreenState createState() => _MyAccountScreenState();
+  _MyAccountScreenState createState() => _MyAccountScreenState([
+    'lblSaved',
+    'lblMyAccount',
+    'lblFirstName',
+    'lblLastName',
+    'lblPhone',
+    'lblMandatoryField',
+    'lblSave'
+    ]);
 }
 
-class _MyAccountScreenState extends State<MyAccountScreen> {
+class _MyAccountScreenState extends BaseState<MyAccountScreen> {
   bool _isInit = true;
 
   final _form = GlobalKey<FormState>();
@@ -31,6 +37,8 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
   final _phoneController = TextEditingController();
 
   var _editedUser = new User();
+
+  _MyAccountScreenState(List<String> labelsKeys) : super(labelsKeys);
 
   @override
   void didChangeDependencies() {
@@ -72,7 +80,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
     if (gro.info.indexOf('success') > -1)
       _scaffoldKey.currentState.showSnackBar(
         SnackBar(
-          content: Text('Saved'),
+          content: Text(getCurrentLabelValue('lblSaved')),
           duration: Duration(seconds: 2),
         ),
       );
@@ -92,7 +100,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
     final deviceWidth = MediaQuery.of(context).size.width;
 
     final appBar = AppBar(
-      title: Text('Contul meu'),
+      title: Text(getCurrentLabelValue('lblMyAccount')),
     );
 
     return Scaffold(
@@ -129,7 +137,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                                 focusNode: _firstNameFocusNode,
                                 controller: _firstNameController,
                                 decoration: InputDecoration(
-                                  labelText: 'Prenume',
+                                  labelText: getCurrentLabelValue('lblFirstName'),
                                   contentPadding: EdgeInsets.all(0),
                                   enabledBorder: UnderlineInputBorder(
                                     borderSide: BorderSide(
@@ -139,7 +147,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                                 textInputAction: TextInputAction.next,
                                 validator: (value) {
                                   return value.isEmpty
-                                      ? 'camp obligatoriu'
+                                      ? getCurrentLabelValue('lblMandatoryField')
                                       : null;
                                 },
                                 onFieldSubmitted: (_) {
@@ -167,7 +175,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                                 focusNode: _lastNameFocusNode,
                                 controller: _lastNameController,
                                 decoration: InputDecoration(
-                                  labelText: 'Nume',
+                                  labelText: getCurrentLabelValue('lblLastName'),
                                   contentPadding: EdgeInsets.all(0),
                                   enabledBorder: UnderlineInputBorder(
                                     borderSide: BorderSide(
@@ -177,7 +185,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                                 textInputAction: TextInputAction.next,
                                 validator: (value) {
                                   return value.isEmpty
-                                      ? 'camp obligatoriu'
+                                      ? getCurrentLabelValue('lblMandatoryField')
                                       : null;
                                 },
                                 onFieldSubmitted: (_) {
@@ -205,7 +213,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                                 focusNode: _phoneFocusNode,
                                 controller: _phoneController,
                                 decoration: InputDecoration(
-                                  labelText: 'Telefon',
+                                  labelText: getCurrentLabelValue('lblPhone'),
                                   contentPadding: EdgeInsets.all(0),
                                   enabledBorder: UnderlineInputBorder(
                                     borderSide: BorderSide(
@@ -216,7 +224,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                                 textInputAction: TextInputAction.next,
                                 validator: (value) {
                                   return value.isEmpty
-                                      ? 'camp obligatoriu'
+                                      ? getCurrentLabelValue('lblMandatoryField')
                                       : null;
                                 },
                                 onFieldSubmitted: (_) {
@@ -254,7 +262,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                                 textInputAction: TextInputAction.done,
                                 validator: (value) {
                                   return value.isEmpty
-                                      ? 'camp obligatoriu'
+                                      ? getCurrentLabelValue('lblMandatoryField')
                                       : null;
                                 },
                                 onFieldSubmitted: (_) {
@@ -279,7 +287,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                                     borderRadius:
                                         new BorderRadius.circular(18.0)),
                                 icon: Icon(Icons.done),
-                                label: Text('Salveaza'),
+                                label: Text(getCurrentLabelValue('lblSave')),
                                 onPressed: () {
                                   this.saveForm();
                                 },

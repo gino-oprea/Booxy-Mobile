@@ -1,3 +1,5 @@
+import '../base-widgets/base-stateful-widget.dart';
+
 import '../dialogs/booking-status-dialog.dart';
 import 'package:intl/intl.dart';
 
@@ -6,17 +8,21 @@ import 'package:flutter/material.dart';
 
 enum BookingStatus { Active, Honored, Canceled }
 
-class BookingListItemAdmin extends StatefulWidget {
+class BookingListItemAdmin extends BaseStatefulWidget {
   final Booking booking;
   Future<void> Function() onReloadBookings;
 
   BookingListItemAdmin(this.booking, this.onReloadBookings);
 
   @override
-  _BookingListItemAdminState createState() => _BookingListItemAdminState();
+  _BookingListItemAdminState createState() => _BookingListItemAdminState([
+
+  ]);
 }
 
-class _BookingListItemAdminState extends State<BookingListItemAdmin> {
+class _BookingListItemAdminState extends BaseState<BookingListItemAdmin> {
+  _BookingListItemAdminState(List<String> labelsKeys) : super(labelsKeys);
+
   Text getStatusColored(int idStatus) {
     var color;
     if (idStatus == 1) color = Colors.blue;
@@ -44,7 +50,7 @@ class _BookingListItemAdminState extends State<BookingListItemAdmin> {
               showDialog(
                   context: context,
                   builder: (ctx) => AlertDialog(
-                        title: Text('Eroare'),
+                        title: Text('Error'),
                         content: Text(value),
                         actions: <Widget>[
                           FlatButton(

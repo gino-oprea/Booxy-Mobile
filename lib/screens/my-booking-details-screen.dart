@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import '../base-widgets/base-stateful-widget.dart';
 import '../providers/booking-provider.dart';
 import '../providers/booxy-image-provider.dart';
 import 'package:intl/intl.dart';
@@ -7,18 +7,32 @@ import 'package:intl/intl.dart';
 import '../models/booking.dart';
 import 'package:flutter/material.dart';
 
-class MyBookingDetailsScreen extends StatefulWidget {
+class MyBookingDetailsScreen extends BaseStatefulWidget {
   static const routeName = '/my-booking-details';
 
   @override
-  _MyBookingDetailsScreenState createState() => _MyBookingDetailsScreenState();
+  _MyBookingDetailsScreenState createState() => _MyBookingDetailsScreenState([
+    'lblMyBooking',
+    'lblAddress',
+    'lblPhone',
+    'lblDate',
+    'lblHour',
+    'lblConfirmation',
+    'lblYes',
+    'lblNo',
+    'lblConfirmCancelBooking',
+    'lblCancelBooking',
+    'lblBookingCanceled'
+    ]);
 }
 
-class _MyBookingDetailsScreenState extends State<MyBookingDetailsScreen> {
+class _MyBookingDetailsScreenState extends BaseState<MyBookingDetailsScreen> {
   bool _isInit = true;
   Booking booking;
   List<Widget> entitiesTxts;
   final _scaffoldKey = new GlobalKey<ScaffoldState>();
+
+  _MyBookingDetailsScreenState(List<String> labelsKeys) : super(labelsKeys);
 
   @override
   void initState() {
@@ -94,7 +108,7 @@ class _MyBookingDetailsScreenState extends State<MyBookingDetailsScreen> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text('Programarea mea'),
+        title: Text(getCurrentLabelValue('lblMyBooking')),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -110,7 +124,7 @@ class _MyBookingDetailsScreenState extends State<MyBookingDetailsScreen> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: <Widget>[
                           Text(
-                            'Adresa: ',
+                            getCurrentLabelValue('lblAddress')+': ',
                             style: TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold),
                           ),
@@ -157,7 +171,7 @@ class _MyBookingDetailsScreenState extends State<MyBookingDetailsScreen> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: <Widget>[
                           Text(
-                            'Telefon: ',
+                            getCurrentLabelValue('lblPhone')+': ',
                             style: TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold),
                           ),
@@ -205,7 +219,7 @@ class _MyBookingDetailsScreenState extends State<MyBookingDetailsScreen> {
                               child: Row(
                                 children: <Widget>[
                                   Text(
-                                    'Data: ',
+                                    getCurrentLabelValue('lblDate')+': ',
                                     style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold),
@@ -230,7 +244,7 @@ class _MyBookingDetailsScreenState extends State<MyBookingDetailsScreen> {
                               child: Row(
                                 children: <Widget>[
                                   Text(
-                                    'Ora: ',
+                                    getCurrentLabelValue('lblHour')+': ',
                                     style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold),
@@ -264,18 +278,18 @@ class _MyBookingDetailsScreenState extends State<MyBookingDetailsScreen> {
           showDialog(
               context: context,
               builder: (ctx) => AlertDialog(
-                    title: Text('Confirma anulare'),
+                    title: Text(getCurrentLabelValue('lblConfirmation')),
                     content: Text(
-                        'Sunteti sigur(a) ca doriti sa anulati programarea?'),
+                        getCurrentLabelValue('lblConfirmCancelBooking')),
                     actions: <Widget>[
                       FlatButton(
-                        child: Text('Nu'),
+                        child: Text(getCurrentLabelValue('lblNo')),
                         onPressed: () {
                           Navigator.of(ctx).pop(false);
                         },
                       ),
                       FlatButton(
-                        child: Text('Da'),
+                        child: Text(getCurrentLabelValue('lblYes')),
                         onPressed: () {
                           Navigator.of(ctx).pop(true);
 
@@ -292,7 +306,7 @@ class _MyBookingDetailsScreenState extends State<MyBookingDetailsScreen> {
                             else
                               _scaffoldKey.currentState.showSnackBar(
                                 SnackBar(
-                                  content: Text('Programare anulata'),
+                                  content: Text(getCurrentLabelValue('lblBookingCanceled')),
                                   duration: Duration(seconds: 2),
                                 ),
                               );
@@ -306,7 +320,7 @@ class _MyBookingDetailsScreenState extends State<MyBookingDetailsScreen> {
                     ],
                   ));
         },
-        label: Text('Anuleaza programare'),
+        label: Text(getCurrentLabelValue('lblCancelBooking')),
         icon: Icon(Icons.delete),
       ),
     );

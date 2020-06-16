@@ -1,3 +1,5 @@
+import '../base-widgets/base-stateful-widget.dart';
+
 import '../models/company.dart';
 import '../widgets/my-company-list-item.dart';
 
@@ -5,17 +7,22 @@ import '../providers/companies-provider.dart';
 import '../providers/login-provider.dart';
 import 'package:flutter/material.dart';
 
-class MyCompaniesScreen extends StatefulWidget {
+class MyCompaniesScreen extends BaseStatefulWidget {
   static String routeName = '/my-companies';
 
   @override
-  _MyCompaniesScreenState createState() => _MyCompaniesScreenState();
+  _MyCompaniesScreenState createState() => _MyCompaniesScreenState([
+    'lblMyCompanies',
+    'lblNoCompaniesPleaseCreate'
+  ]);
 }
 
-class _MyCompaniesScreenState extends State<MyCompaniesScreen> {
+class _MyCompaniesScreenState extends BaseState<MyCompaniesScreen> {
   var _isInit = true;
   var _isLoading = false;
   List<Company> companies = [];
+
+  _MyCompaniesScreenState(List<String> labelsKeys) : super(labelsKeys);
 
   Future<void> _onRefresh(BuildContext ctx) async {
     var currentUser = await LoginProvider().currentUser;
@@ -41,7 +48,7 @@ class _MyCompaniesScreenState extends State<MyCompaniesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Companiile mele'),
+        title: Text(getCurrentLabelValue('lblMyCompanies')),
       ),
       body: _isLoading
           ? Center(
@@ -62,7 +69,7 @@ class _MyCompaniesScreenState extends State<MyCompaniesScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         Text(
-                            'Nu aveti companii. Puteti crea companie noua pe www.booxy.ro'),
+                            getCurrentLabelValue('lblNoCompaniesPleaseCreate')),
                         IconButton(
                           icon: Icon(Icons.refresh),
                           onPressed: () {

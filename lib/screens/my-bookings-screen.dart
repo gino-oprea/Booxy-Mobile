@@ -1,20 +1,25 @@
+import '../base-widgets/base-stateful-widget.dart';
 import '../providers/booking-provider.dart';
 import '../widgets/booking-list-item.dart';
-
 import '../models/booking.dart';
 import 'package:flutter/material.dart';
 
-class MyBookingsScreen extends StatefulWidget {
+class MyBookingsScreen extends BaseStatefulWidget {
   static String routeName = '/my-bookings';
 
   @override
-  _MyBookingsScreenState createState() => _MyBookingsScreenState();
+  _MyBookingsScreenState createState() => _MyBookingsScreenState([
+    'lblMyBookings',
+    'lblNoActiveBookings'
+    ]);
 }
 
-class _MyBookingsScreenState extends State<MyBookingsScreen> {
+class _MyBookingsScreenState extends BaseState<MyBookingsScreen> {
   var _isInit = true;
   var _isLoading = false;
   List<Booking> bookings = [];
+
+  _MyBookingsScreenState(List<String> labelsKeys) : super(labelsKeys);
 
   @override
   void didChangeDependencies() {
@@ -55,7 +60,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Programarile mele'),
+        title: Text(getCurrentLabelValue('lblMyBookings')),
       ),
       body: _isLoading
           ? Center(
@@ -74,7 +79,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
                       child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        Text('Nu aveti programari active'),
+                        Text(getCurrentLabelValue('lblNoActiveBookings')),
                         IconButton(
                           icon: Icon(Icons.refresh),
                           onPressed: loadBookings,

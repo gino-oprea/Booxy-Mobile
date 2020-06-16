@@ -1,16 +1,19 @@
+import '../base-widgets/base-stateful-widget.dart';
 import '../providers/login-provider.dart';
-
-import '../models/generic-response-object.dart';
 import 'package:flutter/material.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends BaseStatefulWidget {
   static const routeName = '/login';
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  _LoginScreenState createState() => _LoginScreenState([
+    'lblInvalidLogin',
+    'lblMandatoryField',
+    'lblPassword'
+  ]);
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends BaseState<LoginScreen> {
   final _form = GlobalKey<FormState>();
   final _scaffoldKey = new GlobalKey<ScaffoldState>();
 
@@ -21,6 +24,8 @@ class _LoginScreenState extends State<LoginScreen> {
     'email': '',
     'password': '',
   };
+
+  _LoginScreenState(List<String> labelsKeys) : super(labelsKeys);
 
   Future<void> saveForm(BuildContext context) async {
     final isValid = _form.currentState.validate();
@@ -35,7 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!isLoggedIn)
       _scaffoldKey.currentState.showSnackBar(
         SnackBar(
-          content: Text('Invalid login'),
+          content: Text(getCurrentLabelValue('lblInvalidLogin')),
           duration: Duration(seconds: 2),
         ),
       );
@@ -103,7 +108,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 textInputAction: TextInputAction.next,
                                 validator: (value) {
                                   return value.isEmpty
-                                      ? 'camp obligatoriu'
+                                      ? getCurrentLabelValue('lblMandatoryField')
                                       : null;
                                 },
                                 onFieldSubmitted: (_) {
@@ -131,7 +136,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 focusNode: _passwordFocusNode,
                                 obscureText: true,
                                 decoration: InputDecoration(
-                                  labelText: 'Password',
+                                  labelText: getCurrentLabelValue('lblPassword'),
                                   contentPadding: EdgeInsets.all(0),
                                   enabledBorder: UnderlineInputBorder(
                                     borderSide: BorderSide(
@@ -141,7 +146,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 textInputAction: TextInputAction.done,
                                 validator: (value) {
                                   return value.isEmpty
-                                      ? 'camp obligatoriu'
+                                      ? getCurrentLabelValue('lblMandatoryField')
                                       : null;
                                 },
                                 onFieldSubmitted: (_) {

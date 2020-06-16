@@ -1,4 +1,6 @@
 import 'dart:convert';
+import '../base-widgets/base-stateful-widget.dart';
+
 import '../models/user.dart';
 
 import '../providers/login-provider.dart';
@@ -15,14 +17,25 @@ import '../models/booking.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class CompanyBookingScreen extends StatefulWidget {
+class CompanyBookingScreen extends BaseStatefulWidget {
   static const String routeName = '/company-booking';
 
   @override
-  _CompanyBookingScreenState createState() => _CompanyBookingScreenState();
+  _CompanyBookingScreenState createState() => _CompanyBookingScreenState([
+        'lblBooking',
+        'lblMandatoryField',
+        'lblFirstName',
+        'lblLastName',
+        'lblPhone',
+        'lblSave',
+        'lblDate',
+        'lblPrice',
+        'lblHour',
+        'lblSaved'
+      ]);
 }
 
-class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
+class _CompanyBookingScreenState extends BaseState<CompanyBookingScreen> {
   bool _isInit = true;
   Company _company;
   AutoAssignedEntityCombination _autoAssignedEntityCombination;
@@ -51,6 +64,8 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
       startDate: null,
       startTime: null,
       endTime: null);
+
+  _CompanyBookingScreenState(List<String> labelsKeys) : super(labelsKeys);
 
   // List<Entity> _selectedEntities = [];
 
@@ -188,7 +203,8 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Programare ' + this._company.name),
+        title:
+            Text(getCurrentLabelValue('lblBooking') + ' ' + this._company.name),
       ),
       body: Form(
         key: _form,
@@ -215,7 +231,8 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
                                 focusNode: _firstNameFocusNode,
                                 controller: _firstNameController,
                                 decoration: InputDecoration(
-                                  labelText: 'Prenume',
+                                  labelText:
+                                      getCurrentLabelValue('lblFirstName'),
                                   contentPadding: EdgeInsets.all(0),
                                   enabledBorder: UnderlineInputBorder(
                                     borderSide: BorderSide(
@@ -225,7 +242,8 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
                                 textInputAction: TextInputAction.next,
                                 validator: (value) {
                                   return value.isEmpty
-                                      ? 'camp obligatoriu'
+                                      ? getCurrentLabelValue(
+                                          'lblMandatoryField')
                                       : null;
                                 },
                                 onFieldSubmitted: (_) {
@@ -253,7 +271,8 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
                                 focusNode: _lastNameFocusNode,
                                 controller: _lastNameController,
                                 decoration: InputDecoration(
-                                  labelText: 'Nume',
+                                  labelText:
+                                      getCurrentLabelValue('lblLastName'),
                                   contentPadding: EdgeInsets.all(0),
                                   enabledBorder: UnderlineInputBorder(
                                     borderSide: BorderSide(
@@ -263,7 +282,8 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
                                 textInputAction: TextInputAction.next,
                                 validator: (value) {
                                   return value.isEmpty
-                                      ? 'camp obligatoriu'
+                                      ? getCurrentLabelValue(
+                                          'lblMandatoryField')
                                       : null;
                                 },
                                 onFieldSubmitted: (_) {
@@ -291,7 +311,7 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
                                 focusNode: _phoneFocusNode,
                                 controller: _phoneController,
                                 decoration: InputDecoration(
-                                  labelText: 'Telefon',
+                                  labelText: getCurrentLabelValue('lblPhone'),
                                   contentPadding: EdgeInsets.all(0),
                                   enabledBorder: UnderlineInputBorder(
                                     borderSide: BorderSide(
@@ -302,7 +322,8 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
                                 textInputAction: TextInputAction.next,
                                 validator: (value) {
                                   return value.isEmpty
-                                      ? 'camp obligatoriu'
+                                      ? getCurrentLabelValue(
+                                          'lblMandatoryField')
                                       : null;
                                 },
                                 onFieldSubmitted: (_) {
@@ -378,7 +399,7 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
                                 child: Row(
                                   children: <Widget>[
                                     Text(
-                                      'Data: ',
+                                      getCurrentLabelValue('lblDate')+': ',
                                       style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold),
@@ -403,7 +424,7 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
                                 child: Row(
                                   children: <Widget>[
                                     Text(
-                                      'Pret: ',
+                                      getCurrentLabelValue('lblPrice') + ': ',
                                       style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold),
@@ -432,7 +453,7 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
                                 child: Row(
                                   children: <Widget>[
                                     Text(
-                                      'Ora: ',
+                                      getCurrentLabelValue('lblHour')+': ',
                                       style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold),
@@ -481,7 +502,7 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
               else
                 Scaffold.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Programare salvata'),
+                    content: Text(getCurrentLabelValue('lblSaved')),
                     duration: Duration(seconds: 2),
                   ),
                 );
@@ -491,7 +512,7 @@ class _CompanyBookingScreenState extends State<CompanyBookingScreen> {
               });
             }
           },
-          label: Text('Salveaza'),
+          label: Text(getCurrentLabelValue('lblSave')),
           icon: Icon(Icons.check),
         ),
       ),

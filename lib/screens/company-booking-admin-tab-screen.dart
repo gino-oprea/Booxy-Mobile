@@ -1,3 +1,5 @@
+import '../base-widgets/base-stateful-widget.dart';
+
 import '../models/company.dart';
 
 import '../providers/booking-provider.dart';
@@ -6,7 +8,7 @@ import '../models/booking.dart';
 import '../widgets/booking-list-item-admin.dart';
 import 'package:flutter/material.dart';
 
-class CompanyBookingAdminTabScreen extends StatefulWidget {
+class CompanyBookingAdminTabScreen extends BaseStatefulWidget {
   final String type;
   final Company company;
 
@@ -14,15 +16,17 @@ class CompanyBookingAdminTabScreen extends StatefulWidget {
 
   @override
   _CompanyBookingAdminTabScreenState createState() =>
-      _CompanyBookingAdminTabScreenState();
+      _CompanyBookingAdminTabScreenState(['lblNoBookings','lblNoBookingsToday']);
 }
 
 class _CompanyBookingAdminTabScreenState
-    extends State<CompanyBookingAdminTabScreen> {
+    extends BaseState<CompanyBookingAdminTabScreen> {
   var _isInit = true;
   var _isLoading = false;
   List<Booking> bookings = [];
   List<Booking> todayBookings = [];
+
+  _CompanyBookingAdminTabScreenState(List<String> labelsKeys) : super(labelsKeys);
 
   @override
   void didChangeDependencies() {
@@ -77,8 +81,8 @@ class _CompanyBookingAdminTabScreenState
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       widget.type == 'all'
-                          ? Text('Nu aveti programari')
-                          : Text('Nu aveti programari astazi'),
+                          ? Text(getCurrentLabelValue('lblNoBookings'))
+                          : Text(getCurrentLabelValue('lblNoBookingsToday')),
                       IconButton(
                         icon: Icon(Icons.refresh),
                         onPressed: loadBookings,

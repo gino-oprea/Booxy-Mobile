@@ -1,22 +1,24 @@
+import '../base-widgets/base-stateful-widget.dart';
 import '../models/company.dart';
-
 import './company-booking-admin-tab-screen.dart';
 import 'package:flutter/material.dart';
 
-class CompanyBookingsAdminScreen extends StatefulWidget {
+class CompanyBookingsAdminScreen extends BaseStatefulWidget {
   static String routeName = '/company-bookings';
 
   @override
   _CompanyBookingsAdminScreenState createState() =>
-      _CompanyBookingsAdminScreenState();
+      _CompanyBookingsAdminScreenState(['lblCompanyBookings','lblAll','lblToday']);
 }
 
 class _CompanyBookingsAdminScreenState
-    extends State<CompanyBookingsAdminScreen> {
+    extends BaseState<CompanyBookingsAdminScreen> {
   List<Widget> _pages;
   int _selectedPageIndex = 0;
   bool _isInit = true;
   Company company;
+
+  _CompanyBookingsAdminScreenState(List<String> labelsKeys) : super(labelsKeys);
 
   @override
   void initState() {
@@ -49,7 +51,7 @@ class _CompanyBookingsAdminScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Programarile companiei'),
+        title: Text(getCurrentLabelValue('lblCompanyBookings')),
       ),
       body: _pages[_selectedPageIndex],
       bottomNavigationBar: BottomNavigationBar(
@@ -62,11 +64,11 @@ class _CompanyBookingsAdminScreenState
           BottomNavigationBarItem(
               backgroundColor: Theme.of(context).primaryColor,
               icon: Icon(Icons.history),
-              title: Text('Toate')),
+              title: Text(getCurrentLabelValue('lblAll'))),
           BottomNavigationBarItem(
               backgroundColor: Theme.of(context).primaryColor,
               icon: Icon(Icons.today),
-              title: Text('Astazi')),
+              title: Text(getCurrentLabelValue('lblToday'))),
         ],
       ),
     );
