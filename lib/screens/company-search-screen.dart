@@ -22,11 +22,14 @@ class CompanySearchScreen extends BaseStatefulWidget {
 class _CompanySearchScreenState extends BaseState<CompanySearchScreen> {
   var _isInit = true;
   var _isLoading = false;
+
   CompanyFilter _advancedFilter;
 
   final _companyNameController = TextEditingController();
 
-  _CompanySearchScreenState(List<String> labelsKeys) : super(labelsKeys);
+  _CompanySearchScreenState(List<String> labelsKeys) : super(labelsKeys) {
+    this.widgetName = 'Search company';
+  }
 
   @override
   void didChangeDependencies() {

@@ -1,12 +1,15 @@
+import '../providers/log-provider.dart';
+
+import '../enums/actions-enum.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/material.dart';
 
+import '../models/log-item.dart';
+import '../models/user.dart';
 import '../providers/culture-provider.dart';
-
 import '../providers/login-provider.dart';
-
 import '../providers/label-provider.dart';
 import '../models/label.dart';
-import 'package:flutter/material.dart';
 
 class BaseStatefulWidget extends StatefulWidget {
   @override
@@ -20,7 +23,7 @@ class BaseState<T extends BaseStatefulWidget> extends State<T> {
   var _isInitBase = true;
 
   int idCompany;
-  String widgetName;
+  String widgetName = 'testWidget';
   List<String> widgetLabels;
   String currentCulture = '';
   List<Label> currentLabels;
@@ -36,6 +39,30 @@ class BaseState<T extends BaseStatefulWidget> extends State<T> {
     this.currentLabels =
         await LabelProvider().getLabelsByKeyName(this.widgetLabels);
     setState(() {});
+  }
+
+  Future<void> logAction(int idCompany, bool isError, int idAction,
+      String errMsg, String infoMsg) async {
+    User usr = await LoginProvider().currentUser;
+
+    var log = new LogItem();
+
+    if (usr != null) {
+      log.idUser = usr.id;
+      log.email = usr.email;
+      log.userFirstName = usr.firstName;
+      log.userLastName = usr.lastName;
+      log.phone = usr.phone;
+    }
+    log.idCompany = this.idCompany;
+    log.isError = isError;
+    log.pageName = this.widgetName;
+    log.idAction = idAction;
+    log.actionName = ActionsEnum.getActionName(idAction);
+    log.logErrorMessage = errMsg;
+    log.logInfoMessage = infoMsg;
+
+    LogProvider().setLog(log);
   }
 
   String getCurrentLabelValue(String keyName) {
@@ -58,8 +85,8 @@ class BaseState<T extends BaseStatefulWidget> extends State<T> {
   getCurrentCulture() {
     LoginProvider().currentCulture.then((cult) {
       //setState(() {
-        this.currentCulture = cult;
-        this.cultureProvider.changeCulture(this.currentCulture);
+      this.currentCulture = cult;
+      this.cultureProvider.changeCulture(this.currentCulture);
       //});
     });
   }
@@ -81,10 +108,10 @@ class BaseState<T extends BaseStatefulWidget> extends State<T> {
     if (this._isInitBase) {
       this.cultureProvider = Provider.of<CultureProvider>(context);
       this.getCurrentCulture();
+      this.logAction(this.idCompany, false, ActionsEnum.View, '', '');
     }
 
     this._isInitBase = false;
-
     super.didChangeDependencies();
   }
 }
