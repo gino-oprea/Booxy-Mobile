@@ -250,7 +250,7 @@ class BookingProvider with ChangeNotifier {
         '&dateEnd=' +
         DateFormat('yyyy-MM-dd')
             .format(DateTime.now().add(Duration(days: 365 * 10))) +
-        '&includeCanceled=true';
+        '&includeCanceled=true&filterByLinkedEntityToUser=true';
 
     final response = await http.get(url, headers: {
       HttpHeaders.authorizationHeader: "Bearer " + token.access_token
