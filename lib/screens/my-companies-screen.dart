@@ -11,10 +11,8 @@ class MyCompaniesScreen extends BaseStatefulWidget {
   static String routeName = '/my-companies';
 
   @override
-  _MyCompaniesScreenState createState() => _MyCompaniesScreenState([
-    'lblMyCompanies',
-    'lblNoCompaniesPleaseCreate'
-  ]);
+  _MyCompaniesScreenState createState() =>
+      _MyCompaniesScreenState(['lblMyCompanies', 'lblNoCompaniesPleaseCreate']);
 }
 
 class _MyCompaniesScreenState extends BaseState<MyCompaniesScreen> {
@@ -22,7 +20,9 @@ class _MyCompaniesScreenState extends BaseState<MyCompaniesScreen> {
   var _isLoading = false;
   List<Company> companies = [];
 
-  _MyCompaniesScreenState(List<String> labelsKeys) : super(labelsKeys);
+  _MyCompaniesScreenState(List<String> labelsKeys) : super(labelsKeys) {
+    this.widgetName = 'My Companies';
+  }
 
   Future<void> _onRefresh(BuildContext ctx) async {
     var currentUser = await LoginProvider().currentUser;

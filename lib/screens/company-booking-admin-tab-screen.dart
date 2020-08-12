@@ -16,7 +16,8 @@ class CompanyBookingAdminTabScreen extends BaseStatefulWidget {
 
   @override
   _CompanyBookingAdminTabScreenState createState() =>
-      _CompanyBookingAdminTabScreenState(['lblNoBookings','lblNoBookingsToday']);
+      _CompanyBookingAdminTabScreenState(
+          ['lblNoBookings', 'lblNoBookingsToday']);
 }
 
 class _CompanyBookingAdminTabScreenState
@@ -26,7 +27,11 @@ class _CompanyBookingAdminTabScreenState
   List<Booking> bookings = [];
   List<Booking> todayBookings = [];
 
-  _CompanyBookingAdminTabScreenState(List<String> labelsKeys) : super(labelsKeys);
+  _CompanyBookingAdminTabScreenState(List<String> labelsKeys)
+      : super(labelsKeys) {
+    this.widgetName = "Company bookings admin";
+    
+  }
 
   @override
   void didChangeDependencies() {
@@ -39,6 +44,8 @@ class _CompanyBookingAdminTabScreenState
     }
 
     this._isInit = false;
+
+    this.idCompany = widget.company.id;
 
     super.didChangeDependencies();
   }

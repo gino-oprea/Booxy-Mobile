@@ -12,18 +12,18 @@ class MyBookingDetailsScreen extends BaseStatefulWidget {
 
   @override
   _MyBookingDetailsScreenState createState() => _MyBookingDetailsScreenState([
-    'lblMyBooking',
-    'lblAddress',
-    'lblPhone',
-    'lblDate',
-    'lblHour',
-    'lblConfirmation',
-    'lblYes',
-    'lblNo',
-    'lblConfirmCancelBooking',
-    'lblCancelBooking',
-    'lblBookingCanceled'
-    ]);
+        'lblMyBooking',
+        'lblAddress',
+        'lblPhone',
+        'lblDate',
+        'lblHour',
+        'lblConfirmation',
+        'lblYes',
+        'lblNo',
+        'lblConfirmCancelBooking',
+        'lblCancelBooking',
+        'lblBookingCanceled'
+      ]);
 }
 
 class _MyBookingDetailsScreenState extends BaseState<MyBookingDetailsScreen> {
@@ -32,7 +32,9 @@ class _MyBookingDetailsScreenState extends BaseState<MyBookingDetailsScreen> {
   List<Widget> entitiesTxts;
   final _scaffoldKey = new GlobalKey<ScaffoldState>();
 
-  _MyBookingDetailsScreenState(List<String> labelsKeys) : super(labelsKeys);
+  _MyBookingDetailsScreenState(List<String> labelsKeys) : super(labelsKeys) {
+    this.widgetName = 'My booking details';
+  }
 
   @override
   void initState() {
@@ -124,7 +126,7 @@ class _MyBookingDetailsScreenState extends BaseState<MyBookingDetailsScreen> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: <Widget>[
                           Text(
-                            getCurrentLabelValue('lblAddress')+': ',
+                            getCurrentLabelValue('lblAddress') + ': ',
                             style: TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold),
                           ),
@@ -171,7 +173,7 @@ class _MyBookingDetailsScreenState extends BaseState<MyBookingDetailsScreen> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: <Widget>[
                           Text(
-                            getCurrentLabelValue('lblPhone')+': ',
+                            getCurrentLabelValue('lblPhone') + ': ',
                             style: TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold),
                           ),
@@ -219,7 +221,7 @@ class _MyBookingDetailsScreenState extends BaseState<MyBookingDetailsScreen> {
                               child: Row(
                                 children: <Widget>[
                                   Text(
-                                    getCurrentLabelValue('lblDate')+': ',
+                                    getCurrentLabelValue('lblDate') + ': ',
                                     style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold),
@@ -244,7 +246,7 @@ class _MyBookingDetailsScreenState extends BaseState<MyBookingDetailsScreen> {
                               child: Row(
                                 children: <Widget>[
                                   Text(
-                                    getCurrentLabelValue('lblHour')+': ',
+                                    getCurrentLabelValue('lblHour') + ': ',
                                     style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold),
@@ -279,8 +281,8 @@ class _MyBookingDetailsScreenState extends BaseState<MyBookingDetailsScreen> {
               context: context,
               builder: (ctx) => AlertDialog(
                     title: Text(getCurrentLabelValue('lblConfirmation')),
-                    content: Text(
-                        getCurrentLabelValue('lblConfirmCancelBooking')),
+                    content:
+                        Text(getCurrentLabelValue('lblConfirmCancelBooking')),
                     actions: <Widget>[
                       FlatButton(
                         child: Text(getCurrentLabelValue('lblNo')),
@@ -306,7 +308,8 @@ class _MyBookingDetailsScreenState extends BaseState<MyBookingDetailsScreen> {
                             else
                               _scaffoldKey.currentState.showSnackBar(
                                 SnackBar(
-                                  content: Text(getCurrentLabelValue('lblBookingCanceled')),
+                                  content: Text(getCurrentLabelValue(
+                                      'lblBookingCanceled')),
                                   duration: Duration(seconds: 2),
                                 ),
                               );

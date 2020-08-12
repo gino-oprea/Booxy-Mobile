@@ -46,12 +46,18 @@ class _CompanyDetailsScreenState extends BaseState<CompanyDetailsScreen> {
 
   final _form = GlobalKey<FormState>();
 
-  _CompanyDetailsScreenState(List<String> labelsKeys) : super(labelsKeys);
+  _CompanyDetailsScreenState(List<String> labelsKeys) : super(labelsKeys) {
+    this.widgetName = 'Company details';
+  }
 
   @override
   void didChangeDependencies() {
     if (_isInit) {
       this._company = ModalRoute.of(context).settings.arguments as Company;
+      
+      //for base logging
+      this.idCompany = this._company.id;
+
       var weekDates = DatesHelper.getWeekDates(_pickedDate);
 
       Future.wait([

@@ -65,7 +65,9 @@ class _CompanyBookingScreenState extends BaseState<CompanyBookingScreen> {
       startTime: null,
       endTime: null);
 
-  _CompanyBookingScreenState(List<String> labelsKeys) : super(labelsKeys);
+  _CompanyBookingScreenState(List<String> labelsKeys) : super(labelsKeys) {
+    this.widgetName = 'Company booking confirm';
+  }
 
   // List<Entity> _selectedEntities = [];
 
@@ -93,6 +95,10 @@ class _CompanyBookingScreenState extends BaseState<CompanyBookingScreen> {
       this._company = (ModalRoute.of(context).settings.arguments
               as BookingConfirmationPayload)
           .company;
+
+      //for base logging
+      this.idCompany = this._company.id;
+
       this._autoAssignedEntityCombination = (ModalRoute.of(context)
               .settings
               .arguments as BookingConfirmationPayload)
@@ -399,7 +405,7 @@ class _CompanyBookingScreenState extends BaseState<CompanyBookingScreen> {
                                 child: Row(
                                   children: <Widget>[
                                     Text(
-                                      getCurrentLabelValue('lblDate')+': ',
+                                      getCurrentLabelValue('lblDate') + ': ',
                                       style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold),
@@ -453,7 +459,7 @@ class _CompanyBookingScreenState extends BaseState<CompanyBookingScreen> {
                                 child: Row(
                                   children: <Widget>[
                                     Text(
-                                      getCurrentLabelValue('lblHour')+': ',
+                                      getCurrentLabelValue('lblHour') + ': ',
                                       style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold),

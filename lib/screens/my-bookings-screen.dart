@@ -8,10 +8,8 @@ class MyBookingsScreen extends BaseStatefulWidget {
   static String routeName = '/my-bookings';
 
   @override
-  _MyBookingsScreenState createState() => _MyBookingsScreenState([
-    'lblMyBookings',
-    'lblNoActiveBookings'
-    ]);
+  _MyBookingsScreenState createState() =>
+      _MyBookingsScreenState(['lblMyBookings', 'lblNoActiveBookings']);
 }
 
 class _MyBookingsScreenState extends BaseState<MyBookingsScreen> {
@@ -19,7 +17,9 @@ class _MyBookingsScreenState extends BaseState<MyBookingsScreen> {
   var _isLoading = false;
   List<Booking> bookings = [];
 
-  _MyBookingsScreenState(List<String> labelsKeys) : super(labelsKeys);
+  _MyBookingsScreenState(List<String> labelsKeys) : super(labelsKeys) {
+    this.widgetName = 'My bookings';
+  }
 
   @override
   void didChangeDependencies() {

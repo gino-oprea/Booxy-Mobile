@@ -6,11 +6,8 @@ class LoginScreen extends BaseStatefulWidget {
   static const routeName = '/login';
 
   @override
-  _LoginScreenState createState() => _LoginScreenState([
-    'lblInvalidLogin',
-    'lblMandatoryField',
-    'lblPassword'
-  ]);
+  _LoginScreenState createState() => _LoginScreenState(
+      ['lblInvalidLogin', 'lblMandatoryField', 'lblPassword']);
 }
 
 class _LoginScreenState extends BaseState<LoginScreen> {
@@ -25,7 +22,9 @@ class _LoginScreenState extends BaseState<LoginScreen> {
     'password': '',
   };
 
-  _LoginScreenState(List<String> labelsKeys) : super(labelsKeys);
+  _LoginScreenState(List<String> labelsKeys) : super(labelsKeys) {
+    this.widgetName = 'Login';
+  }
 
   Future<void> saveForm(BuildContext context) async {
     final isValid = _form.currentState.validate();
@@ -108,7 +107,8 @@ class _LoginScreenState extends BaseState<LoginScreen> {
                                 textInputAction: TextInputAction.next,
                                 validator: (value) {
                                   return value.isEmpty
-                                      ? getCurrentLabelValue('lblMandatoryField')
+                                      ? getCurrentLabelValue(
+                                          'lblMandatoryField')
                                       : null;
                                 },
                                 onFieldSubmitted: (_) {
@@ -136,7 +136,8 @@ class _LoginScreenState extends BaseState<LoginScreen> {
                                 focusNode: _passwordFocusNode,
                                 obscureText: true,
                                 decoration: InputDecoration(
-                                  labelText: getCurrentLabelValue('lblPassword'),
+                                  labelText:
+                                      getCurrentLabelValue('lblPassword'),
                                   contentPadding: EdgeInsets.all(0),
                                   enabledBorder: UnderlineInputBorder(
                                     borderSide: BorderSide(
@@ -146,7 +147,8 @@ class _LoginScreenState extends BaseState<LoginScreen> {
                                 textInputAction: TextInputAction.done,
                                 validator: (value) {
                                   return value.isEmpty
-                                      ? getCurrentLabelValue('lblMandatoryField')
+                                      ? getCurrentLabelValue(
+                                          'lblMandatoryField')
                                       : null;
                                 },
                                 onFieldSubmitted: (_) {

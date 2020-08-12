@@ -11,11 +11,19 @@ import 'package:flutter/material.dart';
 
 class AppDrawer extends BaseStatefulWidget {
   @override
-  _AppDrawerState createState() => _AppDrawerState(['lblMyAccount', 'lblLanguage','lblSearchCompany','lblBookings','lblMyCompanies']);
+  _AppDrawerState createState() => _AppDrawerState([
+        'lblMyAccount',
+        'lblLanguage',
+        'lblSearchCompany',
+        'lblBookings',
+        'lblMyCompanies'
+      ]);
 }
 
 class _AppDrawerState extends BaseState<AppDrawer> {
-  _AppDrawerState(List<String> labelsKeys) : super(labelsKeys);
+  _AppDrawerState(List<String> labelsKeys) : super(labelsKeys) {
+    this.widgetName = 'App drawer';
+  }
 
   bool isAuth = false;
 

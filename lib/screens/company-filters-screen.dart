@@ -32,7 +32,9 @@ class _CompanyFiltersScreenState extends BaseState<CompanyFiltersScreen> {
   GenericDictionaryItem _selectedCategory;
   GenericDictionaryItem _selectedSubCategory;
 
-  _CompanyFiltersScreenState(List<String> labelsKeys) : super(labelsKeys);
+  _CompanyFiltersScreenState(List<String> labelsKeys) : super(labelsKeys) {
+    this.widgetName = 'Company filters';
+  }
 
   @override
   void initState() {

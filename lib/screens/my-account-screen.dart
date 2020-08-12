@@ -10,14 +10,14 @@ class MyAccountScreen extends BaseStatefulWidget {
 
   @override
   _MyAccountScreenState createState() => _MyAccountScreenState([
-    'lblSaved',
-    'lblMyAccount',
-    'lblFirstName',
-    'lblLastName',
-    'lblPhone',
-    'lblMandatoryField',
-    'lblSave'
-    ]);
+        'lblSaved',
+        'lblMyAccount',
+        'lblFirstName',
+        'lblLastName',
+        'lblPhone',
+        'lblMandatoryField',
+        'lblSave'
+      ]);
 }
 
 class _MyAccountScreenState extends BaseState<MyAccountScreen> {
@@ -38,7 +38,9 @@ class _MyAccountScreenState extends BaseState<MyAccountScreen> {
 
   var _editedUser = new User();
 
-  _MyAccountScreenState(List<String> labelsKeys) : super(labelsKeys);
+  _MyAccountScreenState(List<String> labelsKeys) : super(labelsKeys) {
+    this.widgetName = 'My Account';
+  }
 
   @override
   void didChangeDependencies() {
@@ -137,7 +139,8 @@ class _MyAccountScreenState extends BaseState<MyAccountScreen> {
                                 focusNode: _firstNameFocusNode,
                                 controller: _firstNameController,
                                 decoration: InputDecoration(
-                                  labelText: getCurrentLabelValue('lblFirstName'),
+                                  labelText:
+                                      getCurrentLabelValue('lblFirstName'),
                                   contentPadding: EdgeInsets.all(0),
                                   enabledBorder: UnderlineInputBorder(
                                     borderSide: BorderSide(
@@ -147,7 +150,8 @@ class _MyAccountScreenState extends BaseState<MyAccountScreen> {
                                 textInputAction: TextInputAction.next,
                                 validator: (value) {
                                   return value.isEmpty
-                                      ? getCurrentLabelValue('lblMandatoryField')
+                                      ? getCurrentLabelValue(
+                                          'lblMandatoryField')
                                       : null;
                                 },
                                 onFieldSubmitted: (_) {
@@ -175,7 +179,8 @@ class _MyAccountScreenState extends BaseState<MyAccountScreen> {
                                 focusNode: _lastNameFocusNode,
                                 controller: _lastNameController,
                                 decoration: InputDecoration(
-                                  labelText: getCurrentLabelValue('lblLastName'),
+                                  labelText:
+                                      getCurrentLabelValue('lblLastName'),
                                   contentPadding: EdgeInsets.all(0),
                                   enabledBorder: UnderlineInputBorder(
                                     borderSide: BorderSide(
@@ -185,7 +190,8 @@ class _MyAccountScreenState extends BaseState<MyAccountScreen> {
                                 textInputAction: TextInputAction.next,
                                 validator: (value) {
                                   return value.isEmpty
-                                      ? getCurrentLabelValue('lblMandatoryField')
+                                      ? getCurrentLabelValue(
+                                          'lblMandatoryField')
                                       : null;
                                 },
                                 onFieldSubmitted: (_) {
@@ -224,7 +230,8 @@ class _MyAccountScreenState extends BaseState<MyAccountScreen> {
                                 textInputAction: TextInputAction.next,
                                 validator: (value) {
                                   return value.isEmpty
-                                      ? getCurrentLabelValue('lblMandatoryField')
+                                      ? getCurrentLabelValue(
+                                          'lblMandatoryField')
                                       : null;
                                 },
                                 onFieldSubmitted: (_) {
@@ -262,7 +269,8 @@ class _MyAccountScreenState extends BaseState<MyAccountScreen> {
                                 textInputAction: TextInputAction.done,
                                 validator: (value) {
                                   return value.isEmpty
-                                      ? getCurrentLabelValue('lblMandatoryField')
+                                      ? getCurrentLabelValue(
+                                          'lblMandatoryField')
                                       : null;
                                 },
                                 onFieldSubmitted: (_) {

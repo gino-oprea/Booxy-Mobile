@@ -23,7 +23,7 @@ class BaseState<T extends BaseStatefulWidget> extends State<T> {
   var _isInitBase = true;
 
   int idCompany;
-  String widgetName = 'testWidget';
+  String widgetName = '';
   List<String> widgetLabels;
   String currentCulture = '';
   List<Label> currentLabels;
@@ -43,26 +43,28 @@ class BaseState<T extends BaseStatefulWidget> extends State<T> {
 
   Future<void> logAction(int idCompany, bool isError, int idAction,
       String errMsg, String infoMsg) async {
-    User usr = await LoginProvider().currentUser;
+    if (this.widgetName.trim() != '') {
+      User usr = await LoginProvider().currentUser;
 
-    var log = new LogItem();
+      var log = new LogItem();
 
-    if (usr != null) {
-      log.idUser = usr.id;
-      log.email = usr.email;
-      log.userFirstName = usr.firstName;
-      log.userLastName = usr.lastName;
-      log.phone = usr.phone;
+      if (usr != null) {
+        log.idUser = usr.id;
+        log.email = usr.email;
+        log.userFirstName = usr.firstName;
+        log.userLastName = usr.lastName;
+        log.phone = usr.phone;
+      }
+      log.idCompany = this.idCompany;
+      log.isError = isError;
+      log.pageName = this.widgetName;
+      log.idAction = idAction;
+      log.actionName = ActionsEnum.getActionName(idAction);
+      log.logErrorMessage = errMsg;
+      log.logInfoMessage = infoMsg;
+
+      LogProvider().setLog(log);
     }
-    log.idCompany = this.idCompany;
-    log.isError = isError;
-    log.pageName = this.widgetName;
-    log.idAction = idAction;
-    log.actionName = ActionsEnum.getActionName(idAction);
-    log.logErrorMessage = errMsg;
-    log.logInfoMessage = infoMsg;
-
-    LogProvider().setLog(log);
   }
 
   String getCurrentLabelValue(String keyName) {
