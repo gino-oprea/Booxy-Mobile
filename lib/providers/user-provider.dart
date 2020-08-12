@@ -1,11 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:booxy/providers/log-provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import './login-provider.dart';
 import '../models/user.dart';
-import '../models/token.dart';
 import '../config/booxy-config.dart';
 import 'package:http/http.dart' as http;
 import '../models/generic-response-object.dart';
