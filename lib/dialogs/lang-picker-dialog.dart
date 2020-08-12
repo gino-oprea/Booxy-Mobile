@@ -1,3 +1,5 @@
+import 'package:booxy/enums/actions-enum.dart';
+
 import '../base-widgets/base-stateful-widget.dart';
 import 'package:flutter/material.dart';
 
@@ -7,7 +9,9 @@ class LangPickerDialog extends BaseStatefulWidget {
 }
 
 class _LangPickerDialogState extends BaseState<LangPickerDialog> {
-  _LangPickerDialogState(List<String> labelsKeys) : super(labelsKeys);
+  _LangPickerDialogState(List<String> labelsKeys) : super(labelsKeys) {
+    this.widgetName = 'Language picker dialog';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +29,8 @@ class _LangPickerDialogState extends BaseState<LangPickerDialog> {
               onChanged: (value) async {
                 this.currentCulture = value;
                 await this.setCurrentCulture();
+                logAction(this.idCompany, false, ActionsEnum.Edit, '',
+                    'Change culture to RO');
                 Navigator.of(context).pop(this.currentCulture);
               },
             ),
@@ -35,6 +41,8 @@ class _LangPickerDialogState extends BaseState<LangPickerDialog> {
               onChanged: (value) async {
                 this.currentCulture = value;
                 await this.setCurrentCulture();
+                logAction(this.idCompany, false, ActionsEnum.Edit, '',
+                    'Change culture to EN');
                 Navigator.of(context).pop(this.currentCulture);
               },
             )

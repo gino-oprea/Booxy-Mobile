@@ -1,3 +1,5 @@
+import 'package:booxy/enums/actions-enum.dart';
+
 import '../base-widgets/base-stateful-widget.dart';
 import '../providers/login-provider.dart';
 import 'package:flutter/material.dart';
@@ -35,6 +37,8 @@ class _LoginScreenState extends BaseState<LoginScreen> {
     //submit
     bool isLoggedIn =
         await LoginProvider().login(_authData['email'], _authData['password']);
+
+    logAction(this.idCompany, false, ActionsEnum.Login, '', '');
 
     if (!isLoggedIn)
       _scaffoldKey.currentState.showSnackBar(

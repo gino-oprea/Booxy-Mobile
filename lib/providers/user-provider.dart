@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:booxy/providers/log-provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import './login-provider.dart';
@@ -41,7 +42,7 @@ class UserProvider {
       final prefs = await SharedPreferences.getInstance();
       final userData = json.encode(currentUser.toJson());
       prefs.setString('authUser', userData);
-    }
+    }    
 
     return gro;
   }

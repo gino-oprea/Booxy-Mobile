@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:booxy/enums/actions-enum.dart';
+
 import '../base-widgets/base-stateful-widget.dart';
 
 import '../models/user.dart';
@@ -498,22 +500,26 @@ class _CompanyBookingScreenState extends BaseState<CompanyBookingScreen> {
           onPressed: () async {
             var gro = await saveForm();
             if (gro != null) {
-              if (gro.error != '')
+              if (gro.error != '') {
                 Scaffold.of(context).showSnackBar(
                   SnackBar(
                     content: Text(gro.error),
-                    duration: Duration(seconds: 2),
+                    duration: Duration(seconds: 1),
                   ),
                 );
-              else
+                logAction(this.idCompany, true, ActionsEnum.Save, gro.error,
+                    gro.errorDetailed);
+              } else {
                 Scaffold.of(context).showSnackBar(
                   SnackBar(
                     content: Text(getCurrentLabelValue('lblSaved')),
-                    duration: Duration(seconds: 2),
+                    duration: Duration(seconds: 1),
                   ),
                 );
+                logAction(this.idCompany, false, ActionsEnum.Save, '', 'Saved booking');
+              }
 
-              Future.delayed(Duration(seconds: 2), () {
+              Future.delayed(Duration(seconds: 1), () {
                 Navigator.of(context).pop();
               });
             }

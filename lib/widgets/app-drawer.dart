@@ -1,3 +1,5 @@
+import 'package:booxy/enums/actions-enum.dart';
+
 import '../base-widgets/base-stateful-widget.dart';
 import '../dialogs/lang-picker-dialog.dart';
 
@@ -111,7 +113,8 @@ class _AppDrawerState extends BaseState<AppDrawer> {
             if (this.isAuth)
               ListTile(
                 onTap: () {
-                  LoginProvider().logout();
+                  logAction(this.idCompany, false, ActionsEnum.Logout, '', '');
+                  LoginProvider().logout();                  
                   Navigator.of(context).pop();
                 },
                 leading: Icon(Icons.exit_to_app),

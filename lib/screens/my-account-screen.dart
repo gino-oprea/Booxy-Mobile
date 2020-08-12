@@ -1,3 +1,5 @@
+import 'package:booxy/enums/actions-enum.dart';
+
 import '../base-widgets/base-stateful-widget.dart';
 import '../providers/user-provider.dart';
 import '../models/generic-response-object.dart';
@@ -79,20 +81,23 @@ class _MyAccountScreenState extends BaseState<MyAccountScreen> {
     //submit
 
     var gro = await UserProvider().editUser(_editedUser);
-    if (gro.info.indexOf('success') > -1)
+    if (gro.info.indexOf('success') > -1) {
       _scaffoldKey.currentState.showSnackBar(
         SnackBar(
           content: Text(getCurrentLabelValue('lblSaved')),
           duration: Duration(seconds: 2),
         ),
       );
-    else {
+      logAction(this.idCompany, false, ActionsEnum.Edit, '', 'My account edit');
+    } else {
       _scaffoldKey.currentState.showSnackBar(
         SnackBar(
           content: Text(gro.error),
           duration: Duration(seconds: 2),
         ),
       );
+      logAction(
+          this.idCompany, true, ActionsEnum.Edit, gro.error, gro.errorDetailed);
     }
   }
 

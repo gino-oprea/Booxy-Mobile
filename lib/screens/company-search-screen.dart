@@ -1,3 +1,5 @@
+import 'package:booxy/enums/actions-enum.dart';
+
 import '../base-widgets/base-stateful-widget.dart';
 
 import '../models/company-filter.dart';
@@ -41,6 +43,9 @@ class _CompanySearchScreenState extends BaseState<CompanySearchScreen> {
         setState(() {
           _isLoading = false;
         });
+
+        logAction(
+            this.idCompany, false, ActionsEnum.Search, '', 'Search company');
       });
     }
     _isInit = false;
@@ -49,29 +54,39 @@ class _CompanySearchScreenState extends BaseState<CompanySearchScreen> {
   }
 
   void _onSearchCompany(String companyName) {
-    if (_advancedFilter == null)
+    if (_advancedFilter == null) {
       Provider.of<CompaniesProvider>(context)
           .getCompanies(_companyNameController.text);
-    else
+      logAction(
+          this.idCompany, false, ActionsEnum.Search, '', 'Search company');
+    } else {
       Provider.of<CompaniesProvider>(context).getCompanies(
           _companyNameController.text,
           _advancedFilter.idCategory,
           _advancedFilter.idSubCategory,
           _advancedFilter.idCounty,
           _advancedFilter.idCity);
+      logAction(this.idCompany, false, ActionsEnum.Search, '',
+          'Search company advanced filters');
+    }
   }
 
   Future<void> _onRefresh(BuildContext ctx) async {
-    if (_advancedFilter == null)
+    if (_advancedFilter == null) {
       await Provider.of<CompaniesProvider>(ctx)
           .getCompanies(_companyNameController.text);
-    else
+      logAction(
+          this.idCompany, false, ActionsEnum.Search, '', 'Search company');
+    } else {
       Provider.of<CompaniesProvider>(context).getCompanies(
           _companyNameController.text,
           _advancedFilter.idCategory,
           _advancedFilter.idSubCategory,
           _advancedFilter.idCounty,
           _advancedFilter.idCity);
+      logAction(this.idCompany, false, ActionsEnum.Search, '',
+          'Search company advanced filters');
+    }
   }
 
   void _setAdvancedFilters(CompanyFilter filter) {
@@ -93,6 +108,8 @@ class _CompanySearchScreenState extends BaseState<CompanySearchScreen> {
         filter.idSubCategory,
         filter.idCounty,
         filter.idCity);
+    logAction(this.idCompany, false, ActionsEnum.Search, '',
+        'Search company advanced filters');
   }
 
   @override
