@@ -166,6 +166,26 @@ class _LoginScreenState extends BaseState<LoginScreen> {
                           ],
                         ),
                         SizedBox(
+                          height: 10,
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            _scaffoldKey.currentState.showSnackBar(
+                              SnackBar(
+                                content: Text('not implemented yet'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(vertical: 10),
+                            alignment: Alignment.centerRight,
+                            child: Text('Forgot Password ?',
+                                style: TextStyle(
+                                    fontSize: 14, fontWeight: FontWeight.w500)),
+                          ),
+                        ),
+                        SizedBox(
                           height: 40,
                         ),
                         Container(
