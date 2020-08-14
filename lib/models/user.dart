@@ -66,26 +66,27 @@ class User {
   }
 
   Map toJson() {
-    Map obj = {
-      'id': this.id,
-      'email': this.email,
-      'roles': this.roles != null
-          ? this.roles.map((r) => r.toJson()).toList()
-          : null,
-      'firstName': this.firstName,
-      'lastName': this.lastName,
-      'phone': this.phone,
-      'password': this.password,
-      'creationDate':
-          DateFormat('yyyy-MM-ddTHH:mm:ss').format(this.creationDate),
-      'activationKey': this.activationKey,
-      'isEnabled': this.isEnabled,
-      'lastLoginDate':
-          DateFormat('yyyy-MM-ddTHH:mm:ss').format(this.lastLoginDate),
-      'token': this.token,
-      'error': this.error,
-      'errorDetailed': this.errorDetailed
-    };
+    Map obj = Map();
+
+    if (this.id != null) obj['id'] = this.id;
+    if (this.email != null) obj['email'] = this.email;
+    if (this.roles != null)
+      obj['roles'] = this.roles.map((r) => r.toJson()).toList();
+    if (this.firstName != null) obj['firstName'] = this.firstName;
+    if (this.lastName != null) obj['lastName'] = this.lastName;
+    if (this.phone != null) obj['phone'] = this.phone;
+    if (this.password != null) obj['password'] = this.password;
+    if (this.creationDate != null)
+      obj['creationDate'] =
+          DateFormat('yyyy-MM-ddTHH:mm:ss').format(this.creationDate);
+    if (this.activationKey != null) obj['activationKey'] = this.activationKey;
+    if (this.isEnabled != null) obj['isEnabled'] = this.isEnabled;
+    if (this.lastLoginDate != null)
+      obj['lastLoginDate'] =
+          DateFormat('yyyy-MM-ddTHH:mm:ss').format(this.lastLoginDate);
+    if (this.token != null) obj['token'] = this.token;
+    if (this.error != null) obj['error'] = this.error;
+    if (this.errorDetailed != null) obj['errorDetailed'] = this.errorDetailed;
 
     return obj;
   }

@@ -40,7 +40,28 @@ class UserProvider {
       final prefs = await SharedPreferences.getInstance();
       final userData = json.encode(currentUser.toJson());
       prefs.setString('authUser', userData);
-    }    
+    }
+
+    return gro;
+  }
+
+  Future<GenericResponseObject> registerUser(User user) async {
+    String url = BooxyConfig.api_endpoint + 'users';
+
+    var bdyObj = json.encode(user.toJson());
+    
+    final response = await http.post(url,
+        headers: {
+          'Content-Type': 'application/json'          
+        },
+        body: bdyObj);
+
+    final extractedData = json.decode(response.body) as Map<String, dynamic>;
+    if (extractedData == null) {
+      return null;
+    }
+
+    GenericResponseObject gro = GenericResponseObject().fromJson(extractedData);    
 
     return gro;
   }

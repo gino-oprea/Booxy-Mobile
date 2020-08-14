@@ -1,103 +1,92 @@
-import 'package:booxy/enums/actions-enum.dart';
-
 import '../base-widgets/base-stateful-widget.dart';
-import '../providers/user-provider.dart';
-import '../models/generic-response-object.dart';
-import '../providers/login-provider.dart';
+import '../enums/actions-enum.dart';
 import '../models/user.dart';
+import '../providers/user-provider.dart';
 import 'package:flutter/material.dart';
 
-class MyAccountScreen extends BaseStatefulWidget {
-  static const routeName = '/my-account';
+class RegisterScreen extends BaseStatefulWidget {
+  static const routeName = '/register';
 
   @override
-  _MyAccountScreenState createState() => _MyAccountScreenState([
-        'lblSaved',
-        'lblMyAccount',
+  _RegisterScreenState createState() => _RegisterScreenState([
+        'lblMandatoryField',
+        'lblRegister',
+        'lblRegisterNow',
         'lblFirstName',
         'lblLastName',
         'lblPhone',
-        'lblMandatoryField',
-        'lblSave'
+        'lblPassword',
+        'lblConfirmPassword',
+        'lblInvalidEmail',
+        'lblPasswordComplexity',
+        'lblPasswordsDontMatch',
+        'lblActivationLinkSent'
       ]);
 }
 
-class _MyAccountScreenState extends BaseState<MyAccountScreen> {
-  bool _isInit = true;
-
+class _RegisterScreenState extends BaseState<RegisterScreen> {
   final _form = GlobalKey<FormState>();
   final _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   final _firstNameFocusNode = FocusNode();
   final _lastNameFocusNode = FocusNode();
-  final _phoneFocusNode = FocusNode();
   final _emailFocusNode = FocusNode();
+  final _phoneFocusNode = FocusNode();
+  final _passwordFocusNode = FocusNode();
+  final _confirmPasswordFocusNode = FocusNode();
 
-  final _firstNameController = TextEditingController();
-  final _lastNameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _phoneController = TextEditingController();
+  final _passwordController = TextEditingController();
 
-  var _editedUser = new User();
+  User _user = User();
 
-  _MyAccountScreenState(List<String> labelsKeys) : super(labelsKeys) {
-    this.widgetName = 'My Account';
-  }
-
-  @override
-  void didChangeDependencies() {
-    if (_isInit) {
-      LoginProvider().currentUser.then((usr) {
-        setState(() {
-          this._editedUser = usr;
-          this._firstNameController.text = usr.firstName;
-          this._lastNameController.text = usr.lastName;
-          this._emailController.text = usr.email;
-          this._phoneController.text = usr.phone;
-        });
-      });
-    }
-
-    _isInit = false;
-
-    super.didChangeDependencies();
+  _RegisterScreenState(List<String> labelsKeys) : super(labelsKeys) {
+    this.widgetName = 'Register';
   }
 
   @override
   void dispose() {
     _firstNameFocusNode.dispose();
     _lastNameFocusNode.dispose();
-    _phoneFocusNode.dispose();
     _emailFocusNode.dispose();
+    _phoneFocusNode.dispose();
+    _passwordFocusNode.dispose();
+    _confirmPasswordFocusNode.dispose();
 
     super.dispose();
   }
 
-  Future<void> saveForm() async {
+  Future<void> saveForm(BuildContext context) async {
     final isValid = _form.currentState.validate();
     if (!isValid) return null;
 
-    _form.currentState.save(); //triggers onSaved on every form field
-    //submit
+    _form.currentState.save();
 
-    var gro = await UserProvider().editUser(_editedUser);
-    if (gro.info.indexOf('success') > -1) {
+    //submit
+    final gro = await UserProvider().registerUser(_user);
+
+    if (gro.error != '') {
+      await logAction(
+          this.idCompany, true, ActionsEnum.Add, gro.error, gro.errorDetailed);
+
       _scaffoldKey.currentState.showSnackBar(
         SnackBar(
-          content: Text(getCurrentLabelValue('lblSaved')),
-          duration: Duration(seconds: 2),
+          content: Text('An error occurred'),
+          duration: Duration(seconds: 1),
         ),
       );
-      logAction(this.idCompany, false, ActionsEnum.Edit, '', 'My account edit');
     } else {
+      logAction(this.idCompany, false, ActionsEnum.Add, '', 'Registered user');
       _scaffoldKey.currentState.showSnackBar(
         SnackBar(
-          content: Text(gro.error),
+          content: Text(getCurrentLabelValue('lblActivationLinkSent')),
           duration: Duration(seconds: 2),
         ),
       );
-      logAction(
-          this.idCompany, true, ActionsEnum.Edit, gro.error, gro.errorDetailed);
+
+      Future.delayed(Duration(seconds: 2), () {
+        Navigator.of(context).pop();
+        Navigator.of(context).pop();
+      });
     }
   }
 
@@ -107,7 +96,7 @@ class _MyAccountScreenState extends BaseState<MyAccountScreen> {
     final deviceWidth = MediaQuery.of(context).size.width;
 
     final appBar = AppBar(
-      title: Text(getCurrentLabelValue('lblMyAccount')),
+      title: Text(getCurrentLabelValue('lblRegister')),
     );
 
     return Scaffold(
@@ -142,7 +131,6 @@ class _MyAccountScreenState extends BaseState<MyAccountScreen> {
                             Expanded(
                               child: TextFormField(
                                 focusNode: _firstNameFocusNode,
-                                controller: _firstNameController,
                                 decoration: InputDecoration(
                                   labelText:
                                       getCurrentLabelValue('lblFirstName'),
@@ -152,6 +140,7 @@ class _MyAccountScreenState extends BaseState<MyAccountScreen> {
                                         color: Theme.of(context).accentColor),
                                   ),
                                 ),
+                                keyboardType: TextInputType.text,
                                 textInputAction: TextInputAction.next,
                                 validator: (value) {
                                   return value.isEmpty
@@ -164,7 +153,7 @@ class _MyAccountScreenState extends BaseState<MyAccountScreen> {
                                       .requestFocus(_lastNameFocusNode);
                                 },
                                 onSaved: (value) {
-                                  this._editedUser.firstName = value;
+                                  _user.firstName = value;
                                 },
                               ),
                             ),
@@ -176,13 +165,14 @@ class _MyAccountScreenState extends BaseState<MyAccountScreen> {
                         Row(
                           children: <Widget>[
                             IconButton(
-                              icon: Icon(Icons.person),
+                              icon: Icon(
+                                Icons.person,
+                              ),
                               onPressed: () {},
                             ),
                             Expanded(
                               child: TextFormField(
                                 focusNode: _lastNameFocusNode,
-                                controller: _lastNameController,
                                 decoration: InputDecoration(
                                   labelText:
                                       getCurrentLabelValue('lblLastName'),
@@ -193,6 +183,7 @@ class _MyAccountScreenState extends BaseState<MyAccountScreen> {
                                   ),
                                 ),
                                 textInputAction: TextInputAction.next,
+                                keyboardType: TextInputType.text,
                                 validator: (value) {
                                   return value.isEmpty
                                       ? getCurrentLabelValue(
@@ -201,10 +192,10 @@ class _MyAccountScreenState extends BaseState<MyAccountScreen> {
                                 },
                                 onFieldSubmitted: (_) {
                                   FocusScope.of(context)
-                                      .requestFocus(_phoneFocusNode);
+                                      .requestFocus(_emailFocusNode);
                                 },
                                 onSaved: (value) {
-                                  this._editedUser.lastName = value;
+                                  _user.lastName = value;
                                 },
                               ),
                             ),
@@ -216,13 +207,63 @@ class _MyAccountScreenState extends BaseState<MyAccountScreen> {
                         Row(
                           children: <Widget>[
                             IconButton(
+                              icon: Icon(
+                                Icons.email,
+                              ),
                               onPressed: () {},
-                              icon: Icon(Icons.phone),
+                            ),
+                            Expanded(
+                              child: TextFormField(
+                                focusNode: _emailFocusNode,
+                                decoration: InputDecoration(
+                                  labelText: 'Email',
+                                  contentPadding: EdgeInsets.all(0),
+                                  enabledBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Theme.of(context).accentColor),
+                                  ),
+                                ),
+                                keyboardType: TextInputType.emailAddress,
+                                textInputAction: TextInputAction.next,
+                                validator: (value) {
+                                  if (value.isEmpty)
+                                    return getCurrentLabelValue(
+                                        'lblMandatoryField');
+                                  else {
+                                    Pattern pattern =
+                                        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+                                    RegExp regex = new RegExp(pattern);
+                                    if (!regex.hasMatch(value))
+                                      return getCurrentLabelValue(
+                                          'lblInvalidEmail');
+                                  }
+                                  return null;
+                                },
+                                onFieldSubmitted: (_) {
+                                  FocusScope.of(context)
+                                      .requestFocus(_phoneFocusNode);
+                                },
+                                onSaved: (value) {
+                                  _user.email = value;
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Row(
+                          children: <Widget>[
+                            IconButton(
+                              icon: Icon(
+                                Icons.phone,
+                              ),
+                              onPressed: () {},
                             ),
                             Expanded(
                               child: TextFormField(
                                 focusNode: _phoneFocusNode,
-                                controller: _phoneController,
                                 decoration: InputDecoration(
                                   labelText: getCurrentLabelValue('lblPhone'),
                                   contentPadding: EdgeInsets.all(0),
@@ -241,10 +282,10 @@ class _MyAccountScreenState extends BaseState<MyAccountScreen> {
                                 },
                                 onFieldSubmitted: (_) {
                                   FocusScope.of(context)
-                                      .requestFocus(_emailFocusNode);
+                                      .requestFocus(_passwordFocusNode);
                                 },
                                 onSaved: (value) {
-                                  this._editedUser.phone = value;
+                                  _user.phone = value;
                                 },
                               ),
                             ),
@@ -256,49 +297,98 @@ class _MyAccountScreenState extends BaseState<MyAccountScreen> {
                         Row(
                           children: <Widget>[
                             IconButton(
-                              icon: Icon(Icons.email),
+                              icon: Icon(
+                                Icons.lock,
+                              ),
                               onPressed: () {},
                             ),
                             Expanded(
                               child: TextFormField(
-                                focusNode: _emailFocusNode,
-                                controller: _emailController,
+                                focusNode: _passwordFocusNode,
+                                controller: _passwordController,
                                 decoration: InputDecoration(
-                                  labelText: 'Email',
+                                  labelText:
+                                      getCurrentLabelValue('lblPassword'),
                                   contentPadding: EdgeInsets.all(0),
                                   enabledBorder: UnderlineInputBorder(
                                     borderSide: BorderSide(
                                         color: Theme.of(context).accentColor),
                                   ),
                                 ),
-                                keyboardType: TextInputType.emailAddress,
-                                textInputAction: TextInputAction.done,
+                                keyboardType: TextInputType.text,
+                                obscureText: true,
+                                textInputAction: TextInputAction.next,
                                 validator: (value) {
                                   if (value.isEmpty)
                                     return getCurrentLabelValue(
                                         'lblMandatoryField');
                                   else {
                                     Pattern pattern =
-                                        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+                                        '((?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,})';
                                     RegExp regex = new RegExp(pattern);
                                     if (!regex.hasMatch(value))
-                                      return 'Invalid Email';
+                                      return getCurrentLabelValue(
+                                          'lblPasswordComplexity');
                                   }
-
                                   return null;
                                 },
                                 onFieldSubmitted: (_) {
-                                  this.saveForm();
+                                  FocusScope.of(context)
+                                      .requestFocus(_confirmPasswordFocusNode);
                                 },
                                 onSaved: (value) {
-                                  this._editedUser.email = value;
+                                  _user.password = value;
                                 },
                               ),
                             ),
                           ],
                         ),
                         SizedBox(
-                          height: 40,
+                          height: 10,
+                        ),
+                        Row(
+                          children: <Widget>[
+                            IconButton(
+                              icon: Icon(
+                                Icons.lock,
+                              ),
+                              onPressed: () {},
+                            ),
+                            Expanded(
+                              child: TextFormField(
+                                focusNode: _confirmPasswordFocusNode,
+                                decoration: InputDecoration(
+                                  labelText: getCurrentLabelValue(
+                                      'lblConfirmPassword'),
+                                  contentPadding: EdgeInsets.all(0),
+                                  enabledBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Theme.of(context).accentColor),
+                                  ),
+                                ),
+                                keyboardType: TextInputType.text,
+                                obscureText: true,
+                                textInputAction: TextInputAction.next,
+                                validator: (value) {
+                                  if (value.isEmpty)
+                                    return getCurrentLabelValue(
+                                        'lblMandatoryField');
+                                  else {
+                                    if (value != _passwordController.text)
+                                      return getCurrentLabelValue(
+                                          'lblPasswordsDontMatch');
+                                  }
+                                  return null;
+                                },
+                                onFieldSubmitted: (_) {
+                                  saveForm(context);
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 10,
                         ),
                         Container(
                           child: Row(
@@ -309,9 +399,10 @@ class _MyAccountScreenState extends BaseState<MyAccountScreen> {
                                     borderRadius:
                                         new BorderRadius.circular(18.0)),
                                 icon: Icon(Icons.done),
-                                label: Text(getCurrentLabelValue('lblSave')),
+                                label: Text(
+                                    getCurrentLabelValue('lblRegisterNow')),
                                 onPressed: () {
-                                  this.saveForm();
+                                  saveForm(context);
                                 },
                                 elevation: 1,
                                 materialTapTargetSize:

@@ -28,7 +28,7 @@ class LogItem {
       this.logErrorMessage,
       this.logInfoMessage});
 
-Map toJson() {
+  Map toJson() {
     Map obj = {
       'idUser': this.idUser,
       'email': this.email,
@@ -43,10 +43,9 @@ Map toJson() {
       'actionName': this.actionName,
       'isError': this.isError,
       'logErrorMessage': this.logErrorMessage,
-      'logInfoMessage': this.logInfoMessage
+      'logInfoMessage': this.logInfoMessage != null ? this.logInfoMessage : ""
     };
 
     return obj;
   }
-
 }

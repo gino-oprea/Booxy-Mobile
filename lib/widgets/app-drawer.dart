@@ -1,4 +1,5 @@
 import 'package:booxy/enums/actions-enum.dart';
+import 'package:booxy/screens/register-screen.dart';
 
 import '../base-widgets/base-stateful-widget.dart';
 import '../dialogs/lang-picker-dialog.dart';
@@ -18,7 +19,8 @@ class AppDrawer extends BaseStatefulWidget {
         'lblLanguage',
         'lblSearchCompany',
         'lblBookings',
-        'lblMyCompanies'
+        'lblMyCompanies',
+        'lblRegister'
       ]);
 }
 
@@ -59,6 +61,14 @@ class _AppDrawerState extends BaseState<AppDrawer> {
                 title: Text('Login'),
               ),
             if (this.isAuth) Divider(),
+            if (!this.isAuth)
+              ListTile(
+                onTap: () {
+                  Navigator.of(context).pushNamed(RegisterScreen.routeName);
+                },
+                leading: Icon(Icons.perm_identity),
+                title: Text(getCurrentLabelValue('lblRegister')),
+              ),            
             if (this.isAuth)
               ListTile(
                 onTap: () {

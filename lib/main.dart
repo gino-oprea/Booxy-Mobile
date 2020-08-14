@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:booxy/providers/culture-provider.dart';
+import 'package:booxy/screens/register-screen.dart';
 
 import './screens/company-bookings-admin-screen.dart';
 
@@ -60,6 +61,7 @@ class MyApp extends StatelessWidget {
             CompanyFiltersScreen.routeName: (ctx) => CompanyFiltersScreen(),
             CompanyBookingScreen.routeName: (ctx) => CompanyBookingScreen(),
             LoginScreen.routeName: (ctx) => LoginScreen(),
+            RegisterScreen.routeName: (ctx)=>RegisterScreen(),
             MyBookingDetailsScreen.routeName: (ctx) => MyBookingDetailsScreen(),
             CompanyBookingsAdminScreen.routeName: (ctx) => CompanyBookingsAdminScreen()
           },
