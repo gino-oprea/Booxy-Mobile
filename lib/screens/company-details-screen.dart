@@ -44,6 +44,8 @@ class _CompanyDetailsScreenState extends BaseState<CompanyDetailsScreen> {
   Timeslot _selectedTimeslot;
   List<Entity> _selectedEntities = [];
 
+  LatLng defaultLatLng = LatLng(45.9442858, 25.0094303);
+
   final _form = GlobalKey<FormState>();
 
   _CompanyDetailsScreenState(List<String> labelsKeys) : super(labelsKeys) {
@@ -54,7 +56,7 @@ class _CompanyDetailsScreenState extends BaseState<CompanyDetailsScreen> {
   void didChangeDependencies() {
     if (_isInit) {
       this._company = ModalRoute.of(context).settings.arguments as Company;
-      
+
       //for base logging
       this.idCompany = this._company.id;
 
@@ -458,6 +460,24 @@ class _CompanyDetailsScreenState extends BaseState<CompanyDetailsScreen> {
       ),
     );
 
+    var companyGoogleMap = GoogleMap(
+      initialCameraPosition: CameraPosition(target: defaultLatLng, zoom: 5),
+      mapType: MapType.normal,
+    );    
+
+    
+    if (_company.lat != null)
+      companyGoogleMap = GoogleMap(
+        initialCameraPosition: CameraPosition(
+            target: LatLng(_company.lat, _company.lng), zoom: 16),
+        mapType: MapType.normal,
+        markers: {
+          Marker(
+              markerId: MarkerId('m1'),
+              position: LatLng(_company.lat, _company.lng)),
+        },
+      );
+
     var entitiesDdls = generateEntitiesDdls();
 
     return Scaffold(
@@ -543,16 +563,7 @@ class _CompanyDetailsScreenState extends BaseState<CompanyDetailsScreen> {
                 child: Container(
                   height: 150,
                   width: double.infinity,
-                  child: GoogleMap(
-                    initialCameraPosition: CameraPosition(
-                        target: LatLng(_company.lat, _company.lng), zoom: 16),
-                    mapType: MapType.normal,
-                    markers: {
-                      Marker(
-                          markerId: MarkerId('m1'),
-                          position: LatLng(_company.lat, _company.lng)),
-                    },
-                  ),
+                  child: companyGoogleMap,
                 ),
               ),
             ),

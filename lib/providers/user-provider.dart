@@ -9,7 +9,8 @@ import 'package:http/http.dart' as http;
 import '../models/generic-response-object.dart';
 
 class UserProvider {
-  Future<GenericResponseObject> editUser(User user) async {
+  Future<GenericResponseObject> editUser(User user,
+      {bool withPrefsUpdate = true}) async {
     String url = BooxyConfig.api_endpoint + 'users/EditUserForFrontOffice';
 
     var bdyObj = json.encode(user.toJson());
@@ -29,17 +30,19 @@ class UserProvider {
 
     GenericResponseObject gro = GenericResponseObject().fromJson(extractedData);
 
-    if (gro.info.indexOf('success') > -1) {
-      //add the changes to shared preffs
-      var currentUser = await LoginProvider().currentUser;
-      currentUser.firstName = user.firstName;
-      currentUser.lastName = user.lastName;
-      currentUser.phone = user.phone;
-      currentUser.email = user.email;
+    if (withPrefsUpdate) {
+      if (gro.info.indexOf('success') > -1) {
+        //add the changes to shared preffs
+        var currentUser = await LoginProvider().currentUser;
+        currentUser.firstName = user.firstName;
+        currentUser.lastName = user.lastName;
+        currentUser.phone = user.phone;
+        currentUser.email = user.email;
 
-      final prefs = await SharedPreferences.getInstance();
-      final userData = json.encode(currentUser.toJson());
-      prefs.setString('authUser', userData);
+        final prefs = await SharedPreferences.getInstance();
+        final userData = json.encode(currentUser.toJson());
+        prefs.setString('authUser', userData);
+      }
     }
 
     return gro;
@@ -78,5 +81,28 @@ class UserProvider {
     GenericResponseObject gro = GenericResponseObject().fromJson(extractedData);
 
     return gro;
+  }
+
+  Future<bool> currentPasswordIsValid(int idUser, String password) async {
+    var token = await LoginProvider().token;
+    final url = BooxyConfig.api_endpoint +
+        'users/CheckPassword/' +
+        idUser.toString() +
+        '/' +
+        password;
+
+    final response = await http.get(url, headers: {
+      HttpHeaders.authorizationHeader: "Bearer " + token.access_token
+    });
+    final extractedData = json.decode(response.body) as Map<String, dynamic>;
+    if (extractedData == null) {
+      return null;
+    }
+
+    GenericResponseObject gro = GenericResponseObject().fromJson(extractedData);
+    if (gro.error != '')
+      return false;
+    else
+      return true;
   }
 }

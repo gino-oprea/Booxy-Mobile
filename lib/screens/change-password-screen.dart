@@ -1,3 +1,5 @@
+import 'package:booxy/providers/login-provider.dart';
+
 import '../base-widgets/base-stateful-widget.dart';
 import '../enums/actions-enum.dart';
 import '../models/user.dart';
@@ -17,7 +19,8 @@ class ChangePasswordScreen extends BaseStatefulWidget {
         'lblSave',
         'lblMandatoryField',
         'lblPasswordComplexity',
-        'lblPasswordsDontMatch'
+        'lblPasswordsDontMatch',
+        'lblCurrentPasswordNotCorrect'
       ]);
 }
 
@@ -49,36 +52,49 @@ class _ChangePasswordScreenState extends BaseState<ChangePasswordScreen> {
     final isValid = _form.currentState.validate();
     if (!isValid) return null;
 
+    bool isCurrentPassValid = await UserProvider().currentPasswordIsValid(
+        currentUser.id, _currentPasswordController.text);
+
+    if (!isCurrentPassValid) {
+      _scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text(getCurrentLabelValue('lblCurrentPasswordNotCorrect')),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return null;
+    }
+
     _form.currentState.save();
 
-    // //submit
-    // final gro = await UserProvider().registerUser(_user);
+    currentUser.password = _newPasswordController.text;
+    //submit
+    final gro = await UserProvider().editUser(currentUser);
 
-    // if (gro.error != '') {
-    //   await logAction(
-    //       this.idCompany, true, ActionsEnum.Add, gro.error, gro.errorDetailed);
+    currentUser.password = null;//resetare in aplicatie
 
-    //   _scaffoldKey.currentState.showSnackBar(
-    //     SnackBar(
-    //       content: Text('An error occurred'),
-    //       duration: Duration(seconds: 1),
-    //     ),
-    //   );
-    // } else {
-    //   logAction(this.idCompany, false, ActionsEnum.Add, '', 'Registered user');
-    //   _scaffoldKey.currentState.showSnackBar(
-    //     SnackBar(
-    //       content: Text(getCurrentLabelValue('lblActivationLinkSent')),
-    //       duration: Duration(seconds: 2),
-    //     ),
-    //   );
+    if (gro.error != '') {
+      await logAction(
+          this.idCompany, true, ActionsEnum.Edit, gro.error, gro.errorDetailed);
 
-    //   Future.delayed(Duration(seconds: 2), () {
-    //     Navigator.of(context).pop();
-    //     Navigator.of(context).pop();
-    //   });
-    // }
+      _scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text('An error occurred'),
+          duration: Duration(seconds: 1),
+        ),
+      );
+    } else {
+      logAction(
+          this.idCompany, false, ActionsEnum.Edit, '', 'Password changed');
+      _scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text(getCurrentLabelValue('lblYourPasswordChanged')),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
   }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -138,9 +154,6 @@ class _ChangePasswordScreenState extends BaseState<ChangePasswordScreen> {
                                   if (value.isEmpty)
                                     return getCurrentLabelValue(
                                         'lblMandatoryField');
-                                  else {
-                                    //server check password to implement
-                                  }
                                   return null;
                                 },
                                 onFieldSubmitted: (_) {

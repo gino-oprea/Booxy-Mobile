@@ -27,12 +27,16 @@ class BaseState<T extends BaseStatefulWidget> extends State<T> {
   List<String> widgetLabels;
   String currentCulture = '';
   List<Label> currentLabels;
+  User currentUser;
 
   CultureProvider cultureProvider;
 
   BaseState(List<String> labelsKeys) {
     this.widgetLabels = labelsKeys;
     this._getWidgetLabelsFromServer();
+    LoginProvider().currentUser.then((result) {
+      this.currentUser = result;
+    });
   }
 
   Future<void> _getWidgetLabelsFromServer() async {
