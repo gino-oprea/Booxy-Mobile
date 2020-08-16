@@ -49,19 +49,33 @@ class UserProvider {
     String url = BooxyConfig.api_endpoint + 'users';
 
     var bdyObj = json.encode(user.toJson());
-    
+
     final response = await http.post(url,
-        headers: {
-          'Content-Type': 'application/json'          
-        },
-        body: bdyObj);
+        headers: {'Content-Type': 'application/json'}, body: bdyObj);
 
     final extractedData = json.decode(response.body) as Map<String, dynamic>;
     if (extractedData == null) {
       return null;
     }
 
-    GenericResponseObject gro = GenericResponseObject().fromJson(extractedData);    
+    GenericResponseObject gro = GenericResponseObject().fromJson(extractedData);
+
+    return gro;
+  }
+
+  Future<GenericResponseObject> resetUserPasswordByEmail(String email) async {
+    String url =
+        BooxyConfig.api_endpoint + 'users/ResetPasswordWithEmail/' + email;
+
+    final response = await http.put(url,
+        headers: {'Content-Type': 'application/json'}, body: null);
+
+    final extractedData = json.decode(response.body) as Map<String, dynamic>;
+    if (extractedData == null) {
+      return null;
+    }
+
+    GenericResponseObject gro = GenericResponseObject().fromJson(extractedData);
 
     return gro;
   }

@@ -67,15 +67,21 @@ class _MyCompaniesScreenState extends BaseState<MyCompaniesScreen> {
                   : Center(
                       child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
-                        Text(
-                            getCurrentLabelValue('lblNoCompaniesPleaseCreate')),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(getCurrentLabelValue(
+                                'lblNoCompaniesPleaseCreate')),
+                          ),
+                        ),
                         IconButton(
                           icon: Icon(Icons.refresh),
                           onPressed: () {
                             _onRefresh(context);
                           },
-                        )
+                        ),
                       ],
                     )),
             ),

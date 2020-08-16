@@ -1,4 +1,5 @@
 import 'package:booxy/enums/actions-enum.dart';
+import 'package:booxy/screens/change-password-screen.dart';
 import 'package:booxy/screens/register-screen.dart';
 
 import '../base-widgets/base-stateful-widget.dart';
@@ -20,7 +21,8 @@ class AppDrawer extends BaseStatefulWidget {
         'lblSearchCompany',
         'lblBookings',
         'lblMyCompanies',
-        'lblRegister'
+        'lblRegister',
+        'lblChangePassword'
       ]);
 }
 
@@ -68,7 +70,7 @@ class _AppDrawerState extends BaseState<AppDrawer> {
                 },
                 leading: Icon(Icons.perm_identity),
                 title: Text(getCurrentLabelValue('lblRegister')),
-              ),            
+              ),
             if (this.isAuth)
               ListTile(
                 onTap: () {
@@ -76,6 +78,16 @@ class _AppDrawerState extends BaseState<AppDrawer> {
                 },
                 leading: Icon(Icons.account_circle),
                 title: Text(getCurrentLabelValue('lblMyAccount')),
+              ),
+            Divider(),
+            if (this.isAuth)
+              ListTile(
+                onTap: () {
+                  Navigator.of(context)
+                      .pushNamed(ChangePasswordScreen.routeName);
+                },
+                leading: Icon(Icons.lock),
+                title: Text(getCurrentLabelValue('lblChangePassword')),
               ),
             Divider(),
             ListTile(
@@ -124,7 +136,7 @@ class _AppDrawerState extends BaseState<AppDrawer> {
               ListTile(
                 onTap: () {
                   logAction(this.idCompany, false, ActionsEnum.Logout, '', '');
-                  LoginProvider().logout();                  
+                  LoginProvider().logout();
                   Navigator.of(context).pop();
                 },
                 leading: Icon(Icons.exit_to_app),

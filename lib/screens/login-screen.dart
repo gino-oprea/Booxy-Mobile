@@ -1,15 +1,26 @@
 import 'package:booxy/enums/actions-enum.dart';
+import 'package:booxy/providers/user-provider.dart';
 
 import '../base-widgets/base-stateful-widget.dart';
 import '../providers/login-provider.dart';
+import '../enums/actions-enum.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends BaseStatefulWidget {
   static const routeName = '/login';
 
   @override
-  _LoginScreenState createState() => _LoginScreenState(
-      ['lblInvalidLogin', 'lblMandatoryField', 'lblPassword']);
+  _LoginScreenState createState() => _LoginScreenState([
+        'lblInvalidLogin',
+        'lblMandatoryField',
+        'lblPassword',
+        'lblConfirmation',
+        'lblConfirmForgotPassword',
+        'lblYes',
+        'lblNo',
+        'lblResetPasswordEmailSent',
+        'lblInvalidEmail'
+      ]);
 }
 
 class _LoginScreenState extends BaseState<LoginScreen> {
@@ -18,6 +29,8 @@ class _LoginScreenState extends BaseState<LoginScreen> {
 
   final _emailFocusNode = FocusNode();
   final _passwordFocusNode = FocusNode();
+
+  final _emailController = TextEditingController();
 
   Map<String, String> _authData = {
     'email': '',
@@ -51,6 +64,18 @@ class _LoginScreenState extends BaseState<LoginScreen> {
       Navigator.of(context).pop();
       Navigator.of(context).pop();
     }
+  }
+
+  bool validEmailField(String value) {
+    if (value.isEmpty)
+      return false;
+    else {
+      Pattern pattern =
+          r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+      RegExp regex = new RegExp(pattern);
+      if (!regex.hasMatch(value)) return false;
+    }
+    return true;
   }
 
   @override
@@ -109,6 +134,7 @@ class _LoginScreenState extends BaseState<LoginScreen> {
                                   ),
                                 ),
                                 textInputAction: TextInputAction.next,
+                                controller: _emailController,
                                 validator: (value) {
                                   return value.isEmpty
                                       ? getCurrentLabelValue(
@@ -170,12 +196,85 @@ class _LoginScreenState extends BaseState<LoginScreen> {
                         ),
                         GestureDetector(
                           onTap: () {
-                            _scaffoldKey.currentState.showSnackBar(
-                              SnackBar(
-                                content: Text('not implemented yet'),
-                                duration: Duration(seconds: 2),
-                              ),
-                            );
+                            showDialog(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                      title: Text(getCurrentLabelValue(
+                                          'lblConfirmation')),
+                                      content: Text(getCurrentLabelValue(
+                                          'lblConfirmForgotPassword')),
+                                      actions: <Widget>[
+                                        FlatButton(
+                                          child: Text(
+                                              getCurrentLabelValue('lblNo')),
+                                          onPressed: () {
+                                            Navigator.of(ctx).pop();
+                                          },
+                                        ),
+                                        FlatButton(
+                                          child: Text(
+                                              getCurrentLabelValue('lblYes')),
+                                          onPressed: () async {
+                                            var emailText =
+                                                _emailController.text.trim();
+                                            if (validEmailField(emailText)) {
+                                              var gro = await UserProvider()
+                                                  .resetUserPasswordByEmail(
+                                                      emailText);
+                                              if (gro.error != '') {
+                                                logAction(
+                                                    this.idCompany,
+                                                    true,
+                                                    ActionsEnum.Edit,
+                                                    gro.error,
+                                                    gro.errorDetailed);
+
+                                                _scaffoldKey.currentState
+                                                    .showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(gro.error),
+                                                    duration:
+                                                        Duration(seconds: 2),
+                                                  ),
+                                                );
+                                              } else {
+                                                logAction(
+                                                    this.idCompany,
+                                                    false,
+                                                    ActionsEnum.Edit,
+                                                    '',
+                                                    'password reset');
+
+                                                _scaffoldKey.currentState
+                                                    .showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                        getCurrentLabelValue(
+                                                            'lblResetPasswordEmailSent')),
+                                                    duration:
+                                                        Duration(seconds: 2),
+                                                  ),
+                                                );
+                                                Navigator.of(ctx).pop();
+                                              }
+                                            } else {
+                                              Navigator.of(ctx).pop();
+
+                                              _scaffoldKey.currentState
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                      getCurrentLabelValue(
+                                                          'lblInvalidEmail')),
+                                                  duration:
+                                                      Duration(seconds: 2),
+                                                ),
+                                              );
+                                            }
+                                          },
+                                        ),
+                                      ],
+                                    ));
                           },
                           child: Container(
                             padding: EdgeInsets.symmetric(vertical: 10),
