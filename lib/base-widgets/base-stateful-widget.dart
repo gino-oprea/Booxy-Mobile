@@ -36,10 +36,10 @@ class BaseState<T extends BaseStatefulWidget> extends State<T> {
     this.widgetLabels = labelsKeys;
     this._getWidgetLabelsFromServer();
 
-    LoginProvider().currentUserProp.then((result) {
-      this.currentUser = result;
-      setState(() {});
-    });
+    // LoginProvider().currentUserProp.then((result) {
+    //   this.currentUser = result;
+    //   setState(() {});
+    // });
   }
 
   Future<void> _getWidgetLabelsFromServer() async {
@@ -118,7 +118,12 @@ class BaseState<T extends BaseStatefulWidget> extends State<T> {
     this.cultureProvider = Provider.of<CultureProvider>(context);
 
     if (this._isInitBase) {
-      loginProvider.currentUserProp;
+
+      loginProvider.currentUserProp.then((result) {
+        this.currentUser = result;
+        setState(() {});
+      });
+
       this.getCurrentCulture();
       this.logAction(this.idCompany, false, ActionsEnum.View, '', '');
     }

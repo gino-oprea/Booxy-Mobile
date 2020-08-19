@@ -93,6 +93,8 @@ class _CompanyBookingScreenState extends BaseState<CompanyBookingScreen> {
 
   @override
   void didChangeDependencies() {
+    super.didChangeDependencies();
+
     if (_isInit) {
       this._company = (ModalRoute.of(context).settings.arguments
               as BookingConfirmationPayload)
@@ -109,21 +111,28 @@ class _CompanyBookingScreenState extends BaseState<CompanyBookingScreen> {
               as BookingConfirmationPayload)
           .bookingStartDate;
 
-      LoginProvider().currentUserProp.then((usr) {
-        if (usr != null)
-          setState(() {
-            this.currentUser = usr;
-            this._editedBooking.idUser = usr.id;
-            this._firstNameController.text = usr.firstName;
-            this._lastNameController.text = usr.lastName;
-            this._emailController.text = usr.email;
-            this._phoneController.text = usr.phone;
-          });
-      });     
+      // LoginProvider().currentUserProp.then((usr) {
+      //   if (usr != null)
+      //     setState(() {
+      //       this.currentUser = usr;
+      //       this._editedBooking.idUser = usr.id;
+      //       this._firstNameController.text = usr.firstName;
+      //       this._lastNameController.text = usr.lastName;
+      //       this._emailController.text = usr.email;
+      //       this._phoneController.text = usr.phone;
+      //     });
+      // });
+      setState(() {
+        if (this.loginProvider.currentUser != null) {
+          this._editedBooking.idUser = this.loginProvider.currentUser.id;
+          this._firstNameController.text = this.loginProvider.currentUser.firstName;
+          this._lastNameController.text = this.loginProvider.currentUser.lastName;
+          this._emailController.text = this.loginProvider.currentUser.email;
+          this._phoneController.text = this.loginProvider.currentUser.phone;
+        }
+      });
     }
     _isInit = false;
-
-    super.didChangeDependencies();
   }
 
   Future<GenericResponseObject> saveForm() async {

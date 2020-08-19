@@ -36,6 +36,8 @@ class _CompanySearchScreenState extends BaseState<CompanySearchScreen> {
 
   @override
   void didChangeDependencies() {
+    super.didChangeDependencies();
+
     if (_isInit) {
       setState(() {
         _isLoading = true;
@@ -50,8 +52,6 @@ class _CompanySearchScreenState extends BaseState<CompanySearchScreen> {
       });
     }
     _isInit = false;
-
-    super.didChangeDependencies();
   }
 
   void _onSearchCompany(String companyName) {
