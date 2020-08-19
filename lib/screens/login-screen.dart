@@ -49,7 +49,7 @@ class _LoginScreenState extends BaseState<LoginScreen> {
 
     //submit
     bool isLoggedIn =
-        await LoginProvider().login(_authData['email'], _authData['password']);
+        await loginProvider.login(_authData['email'], _authData['password']);
 
     logAction(this.idCompany, false, ActionsEnum.Login, '', '');
 
@@ -61,6 +61,7 @@ class _LoginScreenState extends BaseState<LoginScreen> {
         ),
       );
     else {
+      loginProvider.loginChange();
       Navigator.of(context).pop();
       Navigator.of(context).pop();
     }

@@ -42,7 +42,7 @@ class _CompanyBookingScreenState extends BaseState<CompanyBookingScreen> {
   Company _company;
   AutoAssignedEntityCombination _autoAssignedEntityCombination;
   DateTime _bookingDateTime;
-  User currentUser;
+  //User currentUser;
 
   final _firstNameFocusNode = FocusNode();
   final _lastNameFocusNode = FocusNode();
@@ -109,7 +109,7 @@ class _CompanyBookingScreenState extends BaseState<CompanyBookingScreen> {
               as BookingConfirmationPayload)
           .bookingStartDate;
 
-      LoginProvider().currentUser.then((usr) {
+      LoginProvider().currentUserProp.then((usr) {
         if (usr != null)
           setState(() {
             this.currentUser = usr;
@@ -119,7 +119,7 @@ class _CompanyBookingScreenState extends BaseState<CompanyBookingScreen> {
             this._emailController.text = usr.email;
             this._phoneController.text = usr.phone;
           });
-      });
+      });     
     }
     _isInit = false;
 

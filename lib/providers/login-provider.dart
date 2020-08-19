@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
+
 import '../models/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -10,8 +12,9 @@ import '../models/token.dart';
 import '../config/booxy-config.dart';
 import 'package:http/http.dart' as http;
 
-class LoginProvider {
+class LoginProvider with ChangeNotifier {
   Timer _authTimer;
+  User currentUser;
 
   Future<bool> login(String email, String password) async {
     String url = BooxyConfig.token_api_endpoint;
@@ -39,16 +42,22 @@ class LoginProvider {
     final tokenData = json.encode(token.toJson());
     prefs.setString('tokenData', tokenData);
 
-    User currentUser =
-        await this.getUserByEmail(email.trim(), token.access_token);
-    currentUser.password = password;
-    currentUser.token = token.access_token;
+    User usr = await this.getUserByEmail(email.trim(), token.access_token);
+    usr.password = password;
+    usr.token = token.access_token;
 
-    final userData = json.encode(currentUser.toJson());
+    final userData = json.encode(usr.toJson());
     prefs.setString('authUser', userData);
 
     autoLogin();
+
+    this.currentUser = usr;
+
     return true;
+  }
+
+  loginChange() {
+    notifyListeners();
   }
 
   Future<User> getUserByEmail(String email, String authToken) async {
@@ -80,16 +89,17 @@ class LoginProvider {
     return await token != null;
   }
 
-  Future<User> get currentUser async {
+  Future<User> get currentUserProp async {
     final prefs = await SharedPreferences.getInstance();
 
     if (!prefs.containsKey('authUser')) return null;
 
-    var currentUser = new User().fromJson(
+    var usr = new User().fromJson(
         json.decode(prefs.getString('authUser')) as Map<String, Object>);
 
-    if (currentUser != null) {
-      return currentUser;
+    this.currentUser = usr;
+    if (usr != null) {
+      return usr;
     }
     return null;
   }
@@ -118,6 +128,8 @@ class LoginProvider {
 
     prefs.remove('tokenData');
     prefs.remove('authUser');
+
+    this.currentUser = null;
   }
 
   void autoLogin() {
@@ -138,17 +150,17 @@ class LoginProvider {
           dur = Duration(seconds: timeToExpiry);
         }
 
-        currentUser.then((currentUser) {
-          if (currentUser != null) {
+        currentUserProp.then((usr) {
+          if (usr != null) {
             _authTimer = Timer(dur, () {
-              login(currentUser.email, currentUser.password);
+              login(usr.email, usr.password);
             });
           }
         });
       } else {
-        currentUser.then((currentUser) {
-          if (currentUser != null) {
-            login(currentUser.email, currentUser.password);
+        currentUserProp.then((usr) {
+          if (usr != null) {
+            login(usr.email, usr.password);
           }
         });
       }

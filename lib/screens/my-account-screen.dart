@@ -47,7 +47,7 @@ class _MyAccountScreenState extends BaseState<MyAccountScreen> {
   @override
   void didChangeDependencies() {
     if (_isInit) {
-      LoginProvider().currentUser.then((usr) {
+      LoginProvider().currentUserProp.then((usr) {
         setState(() {
           this._editedUser = usr;
           this._firstNameController.text = usr.firstName;
@@ -55,7 +55,7 @@ class _MyAccountScreenState extends BaseState<MyAccountScreen> {
           this._emailController.text = usr.email;
           this._phoneController.text = usr.phone;
         });
-      });
+      });     
     }
 
     _isInit = false;

@@ -136,7 +136,9 @@ class _AppDrawerState extends BaseState<AppDrawer> {
               ListTile(
                 onTap: () {
                   logAction(this.idCompany, false, ActionsEnum.Logout, '', '');
-                  LoginProvider().logout();
+                  loginProvider.logout().then((_) {
+                    loginProvider.loginChange();
+                  });
                   Navigator.of(context).pop();
                 },
                 leading: Icon(Icons.exit_to_app),

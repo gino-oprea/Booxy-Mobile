@@ -30,12 +30,15 @@ class BaseState<T extends BaseStatefulWidget> extends State<T> {
   User currentUser;
 
   CultureProvider cultureProvider;
+  LoginProvider loginProvider;
 
   BaseState(List<String> labelsKeys) {
     this.widgetLabels = labelsKeys;
     this._getWidgetLabelsFromServer();
-    LoginProvider().currentUser.then((result) {
+
+    LoginProvider().currentUserProp.then((result) {
       this.currentUser = result;
+      setState(() {});
     });
   }
 
@@ -48,7 +51,7 @@ class BaseState<T extends BaseStatefulWidget> extends State<T> {
   Future<void> logAction(int idCompany, bool isError, int idAction,
       String errMsg, String infoMsg) async {
     if (this.widgetName.trim() != '') {
-      User usr = await LoginProvider().currentUser;
+      User usr = await LoginProvider().currentUserProp;
 
       var log = new LogItem();
 
@@ -111,8 +114,11 @@ class BaseState<T extends BaseStatefulWidget> extends State<T> {
 
   @override
   void didChangeDependencies() {
+    this.loginProvider = Provider.of<LoginProvider>(context);
+    this.cultureProvider = Provider.of<CultureProvider>(context);
+
     if (this._isInitBase) {
-      this.cultureProvider = Provider.of<CultureProvider>(context);
+      loginProvider.currentUserProp;
       this.getCurrentCulture();
       this.logAction(this.idCompany, false, ActionsEnum.View, '', '');
     }

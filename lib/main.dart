@@ -39,6 +39,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider.value(value: CompanyLocationProvider([], [])),
         ChangeNotifierProvider.value(value: CategoriesProvider([], [])),
         ChangeNotifierProvider.value(value: CultureProvider('RO')),
+        ChangeNotifierProvider.value(value: LoginProvider()),
       ],
       child: GestureDetector(
         onTap: () {

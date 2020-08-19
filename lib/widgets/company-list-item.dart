@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:booxy/providers/login-provider.dart';
+
 import '../base-widgets/base-stateful-widget.dart';
 import '../models/company.dart';
 import '../screens/company-details-screen.dart';
@@ -6,8 +8,9 @@ import 'package:flutter/material.dart';
 
 class CompanyListItem extends BaseStatefulWidget {
   final Company company;
+  final bool showFavouritesButton;
 
-  CompanyListItem(this.company);
+  CompanyListItem(this.company, this.showFavouritesButton);
 
   @override
   _CompanyListItemState createState() => _CompanyListItemState([]);
@@ -35,8 +38,18 @@ class _CompanyListItemState extends BaseState<CompanyListItem> {
         title: Text(widget.company.name),
         subtitle: Text(widget.company.address),
         trailing: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[Icon(Icons.arrow_right)]),
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            if (widget.showFavouritesButton)
+              IconButton(
+                icon: Icon(
+                  Icons.favorite_border,
+                ),
+                color: Theme.of(context).accentColor,
+                onPressed: () {},
+              ),
+          ],
+        ),
         isThreeLine: true,
       ),
     );

@@ -208,7 +208,7 @@ class BookingProvider with ChangeNotifier {
   }
 
   Future<GenericResponseObject> getCurrentUserBookings() async {
-    var currentUser = await LoginProvider().currentUser;
+    var currentUser = await LoginProvider().currentUserProp;
     var token = await LoginProvider().token;
     final url = BooxyConfig.api_endpoint +
         'booking/GetBookingsByUser/' +

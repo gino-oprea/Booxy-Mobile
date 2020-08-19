@@ -25,7 +25,7 @@ class _MyCompaniesScreenState extends BaseState<MyCompaniesScreen> {
   }
 
   Future<void> _onRefresh(BuildContext ctx) async {
-    var currentUser = await LoginProvider().currentUser;
+    var currentUser = await LoginProvider().currentUserProp;
     var gro = await CompaniesProvider(null).getMyCompanies(currentUser.id);
     setState(() {
       this.companies = gro.objList as List<Company>;

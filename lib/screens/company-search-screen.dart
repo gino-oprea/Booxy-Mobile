@@ -1,4 +1,5 @@
 import 'package:booxy/enums/actions-enum.dart';
+import 'package:booxy/providers/login-provider.dart';
 
 import '../base-widgets/base-stateful-widget.dart';
 
@@ -114,6 +115,7 @@ class _CompanySearchScreenState extends BaseState<CompanySearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    //super.build(context);
     final companiesProvider = Provider.of<CompaniesProvider>(context);
 
     return Scaffold(
@@ -172,7 +174,8 @@ class _CompanySearchScreenState extends BaseState<CompanySearchScreen> {
                 child: ListView.builder(
                     itemCount: companiesProvider.companies.length,
                     itemBuilder: (ctx, i) {
-                      return CompanyListItem(companiesProvider.companies[i]);
+                      return CompanyListItem(companiesProvider.companies[i],
+                          loginProvider.currentUser != null);
                     }),
               ),
             ),

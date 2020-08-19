@@ -33,7 +33,7 @@ class UserProvider {
     if (withPrefsUpdate) {
       if (gro.info.indexOf('success') > -1) {
         //add the changes to shared preffs
-        var currentUser = await LoginProvider().currentUser;
+        var currentUser = await LoginProvider().currentUserProp;
         currentUser.firstName = user.firstName;
         currentUser.lastName = user.lastName;
         currentUser.phone = user.phone;
