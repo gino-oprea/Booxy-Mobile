@@ -451,6 +451,27 @@ class _CompanyDetailsScreenState extends BaseState<CompanyDetailsScreen> {
       return 'not_available';
   }
 
+  openDatePickedDialog() {
+    showDatePicker(
+            context: context,
+            initialDate: DateTime.now(),
+            firstDate: DateTime(
+                DateTime.now().year, DateTime.now().month, DateTime.now().day),
+            lastDate: DateTime(2100))
+        .then((selectedDate) {
+      if (selectedDate == null)
+        return;
+      else
+        _pickedDate = selectedDate;
+
+      _selectedTimeslot = null;
+
+      var filteredEntititesPerLevel = this.getFilteredEntitiesPerLevel();
+      this.setupFilterObjectForApiCall(filteredEntititesPerLevel);
+      this.initTimeslots();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final appBar = AppBar(
@@ -463,9 +484,8 @@ class _CompanyDetailsScreenState extends BaseState<CompanyDetailsScreen> {
     var companyGoogleMap = GoogleMap(
       initialCameraPosition: CameraPosition(target: defaultLatLng, zoom: 5),
       mapType: MapType.normal,
-    );    
+    );
 
-    
     if (_company.lat != null)
       companyGoogleMap = GoogleMap(
         initialCameraPosition: CameraPosition(
@@ -584,40 +604,24 @@ class _CompanyDetailsScreenState extends BaseState<CompanyDetailsScreen> {
                             child: IconButton(
                               icon: Icon(Icons.calendar_today),
                               onPressed: () {
-                                showDatePicker(
-                                        context: context,
-                                        initialDate: DateTime.now(),
-                                        firstDate: DateTime(
-                                            DateTime.now().year,
-                                            DateTime.now().month,
-                                            DateTime.now().day),
-                                        lastDate: DateTime(2100))
-                                    .then((selectedDate) {
-                                  if (selectedDate == null)
-                                    return;
-                                  else
-                                    _pickedDate = selectedDate;
-
-                                  _selectedTimeslot = null;
-
-                                  var filteredEntititesPerLevel =
-                                      this.getFilteredEntitiesPerLevel();
-                                  this.setupFilterObjectForApiCall(
-                                      filteredEntititesPerLevel);
-                                  this.initTimeslots();
-                                });
+                                openDatePickedDialog();
                               },
                             ),
                           ),
                           Expanded(
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                getCurrentLabelValue('lblDate') +
-                                    ': ' +
-                                    DateFormat('dd-MMM-yyyy')
-                                        .format(_pickedDate),
-                                style: TextStyle(fontSize: 18),
+                              child: GestureDetector(
+                                onTap: () {
+                                  openDatePickedDialog();
+                                },
+                                child: Text(
+                                  getCurrentLabelValue('lblDate') +
+                                      ': ' +
+                                      DateFormat('dd-MMM-yyyy')
+                                          .format(_pickedDate),
+                                  style: TextStyle(fontSize: 18),
+                                ),
                               ),
                             ),
                           ),

@@ -125,8 +125,10 @@ class _CompanyBookingScreenState extends BaseState<CompanyBookingScreen> {
       setState(() {
         if (this.loginProvider.currentUser != null) {
           this._editedBooking.idUser = this.loginProvider.currentUser.id;
-          this._firstNameController.text = this.loginProvider.currentUser.firstName;
-          this._lastNameController.text = this.loginProvider.currentUser.lastName;
+          this._firstNameController.text =
+              this.loginProvider.currentUser.firstName;
+          this._lastNameController.text =
+              this.loginProvider.currentUser.lastName;
           this._emailController.text = this.loginProvider.currentUser.email;
           this._phoneController.text = this.loginProvider.currentUser.phone;
         }
@@ -161,6 +163,9 @@ class _CompanyBookingScreenState extends BaseState<CompanyBookingScreen> {
     this._editedBooking.startTime = this._bookingDateTime;
     this._editedBooking.endTime = this._bookingDateTime.add(
         Duration(milliseconds: this._autoAssignedEntityCombination.duration));
+
+    this._editedBooking.bookingPrice =
+        int.tryParse(this.getBookingPrice(withCurrencyString: false)) ?? null;
   }
 
   List<Widget> generateEntitiesTxts() {
@@ -204,14 +209,17 @@ class _CompanyBookingScreenState extends BaseState<CompanyBookingScreen> {
     return wdgs;
   }
 
-  String getBookingPrice() {
+  String getBookingPrice({bool withCurrencyString = true}) {
     var ent = this
         ._autoAssignedEntityCombination
         .entityCombination
         .firstWhere((e) => e.defaultServicePrice != null, orElse: () => null);
     if (ent == null) return '';
 
-    return ent.defaultServicePrice.toStringAsFixed(0) + ' RON';
+    if (withCurrencyString)
+      return ent.defaultServicePrice.toStringAsFixed(0) + ' RON';
+    else
+      return ent.defaultServicePrice.toStringAsFixed(0);
   }
 
   @override

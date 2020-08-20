@@ -141,6 +141,7 @@ class Booking {
 
     if (this.id != null) obj['id'] = this.id;
     if (this.idStatus != null) obj['idStatus'] = this.idStatus;
+    if (this.bookingPrice != null) obj['bookingPrice'] = this.bookingPrice;
 
 
     return obj;
