@@ -92,8 +92,7 @@ class _CompanyBookingScreenState extends BaseState<CompanyBookingScreen> {
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  void didChangeDependencies() {   
 
     if (_isInit) {
       this._company = (ModalRoute.of(context).settings.arguments
@@ -122,6 +121,14 @@ class _CompanyBookingScreenState extends BaseState<CompanyBookingScreen> {
       //       this._phoneController.text = usr.phone;
       //     });
       // });
+      
+    }
+    
+
+    super.didChangeDependencies();//nu pot sa folosesc loginProvider decat dupa initializarea din baza
+
+    if(_isInit)
+    {
       setState(() {
         if (this.loginProvider.currentUser != null) {
           this._editedBooking.idUser = this.loginProvider.currentUser.id;
@@ -134,6 +141,7 @@ class _CompanyBookingScreenState extends BaseState<CompanyBookingScreen> {
         }
       });
     }
+
     _isInit = false;
   }
 

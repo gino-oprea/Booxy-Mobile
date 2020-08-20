@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:booxy/providers/culture-provider.dart';
 import 'package:booxy/screens/change-password-screen.dart';
+import 'package:booxy/screens/favourite-companies-screen.dart';
 import 'package:booxy/screens/register-screen.dart';
 
 import './screens/company-bookings-admin-screen.dart';
@@ -55,6 +56,7 @@ class MyApp extends StatelessWidget {
           home: CompanySearchScreen(),
           routes: {
             CompanySearchScreen.routeName: (ctx) => CompanySearchScreen(),
+            FavouriteCompaniesScreen.routeName: (ctx) =>FavouriteCompaniesScreen(),
             CompanyDetailsScreen.routeName: (ctx) => CompanyDetailsScreen(),
             MyAccountScreen.routeName: (ctx) => MyAccountScreen(),
             MyBookingsScreen.routeName: (ctx) => MyBookingsScreen(),

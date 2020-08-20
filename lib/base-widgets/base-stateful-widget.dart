@@ -28,6 +28,7 @@ class BaseState<T extends BaseStatefulWidget> extends State<T> {
   String currentCulture = '';
   List<Label> currentLabels;
   User currentUser;
+  bool logViewAction = true;
 
   CultureProvider cultureProvider;
   LoginProvider loginProvider;
@@ -50,6 +51,9 @@ class BaseState<T extends BaseStatefulWidget> extends State<T> {
 
   Future<void> logAction(int idCompany, bool isError, int idAction,
       String errMsg, String infoMsg) async {
+        
+    if (!this.logViewAction && idAction == ActionsEnum.View) return;
+
     if (this.widgetName.trim() != '') {
       User usr = await LoginProvider().currentUserProp;
 
@@ -118,7 +122,6 @@ class BaseState<T extends BaseStatefulWidget> extends State<T> {
     this.cultureProvider = Provider.of<CultureProvider>(context);
 
     if (this._isInitBase) {
-
       loginProvider.currentUserProp.then((result) {
         this.currentUser = result;
         setState(() {});

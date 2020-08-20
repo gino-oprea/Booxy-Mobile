@@ -30,6 +30,8 @@ class _CompanySearchScreenState extends BaseState<CompanySearchScreen> {
 
   final _companyNameController = TextEditingController();
 
+  final _scaffoldKey = new GlobalKey<ScaffoldState>();
+
   _CompanySearchScreenState(List<String> labelsKeys) : super(labelsKeys) {
     this.widgetName = 'Search company';
   }
@@ -50,7 +52,15 @@ class _CompanySearchScreenState extends BaseState<CompanySearchScreen> {
         logAction(
             this.idCompany, false, ActionsEnum.Search, '', 'Search company');
       });
+
+      ////delay ca sa apuce base-ul sa-si ia userul curent
+      Future.delayed(Duration(seconds: 1), () {
+        if (loginProvider.currentUser != null)
+          Provider.of<CompaniesProvider>(context, listen: false)
+              .getFavouriteCompaniesIds(); //nu mai e nevoie de set state pentru ca oricum se declanseaza notifyChanges
+      });
     }
+
     _isInit = false;
   }
 
@@ -113,12 +123,23 @@ class _CompanySearchScreenState extends BaseState<CompanySearchScreen> {
         'Search company advanced filters');
   }
 
+  showPageMessage(String message)
+  {
+     _scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text(message),
+          duration: Duration(seconds: 1),
+        ),
+      );
+  }
+
   @override
   Widget build(BuildContext context) {
     //super.build(context);
     final companiesProvider = Provider.of<CompaniesProvider>(context);
 
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Container(
           height: 40,
@@ -174,8 +195,11 @@ class _CompanySearchScreenState extends BaseState<CompanySearchScreen> {
                 child: ListView.builder(
                     itemCount: companiesProvider.companies.length,
                     itemBuilder: (ctx, i) {
-                      return CompanyListItem(companiesProvider.companies[i],
-                          loginProvider.currentUser != null);
+                      return CompanyListItem(
+                          companiesProvider.companies[i],
+                          loginProvider.currentUser != null,
+                          companiesProvider
+                              .isFavourite(companiesProvider.companies[i].id), showPageMessage);
                     }),
               ),
             ),

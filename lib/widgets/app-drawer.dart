@@ -1,5 +1,6 @@
 import 'package:booxy/enums/actions-enum.dart';
 import 'package:booxy/screens/change-password-screen.dart';
+import 'package:booxy/screens/favourite-companies-screen.dart';
 import 'package:booxy/screens/register-screen.dart';
 
 import '../base-widgets/base-stateful-widget.dart';
@@ -22,7 +23,8 @@ class AppDrawer extends BaseStatefulWidget {
         'lblBookings',
         'lblMyCompanies',
         'lblRegister',
-        'lblChangePassword'
+        'lblChangePassword',
+        'lblFavourites'
       ]);
 }
 
@@ -62,7 +64,7 @@ class _AppDrawerState extends BaseState<AppDrawer> {
                 leading: Icon(Icons.perm_identity),
                 title: Text('Login'),
               ),
-            if (this.isAuth) Divider(),
+            if (!this.isAuth) Divider(),
             if (!this.isAuth)
               ListTile(
                 onTap: () {
@@ -71,6 +73,7 @@ class _AppDrawerState extends BaseState<AppDrawer> {
                 leading: Icon(Icons.perm_identity),
                 title: Text(getCurrentLabelValue('lblRegister')),
               ),
+            if (!this.isAuth) Divider(),
             if (this.isAuth)
               ListTile(
                 onTap: () {
@@ -79,7 +82,7 @@ class _AppDrawerState extends BaseState<AppDrawer> {
                 leading: Icon(Icons.account_circle),
                 title: Text(getCurrentLabelValue('lblMyAccount')),
               ),
-            Divider(),
+            if (this.isAuth) Divider(),
             if (this.isAuth)
               ListTile(
                 onTap: () {
@@ -89,7 +92,7 @@ class _AppDrawerState extends BaseState<AppDrawer> {
                 leading: Icon(Icons.lock),
                 title: Text(getCurrentLabelValue('lblChangePassword')),
               ),
-            Divider(),
+            if (this.isAuth) Divider(),
             ListTile(
               onTap: () {
                 showDialog(
@@ -110,6 +113,15 @@ class _AppDrawerState extends BaseState<AppDrawer> {
               leading: Icon(Icons.search),
               title: Text(getCurrentLabelValue('lblSearchCompany')),
             ),
+            if (this.isAuth) Divider(),
+            if (this.isAuth)
+              ListTile(
+                onTap: () {
+                  Navigator.of(context).pushNamed(FavouriteCompaniesScreen.routeName);
+                },
+                leading: Icon(Icons.favorite),
+                title: Text(getCurrentLabelValue('lblFavourites')),
+              ),
             if (this.isAuth) Divider(),
             if (this.isAuth)
               ListTile(
