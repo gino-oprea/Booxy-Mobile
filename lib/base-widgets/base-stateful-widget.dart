@@ -25,12 +25,12 @@ class BaseState<T extends BaseStatefulWidget> extends State<T> {
   int idCompany;
   String widgetName = '';
   List<String> widgetLabels;
-  String currentCulture = '';
+  // String currentCulture = '';
   List<Label> currentLabels;
-  User currentUser;
+  //User currentUser;
   bool logViewAction = true;
 
-  CultureProvider cultureProvider;
+  // CultureProvider cultureProvider;
   LoginProvider loginProvider;
 
   BaseState(List<String> labelsKeys) {
@@ -51,7 +51,6 @@ class BaseState<T extends BaseStatefulWidget> extends State<T> {
 
   Future<void> logAction(int idCompany, bool isError, int idAction,
       String errMsg, String infoMsg) async {
-        
     if (!this.logViewAction && idAction == ActionsEnum.View) return;
 
     if (this.widgetName.trim() != '') {
@@ -87,7 +86,7 @@ class BaseState<T extends BaseStatefulWidget> extends State<T> {
           break;
         }
       }
-      if (this.cultureProvider.getCurrentCulture() == 'EN')
+      if (this.loginProvider.currentCulture == 'EN')
         return currLabel.en;
       else
         return currLabel.ro;
@@ -95,18 +94,18 @@ class BaseState<T extends BaseStatefulWidget> extends State<T> {
       return '';
   }
 
-  getCurrentCulture() {
-    LoginProvider().currentCulture.then((cult) {
-      //setState(() {
-      this.currentCulture = cult;
-      this.cultureProvider.changeCulture(this.currentCulture);
-      //});
-    });
-  }
+  // getCurrentCulture() {
+  //   loginProvider.getCurrentCulture().then((cult) {
+  //     //setState(() {
+  //     this.currentCulture = cult;
+  //     this.cultureProvider.changeCulture(this.currentCulture);
+  //     //});
+  //   });
+  // }
 
-  Future<bool> setCurrentCulture() async {
-    await LoginProvider().setCurrentCulture(this.currentCulture);
-    cultureProvider.changeCulture(this.currentCulture);
+  Future<void> setCurrentCulture(String culture) async {
+    await loginProvider.setCurrentCulture(culture);
+    // cultureProvider.changeCulture(this.currentCulture);
     //setState(() {});
   }
 
@@ -119,15 +118,18 @@ class BaseState<T extends BaseStatefulWidget> extends State<T> {
   @override
   void didChangeDependencies() {
     this.loginProvider = Provider.of<LoginProvider>(context);
-    this.cultureProvider = Provider.of<CultureProvider>(context);
+    // this.cultureProvider = Provider.of<CultureProvider>(context);
 
     if (this._isInitBase) {
       loginProvider.currentUserProp.then((result) {
-        this.currentUser = result;
-        setState(() {});
+        // this.currentUser = result;
+        // setState(() {});
+        loginProvider.getCurrentCulture().then((_) {
+          loginProvider.loginChange();
+        });
       });
 
-      this.getCurrentCulture();
+      // this.getCurrentCulture();
       this.logAction(this.idCompany, false, ActionsEnum.View, '', '');
     }
 

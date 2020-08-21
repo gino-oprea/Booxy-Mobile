@@ -1,15 +1,15 @@
-import 'package:flutter/material.dart';
+// import 'package:flutter/material.dart';
 
-class CultureProvider with ChangeNotifier {
-  String _culture = '';
-  CultureProvider(this._culture);
+// class CultureProvider with ChangeNotifier {
+//   String _culture = '';
+//   CultureProvider(this._culture);
 
-  changeCulture(String newCulture) {
-    this._culture = newCulture;
-    notifyListeners();
-  }
+//   changeCulture(String newCulture) {
+//     this._culture = newCulture;
+//     notifyListeners();
+//   }
 
-  String getCurrentCulture() {
-    return this._culture;
-  }
-}
+//   String getCurrentCulture() {
+//     return this._culture;
+//   }
+// }

@@ -53,7 +53,7 @@ class _CompanySearchScreenState extends BaseState<CompanySearchScreen> {
             this.idCompany, false, ActionsEnum.Search, '', 'Search company');
       });
 
-      ////delay ca sa apuce base-ul sa-si ia userul curent
+      //delay ca sa apuce base-ul sa-si ia userul curent
       Future.delayed(Duration(seconds: 1), () {
         if (loginProvider.currentUser != null)
           Provider.of<CompaniesProvider>(context, listen: false)
@@ -123,21 +123,20 @@ class _CompanySearchScreenState extends BaseState<CompanySearchScreen> {
         'Search company advanced filters');
   }
 
-  showPageMessage(String message)
-  {
-     _scaffoldKey.currentState.showSnackBar(
-        SnackBar(
-          content: Text(message),
-          duration: Duration(seconds: 1),
-        ),
-      );
+  showPageMessage(String message) {
+    _scaffoldKey.currentState.showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: Duration(seconds: 1),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     //super.build(context);
     final companiesProvider = Provider.of<CompaniesProvider>(context);
-
+    print('build search screen');
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -199,7 +198,8 @@ class _CompanySearchScreenState extends BaseState<CompanySearchScreen> {
                           companiesProvider.companies[i],
                           loginProvider.currentUser != null,
                           companiesProvider
-                              .isFavourite(companiesProvider.companies[i].id), showPageMessage);
+                              .isFavourite(companiesProvider.companies[i].id),
+                          showPageMessage);
                     }),
               ),
             ),

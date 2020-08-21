@@ -25,25 +25,25 @@ class _LangPickerDialogState extends BaseState<LangPickerDialog> {
             RadioListTile<String>(
               title: Text('RO'),
               value: 'RO',
-              groupValue: this.currentCulture,
+              groupValue: loginProvider.currentCulture,
               onChanged: (value) async {
-                this.currentCulture = value;
-                await this.setCurrentCulture();
+                //this.currentCulture = value;
+                await this.setCurrentCulture(value);
                 logAction(this.idCompany, false, ActionsEnum.Edit, '',
                     'Change culture to RO');
-                Navigator.of(context).pop(this.currentCulture);
+                Navigator.of(context).pop(value);
               },
             ),
             RadioListTile<String>(
               title: Text('EN'),
               value: 'EN',
-              groupValue: this.currentCulture,
+              groupValue: loginProvider.currentCulture,
               onChanged: (value) async {
-                this.currentCulture = value;
-                await this.setCurrentCulture();
+                // this.currentCulture = value;
+                await this.setCurrentCulture(value);
                 logAction(this.idCompany, false, ActionsEnum.Edit, '',
                     'Change culture to EN');
-                Navigator.of(context).pop(this.currentCulture);
+                Navigator.of(context).pop(value);
               },
             )
           ],

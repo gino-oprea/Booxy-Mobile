@@ -15,6 +15,7 @@ import 'package:http/http.dart' as http;
 class LoginProvider with ChangeNotifier {
   Timer _authTimer;
   User currentUser;
+  String currentCulture = 'RO';
 
   Future<bool> login(String email, String password) async {
     String url = BooxyConfig.token_api_endpoint;
@@ -74,15 +75,17 @@ class LoginProvider with ChangeNotifier {
     return user;
   }
 
-  Future<String> get currentCulture async {
+  Future<String> getCurrentCulture() async {
     final prefs = await SharedPreferences.getInstance();
     if (!prefs.containsKey('currentCulture')) return 'RO';
     return prefs.getString('currentCulture');
   }
 
-  Future<bool> setCurrentCulture(String value) async {
+  Future<void> setCurrentCulture(String value) async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.setString('currentCulture', value);
+    prefs.setString('currentCulture', value);
+    this.currentCulture = value;
+    notifyListeners();
   }
 
   Future<bool> get isAuth async {

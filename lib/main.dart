@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider.value(value: CompaniesProvider([])),
         ChangeNotifierProvider.value(value: CompanyLocationProvider([], [])),
         ChangeNotifierProvider.value(value: CategoriesProvider([], [])),
-        ChangeNotifierProvider.value(value: CultureProvider('RO')),
+        //ChangeNotifierProvider.value(value: CultureProvider('RO')),
         ChangeNotifierProvider.value(value: LoginProvider()),
       ],
       child: GestureDetector(
@@ -56,7 +56,8 @@ class MyApp extends StatelessWidget {
           home: CompanySearchScreen(),
           routes: {
             CompanySearchScreen.routeName: (ctx) => CompanySearchScreen(),
-            FavouriteCompaniesScreen.routeName: (ctx) =>FavouriteCompaniesScreen(),
+            FavouriteCompaniesScreen.routeName: (ctx) =>
+                FavouriteCompaniesScreen(),
             CompanyDetailsScreen.routeName: (ctx) => CompanyDetailsScreen(),
             MyAccountScreen.routeName: (ctx) => MyAccountScreen(),
             MyBookingsScreen.routeName: (ctx) => MyBookingsScreen(),

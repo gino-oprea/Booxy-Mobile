@@ -390,7 +390,8 @@ class _CompanyDetailsScreenState extends BaseState<CompanyDetailsScreen> {
                 child: DropdownButtonFormField<Entity>(
                     isDense: true,
                     decoration: InputDecoration(
-                      labelText: cultureProvider.getCurrentCulture() == 'EN'
+                      labelText: loginProvider.currentCulture ==
+                              'EN' //cultureProvider.getCurrentCulture() == 'EN'
                           ? level.levelName_EN
                           : level.levelName_RO,
                       contentPadding: EdgeInsets.all(0),

@@ -53,7 +53,7 @@ class _ChangePasswordScreenState extends BaseState<ChangePasswordScreen> {
     if (!isValid) return null;
 
     bool isCurrentPassValid = await UserProvider().currentPasswordIsValid(
-        currentUser.id, _currentPasswordController.text);
+        loginProvider.currentUser.id, _currentPasswordController.text);
 
     if (!isCurrentPassValid) {
       _scaffoldKey.currentState.showSnackBar(
@@ -67,11 +67,11 @@ class _ChangePasswordScreenState extends BaseState<ChangePasswordScreen> {
 
     _form.currentState.save();
 
-    currentUser.password = _newPasswordController.text;
+    loginProvider.currentUser.password = _newPasswordController.text;
     //submit
-    final gro = await UserProvider().editUser(currentUser);
+    final gro = await UserProvider().editUser(loginProvider.currentUser);
 
-    currentUser.password = null;//resetare in aplicatie
+    loginProvider.currentUser.password = null; //resetare in aplicatie
 
     if (gro.error != '') {
       await logAction(
@@ -94,7 +94,6 @@ class _ChangePasswordScreenState extends BaseState<ChangePasswordScreen> {
       );
     }
   }
-  
 
   @override
   Widget build(BuildContext context) {
