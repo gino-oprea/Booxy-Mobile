@@ -6,8 +6,9 @@ import 'package:flutter/material.dart';
 
 class MyCompanyListItem extends BaseStatefulWidget {
   final Company company;
+  dynamic memoryImage;
 
-  MyCompanyListItem(this.company);
+  MyCompanyListItem(this.company, this.memoryImage);
 
   @override
   _MyCompanyListItemState createState() => _MyCompanyListItemState([]);
@@ -25,10 +26,11 @@ class _MyCompanyListItemState extends BaseState<MyCompanyListItem> {
         },
         leading: CircleAvatar(
           radius: 30.0,
-          backgroundImage: widget.company.image.length > 0
-              ? MemoryImage(base64Decode(widget.company.image[0].img))
-              : NetworkImage(
-                  'https://i.ya-webdesign.com/images/vector-buildings-logo-1.png'),
+          backgroundImage: widget.memoryImage,
+          // widget.company.image.length > 0
+          //     ? MemoryImage(base64Decode(widget.company.image[0].img))
+          //     : NetworkImage(
+          //         'https://i.ya-webdesign.com/images/vector-buildings-logo-1.png'),
           backgroundColor: Colors.transparent,
         ),
         title: Text(widget.company.name),

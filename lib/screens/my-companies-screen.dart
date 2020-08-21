@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import '../base-widgets/base-stateful-widget.dart';
 
 import '../models/company.dart';
@@ -43,6 +45,13 @@ class _MyCompaniesScreenState extends BaseState<MyCompaniesScreen> {
     this._isInit = false;
     super.didChangeDependencies();
   }
+  
+  dynamic getCompanyMemoryImage(Company company) {
+    return company.image.length > 0
+        ? MemoryImage(base64Decode(company.image[0].img))
+        : NetworkImage(
+            'https://i.ya-webdesign.com/images/vector-buildings-logo-1.png');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +70,7 @@ class _MyCompaniesScreenState extends BaseState<MyCompaniesScreen> {
                       child: ListView.builder(
                           itemCount: this.companies.length,
                           itemBuilder: (ctx, i) {
-                            return MyCompanyListItem(this.companies[i]);
+                            return MyCompanyListItem(this.companies[i], getCompanyMemoryImage(this.companies[i]));
                           }),
                     )
                   : Center(

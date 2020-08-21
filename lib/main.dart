@@ -1,8 +1,6 @@
-import 'dart:async';
-
-import 'package:booxy/providers/culture-provider.dart';
 import 'package:booxy/screens/change-password-screen.dart';
 import 'package:booxy/screens/favourite-companies-screen.dart';
+import 'package:booxy/screens/initialize-screen.dart';
 import 'package:booxy/screens/register-screen.dart';
 
 import './screens/company-bookings-admin-screen.dart';
@@ -38,8 +36,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider.value(value: CompaniesProvider([])),
         ChangeNotifierProvider.value(value: CompanyLocationProvider([], [])),
-        ChangeNotifierProvider.value(value: CategoriesProvider([], [])),
-        //ChangeNotifierProvider.value(value: CultureProvider('RO')),
+        ChangeNotifierProvider.value(value: CategoriesProvider([], [])),        
         ChangeNotifierProvider.value(value: LoginProvider()),
       ],
       child: GestureDetector(
@@ -53,8 +50,9 @@ class MyApp extends StatelessWidget {
           title: 'Booxy',
           theme: ThemeData(
               primarySwatch: Colors.green, accentColor: Colors.deepOrange),
-          home: CompanySearchScreen(),
+          home: InitializeScreen(),
           routes: {
+            InitializeScreen.routeName: (ctx) => InitializeScreen(),
             CompanySearchScreen.routeName: (ctx) => CompanySearchScreen(),
             FavouriteCompaniesScreen.routeName: (ctx) =>
                 FavouriteCompaniesScreen(),

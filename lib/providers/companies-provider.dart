@@ -22,11 +22,12 @@ class CompaniesProvider with ChangeNotifier {
   }
 
   Future<void> getCompanies(
-      [String companyName = '',
+      {String companyName = '',
       int idCategory,
       int idSubcategory,
       int idCounty,
-      int idCity]) async {
+      int idCity,
+      bool withChangeNotify = true}) async {
     final url = BooxyConfig.api_endpoint +
         'CompanyFront?id=null&name=$companyName&idCategory=$idCategory&idSubcategory=$idSubcategory&idCountry=null&idCounty=$idCounty&idCity=$idCity';
     final response = await http.get(url);
@@ -48,10 +49,15 @@ class CompaniesProvider with ChangeNotifier {
     }
 
     _companies = loadedCompanies;
-    notifyListeners();
+
+    var currentUser = await LoginProvider().currentUserProp;
+    if (currentUser != null)
+      await getFavouriteCompaniesIds(withChangeNotify: false);
+
+    if (withChangeNotify) notifyListeners();
   }
 
-  Future<void> getFavouriteCompaniesIds() async {
+  Future<void> getFavouriteCompaniesIds({bool withChangeNotify = true}) async {
     final url = BooxyConfig.api_endpoint + 'CompanyBack/GetFavouriteCompanies';
     var token = await LoginProvider().token;
 
@@ -75,7 +81,8 @@ class CompaniesProvider with ChangeNotifier {
     }
 
     favouritesIds = favCompIds;
-    notifyListeners();
+
+    if (withChangeNotify) notifyListeners();
   }
 
   Future<GenericResponseObject> setFavouriteCompany(int idCompany) async {

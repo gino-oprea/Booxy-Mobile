@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:booxy/enums/actions-enum.dart';
+import 'package:booxy/models/company.dart';
 import 'package:booxy/providers/login-provider.dart';
 
 import '../base-widgets/base-stateful-widget.dart';
@@ -44,20 +47,16 @@ class _CompanySearchScreenState extends BaseState<CompanySearchScreen> {
       setState(() {
         _isLoading = true;
       });
-      Provider.of<CompaniesProvider>(context).getCompanies().then((_) {
+
+      Provider.of<CompaniesProvider>(context)
+          .getCompanies(withChangeNotify: false)
+          .then((_) {
         setState(() {
           _isLoading = false;
         });
 
         logAction(
             this.idCompany, false, ActionsEnum.Search, '', 'Search company');
-      });
-
-      //delay ca sa apuce base-ul sa-si ia userul curent
-      Future.delayed(Duration(seconds: 1), () {
-        if (loginProvider.currentUser != null)
-          Provider.of<CompaniesProvider>(context, listen: false)
-              .getFavouriteCompaniesIds(); //nu mai e nevoie de set state pentru ca oricum se declanseaza notifyChanges
       });
     }
 
@@ -67,16 +66,16 @@ class _CompanySearchScreenState extends BaseState<CompanySearchScreen> {
   void _onSearchCompany(String companyName) {
     if (_advancedFilter == null) {
       Provider.of<CompaniesProvider>(context)
-          .getCompanies(_companyNameController.text);
+          .getCompanies(companyName: _companyNameController.text);
       logAction(
           this.idCompany, false, ActionsEnum.Search, '', 'Search company');
     } else {
       Provider.of<CompaniesProvider>(context).getCompanies(
-          _companyNameController.text,
-          _advancedFilter.idCategory,
-          _advancedFilter.idSubCategory,
-          _advancedFilter.idCounty,
-          _advancedFilter.idCity);
+          companyName: _companyNameController.text,
+          idCategory: _advancedFilter.idCategory,
+          idSubcategory: _advancedFilter.idSubCategory,
+          idCounty: _advancedFilter.idCounty,
+          idCity: _advancedFilter.idCity);
       logAction(this.idCompany, false, ActionsEnum.Search, '',
           'Search company advanced filters');
     }
@@ -85,16 +84,16 @@ class _CompanySearchScreenState extends BaseState<CompanySearchScreen> {
   Future<void> _onRefresh(BuildContext ctx) async {
     if (_advancedFilter == null) {
       await Provider.of<CompaniesProvider>(ctx)
-          .getCompanies(_companyNameController.text);
+          .getCompanies(companyName: _companyNameController.text);
       logAction(
           this.idCompany, false, ActionsEnum.Search, '', 'Search company');
     } else {
       Provider.of<CompaniesProvider>(context).getCompanies(
-          _companyNameController.text,
-          _advancedFilter.idCategory,
-          _advancedFilter.idSubCategory,
-          _advancedFilter.idCounty,
-          _advancedFilter.idCity);
+          companyName: _companyNameController.text,
+          idCategory: _advancedFilter.idCategory,
+          idSubcategory: _advancedFilter.idSubCategory,
+          idCounty: _advancedFilter.idCounty,
+          idCity: _advancedFilter.idCity);
       logAction(this.idCompany, false, ActionsEnum.Search, '',
           'Search company advanced filters');
     }
@@ -114,11 +113,11 @@ class _CompanySearchScreenState extends BaseState<CompanySearchScreen> {
           idSubCategory: filter.idSubCategory);
 
     Provider.of<CompaniesProvider>(context).getCompanies(
-        _companyNameController.text,
-        filter.idCategory,
-        filter.idSubCategory,
-        filter.idCounty,
-        filter.idCity);
+        companyName: _companyNameController.text,
+        idCategory: filter.idCategory,
+        idSubcategory: filter.idSubCategory,
+        idCounty: filter.idCounty,
+        idCity: filter.idCity);
     logAction(this.idCompany, false, ActionsEnum.Search, '',
         'Search company advanced filters');
   }
@@ -132,11 +131,18 @@ class _CompanySearchScreenState extends BaseState<CompanySearchScreen> {
     );
   }
 
+  dynamic getCompanyMemoryImage(Company company) {
+    return company.image.length > 0
+        ? MemoryImage(base64Decode(company.image[0].img))
+        : NetworkImage(
+            'https://i.ya-webdesign.com/images/vector-buildings-logo-1.png');
+  }
+
   @override
   Widget build(BuildContext context) {
-    //super.build(context);
-    final companiesProvider = Provider.of<CompaniesProvider>(context);
     print('build search screen');
+
+    final companiesProvider = Provider.of<CompaniesProvider>(context);
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -199,6 +205,7 @@ class _CompanySearchScreenState extends BaseState<CompanySearchScreen> {
                           loginProvider.currentUser != null,
                           companiesProvider
                               .isFavourite(companiesProvider.companies[i].id),
+                          getCompanyMemoryImage(companiesProvider.companies[i]),
                           showPageMessage);
                     }),
               ),

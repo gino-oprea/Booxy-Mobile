@@ -1,9 +1,7 @@
 import 'dart:convert';
 import 'package:booxy/enums/actions-enum.dart';
 import 'package:booxy/providers/companies-provider.dart';
-import 'package:booxy/providers/login-provider.dart';
 import 'package:provider/provider.dart';
-
 import '../base-widgets/base-stateful-widget.dart';
 import '../models/company.dart';
 import '../screens/company-details-screen.dart';
@@ -13,10 +11,11 @@ class CompanyListItem extends BaseStatefulWidget {
   final Company company;
   final bool showFavouritesButton;
   bool isFavourite;
+  dynamic memoryImage;
 
   void Function(String) showPageMessage;
 
-  CompanyListItem(this.company, this.showFavouritesButton, this.isFavourite,
+  CompanyListItem(this.company, this.showFavouritesButton, this.isFavourite, this.memoryImage,
       this.showPageMessage);
 
   @override
@@ -24,14 +23,13 @@ class CompanyListItem extends BaseStatefulWidget {
 }
 
 class _CompanyListItemState extends BaseState<CompanyListItem> {
-  _CompanyListItemState(List<String> labelsKeys) : super(labelsKeys) {    
+  _CompanyListItemState(List<String> labelsKeys) : super(labelsKeys) {
     this.widgetName = 'Company list item';
     this.logViewAction = false;
   }
 
   @override
   void didChangeDependencies() {
-    
     this.idCompany = widget.company.id;
 
     super.didChangeDependencies();
@@ -47,10 +45,11 @@ class _CompanyListItemState extends BaseState<CompanyListItem> {
         },
         leading: CircleAvatar(
           radius: 30.0,
-          backgroundImage: widget.company.image.length > 0
-              ? MemoryImage(base64Decode(widget.company.image[0].img))
-              : NetworkImage(
-                  'https://i.ya-webdesign.com/images/vector-buildings-logo-1.png'),
+          backgroundImage: widget.memoryImage,
+          // widget.company.image.length > 0
+          //     ? MemoryImage(base64Decode(widget.company.image[0].img))
+          //     : NetworkImage(
+          //         'https://i.ya-webdesign.com/images/vector-buildings-logo-1.png'),
           backgroundColor: Colors.transparent,
         ),
         title: Text(widget.company.name),
@@ -72,7 +71,7 @@ class _CompanyListItemState extends BaseState<CompanyListItem> {
                       widget.showPageMessage(gro.error);
                       this.logAction(widget.company.id, true,
                           ActionsEnum.Delete, gro.error, gro.errorDetailed);
-                    } else {                       
+                    } else {
                       setState(() {
                         widget.isFavourite = false;
                       });
@@ -84,7 +83,7 @@ class _CompanyListItemState extends BaseState<CompanyListItem> {
                       widget.showPageMessage(gro.error);
                       this.logAction(widget.company.id, true, ActionsEnum.Add,
                           gro.error, gro.errorDetailed);
-                    } else {                      
+                    } else {
                       setState(() {
                         widget.isFavourite = true;
                       });

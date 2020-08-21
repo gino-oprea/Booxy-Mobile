@@ -1,5 +1,7 @@
 import 'package:booxy/enums/actions-enum.dart';
+import 'package:booxy/providers/companies-provider.dart';
 import 'package:booxy/providers/user-provider.dart';
+import 'package:provider/provider.dart';
 
 import '../base-widgets/base-stateful-widget.dart';
 import '../providers/login-provider.dart';
@@ -61,9 +63,13 @@ class _LoginScreenState extends BaseState<LoginScreen> {
         ),
       );
     else {
-      loginProvider.loginChange();
-      Navigator.of(context).pop();
-      Navigator.of(context).pop();
+      Provider.of<CompaniesProvider>(context, listen: false)
+          .getFavouriteCompaniesIds(withChangeNotify: false)
+          .then((_) {
+        loginProvider.loginChange();
+        Navigator.of(context).pop();
+        Navigator.of(context).pop();
+      });
     }
   }
 
@@ -147,7 +153,7 @@ class _LoginScreenState extends BaseState<LoginScreen> {
                                       .requestFocus(_passwordFocusNode);
                                 },
                                 onSaved: (value) {
-                                  _authData['email'] = value;
+                                  _authData['email'] = value.trim();
                                 },
                               ),
                             ),

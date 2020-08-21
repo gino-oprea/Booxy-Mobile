@@ -7,9 +7,10 @@ import 'package:flutter/material.dart';
 
 class BookingListItem extends BaseStatefulWidget {
   final Booking booking;
+  dynamic memoryImage;
   Future<void> Function() onRefreshBookings;
 
-  BookingListItem(this.booking, this.onRefreshBookings);
+  BookingListItem(this.booking, this.memoryImage, this.onRefreshBookings);
 
   @override
   _BookingListItemState createState() => _BookingListItemState([]);
@@ -32,10 +33,11 @@ class _BookingListItemState extends BaseState<BookingListItem> {
         },
         leading: CircleAvatar(
           radius: 30.0,
-          backgroundImage: widget.booking.image.length > 0
-              ? MemoryImage(base64Decode(widget.booking.image[0].img))
-              : NetworkImage(
-                  'https://i.ya-webdesign.com/images/vector-buildings-logo-1.png'),
+          backgroundImage: widget.memoryImage,
+          // widget.booking.image.length > 0
+          //     ? MemoryImage(base64Decode(widget.booking.image[0].img))
+          //     : NetworkImage(
+          //         'https://i.ya-webdesign.com/images/vector-buildings-logo-1.png'),
           backgroundColor: Colors.transparent,
         ),
         title: Text(widget.booking.companyName),

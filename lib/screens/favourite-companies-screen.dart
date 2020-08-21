@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:booxy/base-widgets/base-stateful-widget.dart';
 import 'package:booxy/enums/actions-enum.dart';
 import 'package:booxy/models/company.dart';
@@ -73,6 +75,13 @@ class _FavouriteCompaniesScreenState
     return favComps;
   }
 
+  dynamic getCompanyMemoryImage(Company company) {
+    return company.image.length > 0
+        ? MemoryImage(base64Decode(company.image[0].img))
+        : NetworkImage(
+            'https://i.ya-webdesign.com/images/vector-buildings-logo-1.png');
+  }
+
   @override
   Widget build(BuildContext context) {
     final companiesProvider = Provider.of<CompaniesProvider>(context);
@@ -97,6 +106,7 @@ class _FavouriteCompaniesScreenState
                           loginProvider.currentUser != null,
                           companiesProvider
                               .isFavourite(this.favouriteCompanies[i].id),
+                          getCompanyMemoryImage(this.favouriteCompanies[i]),
                           showPageMessage);
                     }),
               ),

@@ -1,5 +1,6 @@
 import 'package:booxy/enums/actions-enum.dart';
 import 'package:booxy/screens/change-password-screen.dart';
+import 'package:booxy/screens/company-search-screen.dart';
 import 'package:booxy/screens/favourite-companies-screen.dart';
 import 'package:booxy/screens/register-screen.dart';
 
@@ -108,7 +109,7 @@ class _AppDrawerState extends BaseState<AppDrawer> {
             Divider(),
             ListTile(
               onTap: () {
-                Navigator.of(context).pushReplacementNamed('/');
+                Navigator.of(context).pushReplacementNamed(CompanySearchScreen.routeName);
               },
               leading: Icon(Icons.search),
               title: Text(getCurrentLabelValue('lblSearchCompany')),

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import '../base-widgets/base-stateful-widget.dart';
 import '../providers/booking-provider.dart';
 import '../widgets/booking-list-item.dart';
@@ -56,6 +58,13 @@ class _MyBookingsScreenState extends BaseState<MyBookingsScreen> {
   //   });
   // }
 
+  dynamic getBookingMemoryImage(Booking booking) {
+    return booking.image.length > 0
+        ? MemoryImage(base64Decode(booking.image[0].img))
+        : NetworkImage(
+            'https://i.ya-webdesign.com/images/vector-buildings-logo-1.png');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -73,7 +82,10 @@ class _MyBookingsScreenState extends BaseState<MyBookingsScreen> {
                       child: ListView.builder(
                           itemCount: bookings.length,
                           itemBuilder: (ctx, i) {
-                            return BookingListItem(bookings[i], loadBookings);
+                            return BookingListItem(
+                                bookings[i],
+                                getBookingMemoryImage(bookings[i]),
+                                loadBookings);
                           }))
                   : Center(
                       child: Row(

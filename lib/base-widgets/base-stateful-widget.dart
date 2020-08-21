@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 
 import '../models/log-item.dart';
 import '../models/user.dart';
-import '../providers/culture-provider.dart';
 import '../providers/login-provider.dart';
 import '../providers/label-provider.dart';
 import '../models/label.dart';
@@ -36,11 +35,6 @@ class BaseState<T extends BaseStatefulWidget> extends State<T> {
   BaseState(List<String> labelsKeys) {
     this.widgetLabels = labelsKeys;
     this._getWidgetLabelsFromServer();
-
-    // LoginProvider().currentUserProp.then((result) {
-    //   this.currentUser = result;
-    //   setState(() {});
-    // });
   }
 
   Future<void> _getWidgetLabelsFromServer() async {
@@ -92,21 +86,10 @@ class BaseState<T extends BaseStatefulWidget> extends State<T> {
         return currLabel.ro;
     } else
       return '';
-  }
-
-  // getCurrentCulture() {
-  //   loginProvider.getCurrentCulture().then((cult) {
-  //     //setState(() {
-  //     this.currentCulture = cult;
-  //     this.cultureProvider.changeCulture(this.currentCulture);
-  //     //});
-  //   });
-  // }
+  } 
 
   Future<void> setCurrentCulture(String culture) async {
-    await loginProvider.setCurrentCulture(culture);
-    // cultureProvider.changeCulture(this.currentCulture);
-    //setState(() {});
+    await loginProvider.setCurrentCulture(culture);    
   }
 
   @override
@@ -117,19 +100,9 @@ class BaseState<T extends BaseStatefulWidget> extends State<T> {
 
   @override
   void didChangeDependencies() {
-    this.loginProvider = Provider.of<LoginProvider>(context);
-    // this.cultureProvider = Provider.of<CultureProvider>(context);
+    this.loginProvider = Provider.of<LoginProvider>(context);   
 
-    if (this._isInitBase) {
-      loginProvider.currentUserProp.then((result) {
-        // this.currentUser = result;
-        // setState(() {});
-        loginProvider.getCurrentCulture().then((_) {
-          loginProvider.loginChange();
-        });
-      });
-
-      // this.getCurrentCulture();
+    if (this._isInitBase) {           
       this.logAction(this.idCompany, false, ActionsEnum.View, '', '');
     }
 
