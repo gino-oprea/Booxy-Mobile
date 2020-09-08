@@ -1,3 +1,6 @@
+import 'package:booxy/models/booxy-image.dart';
+import 'package:booxy/providers/booxy-image-provider.dart';
+
 import '../base-widgets/base-stateful-widget.dart';
 
 import '../models/company.dart';
@@ -30,7 +33,6 @@ class _CompanyBookingAdminTabScreenState
   _CompanyBookingAdminTabScreenState(List<String> labelsKeys)
       : super(labelsKeys) {
     this.widgetName = "Company bookings admin";
-    
   }
 
   @override
@@ -52,8 +54,18 @@ class _CompanyBookingAdminTabScreenState
 
   Future<void> loadBookings() async {
     var gro = await BookingProvider().getCompanyBookings(widget.company.id);
+
+    this.bookings = gro.objList as List<Booking>;
+
+    // for (int i = 0; i < this.bookings.length; i++) {
+    //   for (int j = 0; j < this.bookings[i].entities.length; i++) {
+    //     var entImage = await BooxyImageProvider()
+    //         .getEntityImage(this.bookings[i].entities[j].idEntity);
+    //     this.bookings[i].entities[j].images.add(entImage);
+    //   }
+    // }
+
     setState(() {
-      this.bookings = gro.objList as List<Booking>;
       this.todayBookings = this.bookings.where((b) {
         if (b.startDate.day == DateTime.now().day &&
             b.startDate.month == DateTime.now().month &&

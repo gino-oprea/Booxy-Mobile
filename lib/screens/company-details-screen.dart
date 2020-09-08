@@ -533,42 +533,68 @@ class _CompanyDetailsScreenState extends BaseState<CompanyDetailsScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Text(
-                            getCurrentLabelValue('lblAddress') +
-                                ': ' +
-                                _company.address,
-                            textAlign: TextAlign.left,
-                            maxLines: 3,
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: Colors.black,
-                            ),
+                          Row(
+                            children: [
+                              IconButton(
+                                icon: Icon(
+                                  Icons.my_location,
+                                ),
+                                onPressed: () {},
+                              ),
+                              Flexible(
+                                child: Text(
+                                  _company.address,
+                                  textAlign: TextAlign.left,
+                                  maxLines: 3,
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                          SizedBox(
-                            height: 5,
+                          Row(
+                            children: [
+                              IconButton(
+                                icon: Icon(
+                                  Icons.phone,
+                                ),
+                                onPressed: () {},
+                              ),
+                              Flexible(
+                                child: Text(
+                                  _company.phone,
+                                  textAlign: TextAlign.left,
+                                  maxLines: 3,
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                          Text(
-                            getCurrentLabelValue('lblPhone') +
-                                ': ' +
-                                _company.phone,
-                            textAlign: TextAlign.left,
-                            maxLines: 3,
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: Colors.black,
-                            ),
-                          ),
-                          SizedBox(
-                            height: 5,
-                          ),
-                          Text(
-                            'Email: ' + _company.email,
-                            textAlign: TextAlign.left,
-                            maxLines: 3,
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: Colors.black,
-                            ),
+                          Row(
+                            children: [
+                              IconButton(
+                                icon: Icon(
+                                  Icons.email,
+                                ),
+                                onPressed: () {},
+                              ),
+                              Flexible(
+                                child: Text(
+                                  _company.email,
+                                  textAlign: TextAlign.left,
+                                  maxLines: 3,
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),

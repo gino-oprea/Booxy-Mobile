@@ -70,7 +70,7 @@ class _MyBookingDetailsScreenState extends BaseState<MyBookingDetailsScreen> {
       var entity = this.booking.entities[i];
       var image = await BooxyImageProvider().getEntityImage(entity.idEntity);
 
-      var ddl = Row(
+      var ddl = Column(
         children: <Widget>[
           Container(
             width: 100,
@@ -125,10 +125,16 @@ class _MyBookingDetailsScreenState extends BaseState<MyBookingDetailsScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: <Widget>[
-                          Text(
-                            getCurrentLabelValue('lblAddress') + ': ',
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
+                          // Text(
+                          //   getCurrentLabelValue('lblAddress') + ': ',
+                          //   style: TextStyle(
+                          //       fontSize: 18, fontWeight: FontWeight.bold),
+                          // ),
+                          IconButton(
+                            icon: Icon(
+                              Icons.my_location,
+                            ),
+                            onPressed: () {},
                           ),
                           SizedBox(
                             width: 10,
@@ -150,10 +156,16 @@ class _MyBookingDetailsScreenState extends BaseState<MyBookingDetailsScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: <Widget>[
-                          Text(
-                            'Email: ',
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
+                          // Text(
+                          //   'Email: ',
+                          //   style: TextStyle(
+                          //       fontSize: 18, fontWeight: FontWeight.bold),
+                          // ),
+                          IconButton(
+                            icon: Icon(
+                              Icons.email,
+                            ),
+                            onPressed: () {},
                           ),
                           SizedBox(
                             width: 10,
@@ -172,10 +184,16 @@ class _MyBookingDetailsScreenState extends BaseState<MyBookingDetailsScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: <Widget>[
-                          Text(
-                            getCurrentLabelValue('lblPhone') + ': ',
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
+                          // Text(
+                          //   getCurrentLabelValue('lblPhone') + ': ',
+                          //   style: TextStyle(
+                          //       fontSize: 18, fontWeight: FontWeight.bold),
+                          // ),
+                          IconButton(
+                            icon: Icon(
+                              Icons.phone,
+                            ),
+                            onPressed: () {},
                           ),
                           SizedBox(
                             width: 10,
@@ -198,7 +216,8 @@ class _MyBookingDetailsScreenState extends BaseState<MyBookingDetailsScreen> {
               child: Card(
                 child: Padding(
                   padding: const EdgeInsets.all(10),
-                  child: Column(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       if (entitiesTxts != null) ...entitiesTxts,
                     ],

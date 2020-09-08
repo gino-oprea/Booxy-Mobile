@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:booxy/enums/actions-enum.dart';
 
 import '../base-widgets/base-stateful-widget.dart';
@@ -92,8 +93,7 @@ class _CompanyBookingScreenState extends BaseState<CompanyBookingScreen> {
   }
 
   @override
-  void didChangeDependencies() {   
-
+  void didChangeDependencies() {
     if (_isInit) {
       this._company = (ModalRoute.of(context).settings.arguments
               as BookingConfirmationPayload)
@@ -121,14 +121,13 @@ class _CompanyBookingScreenState extends BaseState<CompanyBookingScreen> {
       //       this._phoneController.text = usr.phone;
       //     });
       // });
-      
+
     }
-    
 
-    super.didChangeDependencies();//nu pot sa folosesc loginProvider decat dupa initializarea din baza
+    super
+        .didChangeDependencies(); //nu pot sa folosesc loginProvider decat dupa initializarea din baza
 
-    if(_isInit)
-    {
+    if (_isInit) {
       setState(() {
         if (this.loginProvider.currentUser != null) {
           this._editedBooking.idUser = this.loginProvider.currentUser.id;
@@ -182,7 +181,7 @@ class _CompanyBookingScreenState extends BaseState<CompanyBookingScreen> {
     if (this._autoAssignedEntityCombination != null &&
         this._autoAssignedEntityCombination.entityCombination != null)
       this._autoAssignedEntityCombination.entityCombination.forEach((entity) {
-        var ddl = Row(
+        var ddl = Column(
           children: <Widget>[
             Container(
               width: 100,
@@ -420,7 +419,8 @@ class _CompanyBookingScreenState extends BaseState<CompanyBookingScreen> {
                 child: Card(
                   child: Padding(
                     padding: const EdgeInsets.all(10),
-                    child: Column(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         ...entitiesTxts,
                       ],
@@ -430,48 +430,66 @@ class _CompanyBookingScreenState extends BaseState<CompanyBookingScreen> {
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                child: Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Column(
-                      children: <Widget>[
-                        Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Row(
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Column(
+                        children: <Widget>[
+                          Container(
+                            width: 200,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
                                   children: <Widget>[
-                                    Text(
-                                      getCurrentLabelValue('lblDate') + ': ',
-                                      style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold),
+                                    Row(
+                                      children: <Widget>[
+                                        // Text(
+                                        //   getCurrentLabelValue('lblDate') + ': ',
+                                        //   style: TextStyle(
+                                        //       fontSize: 18,
+                                        //       fontWeight: FontWeight.bold),
+                                        // ),
+                                        IconButton(
+                                          icon: Icon(
+                                            Icons.calendar_today,
+                                          ),
+                                          onPressed: () {},
+                                        ),
+                                        Text(
+                                          DateFormat('dd-MMM-yyyy')
+                                              .format(this._bookingDateTime),
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    Text(
-                                      DateFormat('dd-MMM-yyyy')
-                                          .format(this._bookingDateTime),
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                      ),
-                                    ),
+                                    // Expanded(
+                                    //   child: Container(
+                                    //     alignment: AlignmentDirectional.centerEnd,
+                                    //     child:
+                                    //   ),
+                                    // ),
                                   ],
                                 ),
-                              ),
-                            ),
-                            SizedBox(
-                              width: 15,
-                            ),
-                            Expanded(
-                              child: Container(
-                                alignment: AlignmentDirectional.centerEnd,
-                                child: Row(
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
                                   children: <Widget>[
-                                    Text(
-                                      getCurrentLabelValue('lblPrice') + ': ',
-                                      style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold),
+                                    // Text(
+                                    //   getCurrentLabelValue('lblPrice') + ': ',
+                                    //   style: TextStyle(
+                                    //       fontSize: 18,
+                                    //       fontWeight: FontWeight.bold),
+                                    // ),
+                                    IconButton(
+                                      icon: Icon(
+                                        Icons.monetization_on,
+                                      ),
+                                      onPressed: () {},
                                     ),
                                     Text(
                                       this.getBookingPrice(),
@@ -481,48 +499,46 @@ class _CompanyBookingScreenState extends BaseState<CompanyBookingScreen> {
                                     ),
                                   ],
                                 ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Row(
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
                                   children: <Widget>[
-                                    Text(
-                                      getCurrentLabelValue('lblHour') + ': ',
-                                      style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    Text(
-                                      DateFormat('HH:mm')
-                                              .format(this._bookingDateTime) +
-                                          ' - ' +
-                                          DateFormat('HH:mm').format(this
-                                              ._bookingDateTime
-                                              .add(Duration(
-                                                  milliseconds: this
-                                                      ._autoAssignedEntityCombination
-                                                      .duration))),
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                      ),
+                                    Row(
+                                      children: <Widget>[
+                                        // Text(
+                                        //   getCurrentLabelValue('lblHour') + ': ',
+                                        //   style: TextStyle(
+                                        //       fontSize: 18,
+                                        //       fontWeight: FontWeight.bold),
+                                        // ),
+                                        IconButton(
+                                          icon: Icon(
+                                            Icons.timelapse,
+                                          ),
+                                          onPressed: () {},
+                                        ),
+                                        Text(
+                                          DateFormat('HH:mm').format(
+                                                  this._bookingDateTime) +
+                                              ' - ' +
+                                              DateFormat('HH:mm').format(this
+                                                  ._bookingDateTime
+                                                  .add(Duration(
+                                                      milliseconds: this
+                                                          ._autoAssignedEntityCombination
+                                                          .duration))),
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
-                              ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
