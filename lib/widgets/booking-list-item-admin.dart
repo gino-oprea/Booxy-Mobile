@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import '../base-widgets/base-stateful-widget.dart';
 
 import '../dialogs/booking-status-dialog.dart';
@@ -11,13 +13,12 @@ enum BookingStatus { Active, Honored, Canceled }
 class BookingListItemAdmin extends BaseStatefulWidget {
   final Booking booking;
   Future<void> Function() onReloadBookings;
+  Map<int, dynamic> memoryImages;
 
-  BookingListItemAdmin(this.booking, this.onReloadBookings);
+  BookingListItemAdmin(this.booking, this.memoryImages, this.onReloadBookings);
 
   @override
-  _BookingListItemAdminState createState() => _BookingListItemAdminState([
-
-  ]);
+  _BookingListItemAdminState createState() => _BookingListItemAdminState([]);
 }
 
 class _BookingListItemAdminState extends BaseState<BookingListItemAdmin> {
@@ -35,6 +36,51 @@ class _BookingListItemAdminState extends BaseState<BookingListItemAdmin> {
     );
   }
 
+  List<Widget> generateEntitiesTxts() {
+    List<Widget> wdgs = [];
+
+    for (int i = 0; i < widget.booking.entities.length; i++) {
+      //this.booking.entities.forEach((entity) {
+      var entity = widget.booking.entities[i];
+      var image = widget.memoryImages[entity
+          .idEntity]; //await BooxyImageProvider().getEntityImage(entity.idEntity);
+
+      var ddl = Column(
+        children: <Widget>[
+          Container(
+            width: 100,
+            height: 100,
+            padding: EdgeInsets.all(5),
+            child: FittedBox(
+              child: image,
+              // image != null
+              //     ? Image.memory(base64Decode(image.img))
+              //     : Icon(Icons.extension),
+              fit: BoxFit.cover,
+            ),
+          ),
+          SizedBox(
+            width: 10,
+          ),
+          // Expanded(
+          // child:
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: Text(
+              entity.entityName_RO,
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+          // ),
+        ],
+      );
+
+      wdgs.add(ddl);
+    }
+
+    return wdgs;
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -43,29 +89,38 @@ class _BookingListItemAdminState extends BaseState<BookingListItemAdmin> {
                 context: context,
                 builder: (ctx) => BookingStatusDialog(widget.booking))
             .then((value) {
-          if (value != null) 
-            if (value as String == '')
-              widget.onReloadBookings();
-            else
-              showDialog(
-                  context: context,
-                  builder: (ctx) => AlertDialog(
-                        title: Text('Error'),
-                        content: Text(value),
-                        actions: <Widget>[
-                          FlatButton(
-                            child: Text('Ok'),
-                            onPressed: () {
-                              Navigator.of(ctx).pop(true);
-                            },
-                          )
-                        ],
-                      ));
+          if (value != null) if (value as String == '')
+            widget.onReloadBookings();
+          else
+            showDialog(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                      title: Text('Error'),
+                      content: Text(value),
+                      actions: <Widget>[
+                        FlatButton(
+                          child: Text('Ok'),
+                          onPressed: () {
+                            Navigator.of(ctx).pop(true);
+                          },
+                        )
+                      ],
+                    ));
         });
       },
       child: Card(
         child: Column(
           children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    ...generateEntitiesTxts(),
+                  ],
+                ),
+              ],
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
@@ -127,26 +182,6 @@ class _BookingListItemAdminState extends BaseState<BookingListItemAdmin> {
                       onPressed: () {},
                     ),
                     Text(widget.booking.phone, style: TextStyle(fontSize: 16)),
-                  ],
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    IconButton(
-                      icon: Icon(
-                        Icons.extension,
-                      ),
-                      onPressed: () {},
-                    ),
-                    Text(
-                        widget.booking.entities
-                            .map((e) => e.entityName_RO)
-                            .join(' - '),
-                        style: TextStyle(fontSize: 16)),
                   ],
                 ),
               ],

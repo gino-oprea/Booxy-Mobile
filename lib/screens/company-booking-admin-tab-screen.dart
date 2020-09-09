@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:booxy/models/booxy-image.dart';
 import 'package:booxy/providers/booxy-image-provider.dart';
 
@@ -29,6 +31,7 @@ class _CompanyBookingAdminTabScreenState
   var _isLoading = false;
   List<Booking> bookings = [];
   List<Booking> todayBookings = [];
+  //Map<int, BooxyImage> entityImages = new Map();
 
   _CompanyBookingAdminTabScreenState(List<String> labelsKeys)
       : super(labelsKeys) {
@@ -56,14 +59,16 @@ class _CompanyBookingAdminTabScreenState
     var gro = await BookingProvider().getCompanyBookings(widget.company.id);
 
     this.bookings = gro.objList as List<Booking>;
+    // this.entityImages = new Map<int, BooxyImage>();
 
-    // for (int i = 0; i < this.bookings.length; i++) {
-    //   for (int j = 0; j < this.bookings[i].entities.length; i++) {
-    //     var entImage = await BooxyImageProvider()
-    //         .getEntityImage(this.bookings[i].entities[j].idEntity);
-    //     this.bookings[i].entities[j].images.add(entImage);
-    //   }
-    // }
+    for (int i = 0; i < this.bookings.length; i++) {
+      for (int j = 0; j < this.bookings[i].entities.length; j++) {
+        var entImage = await BooxyImageProvider()
+            .getEntityImage(this.bookings[i].entities[j].idEntity);
+        this.bookings[i].entities[j].images.add(entImage);
+        // this.entityImages[this.bookings[i].entities[j].idEntity] = entImage;
+      }
+    }
 
     setState(() {
       this.todayBookings = this.bookings.where((b) {
@@ -76,6 +81,20 @@ class _CompanyBookingAdminTabScreenState
 
       this._isLoading = false;
     });
+  }
+
+  Map<int, dynamic> getBookingMemoryImage(Booking booking) {
+    Map<int, dynamic> imgs = {};
+    for (int i = 0; i < booking.entities.length; i++) {
+      dynamic img = booking.entities[i].images.length > 0
+          ? Image.memory(base64Decode(booking.entities[i].images[0].img))
+          : Icon(
+              Icons.extension,
+            );
+
+      imgs[booking.entities[i].idEntity] = img;
+    }
+    return imgs;
   }
 
   @override
@@ -93,7 +112,8 @@ class _CompanyBookingAdminTabScreenState
                     child: ListView.builder(
                         itemCount: bks.length,
                         itemBuilder: (ctx, i) {
-                          return BookingListItemAdmin(bks[i], loadBookings);
+                          return BookingListItemAdmin(bks[i],
+                              getBookingMemoryImage(bks[i]), loadBookings);
                         }))
                 : Center(
                     child: Row(
