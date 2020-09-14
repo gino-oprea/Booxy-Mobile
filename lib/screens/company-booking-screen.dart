@@ -109,19 +109,6 @@ class _CompanyBookingScreenState extends BaseState<CompanyBookingScreen> {
       this._bookingDateTime = (ModalRoute.of(context).settings.arguments
               as BookingConfirmationPayload)
           .bookingStartDate;
-
-      // LoginProvider().currentUserProp.then((usr) {
-      //   if (usr != null)
-      //     setState(() {
-      //       this.currentUser = usr;
-      //       this._editedBooking.idUser = usr.id;
-      //       this._firstNameController.text = usr.firstName;
-      //       this._lastNameController.text = usr.lastName;
-      //       this._emailController.text = usr.email;
-      //       this._phoneController.text = usr.phone;
-      //     });
-      // });
-
     }
 
     super
