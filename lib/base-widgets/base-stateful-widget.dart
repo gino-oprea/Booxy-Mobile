@@ -11,6 +11,8 @@ import '../providers/label-provider.dart';
 import '../models/label.dart';
 
 class BaseStatefulWidget extends StatefulWidget {
+  BaseStatefulWidget({Key key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() {
     // TODO: implement createState
@@ -86,10 +88,10 @@ class BaseState<T extends BaseStatefulWidget> extends State<T> {
         return currLabel.ro;
     } else
       return '';
-  } 
+  }
 
   Future<void> setCurrentCulture(String culture) async {
-    await loginProvider.setCurrentCulture(culture);    
+    await loginProvider.setCurrentCulture(culture);
   }
 
   @override
@@ -100,9 +102,9 @@ class BaseState<T extends BaseStatefulWidget> extends State<T> {
 
   @override
   void didChangeDependencies() {
-    this.loginProvider = Provider.of<LoginProvider>(context);   
+    this.loginProvider = Provider.of<LoginProvider>(context);
 
-    if (this._isInitBase) {           
+    if (this._isInitBase) {
       this.logAction(this.idCompany, false, ActionsEnum.View, '', '');
     }
 

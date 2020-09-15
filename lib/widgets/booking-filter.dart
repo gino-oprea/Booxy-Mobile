@@ -16,7 +16,7 @@ import 'package:intl/intl.dart';
 class BookingFilter extends BaseStatefulWidget {
   Company company;
   final GlobalKey<FormState> formKey;
-  bool doResetSelectedTimeslot;
+  final GlobalKey<BookingFilterState> _bookingFilterState;
 
   void Function(
       List<LevelAsFilter> fltLevels,
@@ -24,14 +24,15 @@ class BookingFilter extends BaseStatefulWidget {
       DateTime pkDate,
       Timeslot slTimeslot) setupBookingFilterSelection;
 
-  BookingFilter(this.company, this.formKey, this.setupBookingFilterSelection,
-      this.doResetSelectedTimeslot);
+  BookingFilter(this._bookingFilterState, this.company, this.formKey,
+      this.setupBookingFilterSelection)
+      : super(key: _bookingFilterState);
 
   @override
-  _BookingFilterState createState() => _BookingFilterState([]);
+  BookingFilterState createState() => BookingFilterState([]);
 }
 
-class _BookingFilterState extends BaseState<BookingFilter> {
+class BookingFilterState extends BaseState<BookingFilter> {
   bool _isInit = true;
 
   DateTime _pickedDate = DateTime.now().add(Duration(days: 1));
@@ -47,7 +48,7 @@ class _BookingFilterState extends BaseState<BookingFilter> {
 
   GlobalKey<FormState> _form;
 
-  _BookingFilterState(List<String> labelsKeys) : super(labelsKeys);
+  BookingFilterState(List<String> labelsKeys) : super(labelsKeys);
 
   List<DropdownMenuItem<Entity>> getDdlEntities(LevelAsFilter lvl) {
     List<DropdownMenuItem<Entity>> list = [];
@@ -94,6 +95,11 @@ class _BookingFilterState extends BaseState<BookingFilter> {
     _isInit = false;
 
     super.didChangeDependencies();
+  }
+
+  void resetTimeslots() {
+    this._selectedTimeslot = null;
+    this.initTimeslots();
   }
 
   void addChildEntityIdsToParentEntities(List<EntitiesLink> entityLinks) {
@@ -331,8 +337,8 @@ class _BookingFilterState extends BaseState<BookingFilter> {
       if (selectedEnt.images != null) {
         imageWidget = Image.memory(base64Decode(selectedEnt.images[0].img));
         return Container(
-          width: 100,
-          height: 100,
+          width: 80,
+          height: 80,
           padding: EdgeInsets.all(5),
           child: FittedBox(
             child: imageWidget,
@@ -442,20 +448,37 @@ class _BookingFilterState extends BaseState<BookingFilter> {
   @override
   Widget build(BuildContext context) {
     var entitiesDdls = generateEntitiesDdls();
-    if (widget.doResetSelectedTimeslot) {
-      this._selectedTimeslot = null;
-      widget.doResetSelectedTimeslot = false;
-    }
 
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(10),
         child: Column(
           children: <Widget>[
-            ...entitiesDdls,
-            SizedBox(
-              height: 5,
+            Container(
+              padding: EdgeInsets.all(8),
+              alignment: AlignmentDirectional.bottomEnd,
+              child: RaisedButton.icon(
+                onPressed: () {
+                  _selectedEntities = [];
+                  _selectedTimeslot = null;
+                  this.initFilteredLevels();
+                  this.initFilteredLevelsForApiCall();
+                  this.initTimeslots();
+                },
+                shape: RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(18.0)),
+                icon: Icon(Icons.refresh),
+                label: Text('Reset'),
+                elevation: 1,
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                color: Theme.of(context).accentColor,
+                textColor: Colors.white,
+              ),
             ),
+            ...entitiesDdls,
+            // SizedBox(
+            //   height: 20,
+            // ),
             Row(
               children: <Widget>[
                 Center(
@@ -482,35 +505,35 @@ class _BookingFilterState extends BaseState<BookingFilter> {
                     ),
                   ),
                 ),
-                SizedBox(
-                  width: 10,
-                ),
-                Container(
-                  padding: EdgeInsets.all(8),
-                  alignment: AlignmentDirectional.bottomStart,
-                  child: RaisedButton.icon(
-                    onPressed: () {
-                      _selectedEntities = [];
-                      _selectedTimeslot = null;
-                      this.initFilteredLevels();
-                      this.initFilteredLevelsForApiCall();
-                      this.initTimeslots();
-                    },
-                    shape: RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(18.0)),
-                    icon: Icon(Icons.refresh),
-                    label: Text('Reset'),
-                    elevation: 1,
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    color: Theme.of(context).accentColor,
-                    textColor: Colors.white,
-                  ),
-                ),
+                // SizedBox(
+                //   width: 10,
+                // ),
+                // Container(
+                //   padding: EdgeInsets.all(8),
+                //   alignment: AlignmentDirectional.bottomStart,
+                //   child: RaisedButton.icon(
+                //     onPressed: () {
+                //       _selectedEntities = [];
+                //       _selectedTimeslot = null;
+                //       this.initFilteredLevels();
+                //       this.initFilteredLevelsForApiCall();
+                //       this.initTimeslots();
+                //     },
+                //     shape: RoundedRectangleBorder(
+                //         borderRadius: new BorderRadius.circular(18.0)),
+                //     icon: Icon(Icons.refresh),
+                //     label: Text('Reset'),
+                //     elevation: 1,
+                //     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                //     color: Theme.of(context).accentColor,
+                //     textColor: Colors.white,
+                //   ),
+                // ),
               ],
             ),
-            SizedBox(
-              height: 5,
-            ),
+            // SizedBox(
+            //   height: 5,
+            // ),
             Form(
               key: _form,
               child: Row(
@@ -557,6 +580,7 @@ class _BookingFilterState extends BaseState<BookingFilter> {
                 ],
               ),
             ),
+            
           ],
         ),
       ),
