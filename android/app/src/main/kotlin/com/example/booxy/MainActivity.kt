@@ -1,4 +1,4 @@
-package com.example.booxy
+package ro.booxy.booxyapp
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity
