@@ -11,7 +11,7 @@
         android:label="Booxy"
         android:icon="@mipmap/ic_launcher">
         <meta-data android:name="com.google.android.geo.API_KEY"
-               android:value="AIzaSyDFLdIgq-_1psrTQEWY_c0ZGSkhGzvvMbs"/>
+               android:value="AIzaSyC8w59rnBMxP6yWIKKOMpEFOdlAbKh5_Y8"/>
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
