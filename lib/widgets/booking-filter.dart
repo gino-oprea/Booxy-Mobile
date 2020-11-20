@@ -80,7 +80,9 @@ class BookingFilterState extends BaseState<BookingFilter> {
       ]).then((results) {
         this._levels = results[0];
 
-        addChildEntityIdsToParentEntities(results[1]);
+        if (results.length > 1 && results[1]!=null) 
+          addChildEntityIdsToParentEntities(results[1]);
+
         List<Entity> firstLevelEntities =
             this._levels.firstWhere((l) => l.orderIndex == 1).entities;
         List<Entity> currentCombination = [];
@@ -580,7 +582,6 @@ class BookingFilterState extends BaseState<BookingFilter> {
                 ],
               ),
             ),
-            
           ],
         ),
       ),
