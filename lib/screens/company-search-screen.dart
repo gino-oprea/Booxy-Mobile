@@ -21,8 +21,8 @@ class CompanySearchScreen extends BaseStatefulWidget {
   static const routeName = '/company-search';
 
   @override
-  _CompanySearchScreenState createState() =>
-      _CompanySearchScreenState(['lblSearchCompany']);
+  _CompanySearchScreenState createState() => _CompanySearchScreenState(
+      ['lblSearchCompany', 'lblNoCompaniesPleaseCreate']);
 }
 
 class _CompanySearchScreenState extends BaseState<CompanySearchScreen> {
@@ -196,19 +196,38 @@ class _CompanySearchScreenState extends BaseState<CompanySearchScreen> {
             )
           : RefreshIndicator(
               onRefresh: () => _onRefresh(context),
-              child: Container(
-                child: ListView.builder(
-                    itemCount: companiesProvider.companies.length,
-                    itemBuilder: (ctx, i) {
-                      return CompanyListItem(
-                          companiesProvider.companies[i],
-                          loginProvider.currentUser != null,
-                          companiesProvider
-                              .isFavourite(companiesProvider.companies[i].id),
-                          getCompanyMemoryImage(companiesProvider.companies[i]),
-                          showPageMessage);
-                    }),
-              ),
+              child: companiesProvider.companies.length > 0
+                  ? Container(
+                      child: ListView.builder(
+                          itemCount: companiesProvider.companies.length,
+                          itemBuilder: (ctx, i) {
+                            return CompanyListItem(
+                                companiesProvider.companies[i],
+                                loginProvider.currentUser != null,
+                                companiesProvider.isFavourite(
+                                    companiesProvider.companies[i].id),
+                                getCompanyMemoryImage(
+                                    companiesProvider.companies[i]),
+                                showPageMessage);
+                          }),
+                    )
+                  : Center(
+                      child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,                                          
+                      children: <Widget>[                        
+                        Flexible(                          
+                          child: Container(
+                            padding: EdgeInsets.only(left: 20),
+                            child: Text(getCurrentLabelValue(
+                                'lblNoCompaniesPleaseCreate')),
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.refresh),
+                          onPressed: ()=>_onRefresh(context),
+                        ),
+                      ],
+                    )),
             ),
     );
   }

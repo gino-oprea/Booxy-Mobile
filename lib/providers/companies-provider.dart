@@ -61,27 +61,28 @@ class CompaniesProvider with ChangeNotifier {
     final url = BooxyConfig.api_endpoint + 'CompanyBack/GetFavouriteCompanies';
     var token = await LoginProvider().token;
 
-    final response = await http.get(url, headers: {
-      HttpHeaders.authorizationHeader: "Bearer " + token.access_token
-    });
+    if (token != null) {
+      final response = await http.get(url, headers: {
+        HttpHeaders.authorizationHeader: "Bearer " + token.access_token
+      });
 
-    final List<int> favCompIds = [];
-    final extractedData = json.decode(response.body) as Map<String, dynamic>;
-    //print(extractedData);
-    if (extractedData == null) {
-      return;
+      final List<int> favCompIds = [];
+      final extractedData = json.decode(response.body) as Map<String, dynamic>;
+      //print(extractedData);
+      if (extractedData == null) {
+        return;
+      }
+
+      final List<dynamic> objList = extractedData["objList"];
+
+      for (int i = 0; i < objList.length; i++) {
+        var idComp = objList[i];
+
+        favCompIds.add(idComp);
+      }
+
+      favouritesIds = favCompIds;
     }
-
-    final List<dynamic> objList = extractedData["objList"];
-
-    for (int i = 0; i < objList.length; i++) {
-      var idComp = objList[i];
-
-      favCompIds.add(idComp);
-    }
-
-    favouritesIds = favCompIds;
-
     if (withChangeNotify) notifyListeners();
   }
 
